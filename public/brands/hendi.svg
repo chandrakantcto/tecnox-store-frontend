@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none" role="img" aria-labelledby="hendi-title">
+  <title id="hendi-title">Hendi</title>
+  <!-- Stylized wordmark; neutral tones match section hover states -->
+  <text
+    x="100"
+    y="33"
+    text-anchor="middle"
+    font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif"
+    font-size="26"
+    font-weight="800"
+    letter-spacing="0.14em"
+    fill="#454545"
+  >
+    HENDI
+  </text>
+</svg>

@@ -1,0 +1,13 @@
+---
+description: Next.js App Router patterns for this TECNOX storefront
+globs: "**/*.{tsx,ts}"
+alwaysApply: false
+---
+
+# Next.js conventions (TECNOX)
+
+- Use **`next/link`** with **`href`**, not TanStack `Link` / `to`.
+- Prefer **`next/image`** for photos; product images may use `string | StaticImageData` from `@/lib/products` — use **`staticSrc()`** from `@/lib/static-asset`** when a plain `<img src>` needs a string.
+- Mark interactive / hook-using components with **`"use client"`** at the top.
+- Cart persistence key: **`tecnox.cart.v1`** (see `CartContext`).
+- Product URLs: **`/produkter/[slug]`** — no nested `$slug` route params.
