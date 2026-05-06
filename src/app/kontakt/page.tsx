@@ -23,26 +23,20 @@ export const metadata: Metadata = {
 
 const OFFICES = [
   {
-    cityNb: "Oslo",
-    cityEn: "Oslo",
+    cityNb: "Moss",
+    cityEn: "Moss",
     address: "Adresseveien 1, 0150 Oslo",
     phone: "922 22 800",
     email: "post@tecnox.no",
   },
   {
-    cityNb: "Bergen",
-    cityEn: "Bergen",
+    cityNb: "Oslo",
+    cityEn: "Oslo",
     address: "Strandgaten 14, 5013 Bergen",
     phone: "922 22 810",
     email: "post@tecnox.no",
   },
-  {
-    cityNb: "Trondheim",
-    cityEn: "Trondheim",
-    address: "Olav Tryggvasons gate 8, 7011 Trondheim",
-    phone: "922 22 820",
-    email: "post@tecnox.no",
-  },
+ 
 ];
 
 export default async function KontaktPage() {
@@ -142,15 +136,16 @@ export default async function KontaktPage() {
                 {tr(locale, "Kontorer", "Offices")}
               </span>
               <h2 className="display-h3 mt-5 text-[var(--color-ink)]">
-                {tr(locale, "Tre byer. Hele landet dekket.", "Three cities. Nationwide coverage.")}
+                {tr(locale, "Vi leverer varer over  hele landet  og  har en stor lagerbeholdning for rask levering.",
+                   "We deliver goods all over the country, with a large stock that ensures fast deliveries.")}
               </h2>
             </div>
           </Reveal>
 
-          <div className="grid md:grid-cols-3 gap-px bg-[var(--color-divider)] border border-[var(--color-divider)]">
+          <div className="grid md:grid-cols-2 max-w-5xl  gap-px bg-[var(--color-divider)] border border-[var(--color-divider)]">
             {OFFICES.map((o, i) => (
               <Reveal key={o.cityNb} delay={i * 0.1}>
-                <div className="bg-white p-8 h-full">
+                <div className="bg-white p-8 h-full pl-10">
                   <p className="text-[12px] font-mono text-[var(--color-copper)] tracking-[0.18em]">
                     /{String(i + 1).padStart(2, "0")}
                   </p>
