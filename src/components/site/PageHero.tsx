@@ -25,7 +25,7 @@ export function PageHero({ label, title, description, crumbs, bgImage }: PageHer
       {bgImage && (
         <div
           aria-hidden="true"
-          className="absolute inset-y-0 right-0 w-1/2 hidden md:block pointer-events-none"
+          className="absolute inset-y-0 right-0 w-1/2 md:block pointer-events-none"
         >
           <div className="relative h-full w-full">
             <Image

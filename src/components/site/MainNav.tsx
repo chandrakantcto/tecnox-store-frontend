@@ -141,14 +141,14 @@ export function MainNav() {
 
           {megaOpen && (
             <div
-              className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-1 animate-fade-in"
+              className="absolute left-1/2 top-full z-70 -translate-x-1/2 pt-8  animate-fade-in"
               onMouseEnter={() => {
                 cancelMegaCloseTimer();
                 setMegaOpen(true);
               }}
               onMouseLeave={scheduleMegaClose}
             >
-              <div className="w-[min(100vw-48px,1040px)] shrink-0 border border-[var(--color-divider)] rounded-[3px] overflow-hidden bg-white shadow-[0_24px_40px_-20px_oklch(0.18_0.005_60/0.18)]">
+              <div className="w-[min(100vw-48px,1200px)] p-7 shrink-0 border border-[var(--color-divider)] rounded-[3px] overflow-hidden bg-white shadow-[0_24px_40px_-20px_oklch(0.18_0.005_60/0.18)]">
                 <div className="grid min-h-[min(320px,50vh)] grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)] gap-0">
                   {/* Kolonne 1 — hovedkategorier */}
                   <div className="border-r border-[var(--color-divider)] bg-[var(--color-stone)]/40">
@@ -176,7 +176,7 @@ export function MainNav() {
                   </div>
 
                   {/* Kolonne 2 — underkategorier */}
-                  <div className="border-r border-[var(--color-divider)] bg-white">
+                  <div className="border-r border-[var(--color-divider)] bg-white pl-5">
                     <ul className="py-2 max-h-[min(320px,50vh)] overflow-y-auto overscroll-contain">
                       {activeMain?.subs.map((sub) => (
                         <li key={sub.id}>
