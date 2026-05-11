@@ -138,7 +138,7 @@ export function Products({ withCategorySidebar = false, locale = "nb" }: Product
                         {p.spec}
                       </p>
                       <div className="mt-auto pt-4 flex items-end justify-between gap-2 border-t border-[var(--color-divider)]">
-                        <div>
+                        <div className="hidden md:block">
                           <p className="text-[10px] text-[var(--color-muted)] uppercase tracking-[0.12em]">
                             {tr(locale, "Fra", "From")}
                           </p>
