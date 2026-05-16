@@ -1,5 +1,21 @@
 "use client";
 
+import type { CartProductSnapshot } from "@/lib/catalog/storefront-product";
+import {
+  cartLinesFromActiveOrder,
+  orderSubtotalExTaxKr,
+  orderTotalQuantity,
+  type VendureCartLine,
+} from "@/lib/vendure/cart-from-active-order";
+import { errorMessageFromShopResult, shopGraphql } from "@/lib/vendure/shop-client-browser";
+import { runCartMutationWithAddingItemsRecovery } from "@/lib/vendure/cart-mutation-recovery";
+import {
+  GQL_ACTIVE_ORDER,
+  GQL_ADD_ITEM_TO_ORDER,
+  GQL_ADJUST_ORDER_LINE,
+  GQL_REMOVE_ORDER_LINE,
+  GQL_REMOVE_ALL_ORDER_LINES,
+} from "@/lib/vendure/shop-order-documents";
 import {
   createContext,
   useCallback,
@@ -9,113 +25,293 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { PRODUCTS, type Product } from "@/lib/products";
 
-export type CartItem = {
-  slug: string;
-  qty: number;
-};
+export type { VendureCartLine };
+
+export function formatNOK(n: number): string {
+  return new Intl.NumberFormat("nb-NO").format(n);
+}
+
+type ActiveOrderQueryResult = { activeOrder: unknown };
+
+type CartActionResult = { ok: true } | { ok: false; message: string };
 
 type CartContextValue = {
-  items: CartItem[];
+  locale: string;
+  /** Order lines from `activeOrder`; empty when no draft cart in Vendure. */
+  lines: VendureCartLine[];
   itemCount: number;
   subtotal: number;
-  addItem: (slug: string, qty?: number) => void;
-  removeItem: (slug: string) => void;
-  updateQty: (slug: string, qty: number) => void;
-  clear: () => void;
-  detailedItems: { product: Product; qty: number; lineTotal: number }[];
+  /** True until the first `activeOrder` fetch after mount. */
+  loading: boolean;
+  /** True while mutating cart (add / adjust / remove). */
+  syncing: boolean;
+  /** Last load or refresh error (e.g. API not configured). */
+  bootstrapError: string | null;
+  /** Last cart mutation error (toast-style). */
+  lastActionError: string | null;
+  clearLastActionError: () => void;
+  /** Clears cached lines immediately (e.g. after checkout); followed by refresh to sync server. */
+  clearCartOptimistic: () => void;
+  refresh: () => Promise<void>;
+  addItemFromSnapshot: (snapshot: CartProductSnapshot | null | undefined, qty?: number) => Promise<CartActionResult>;
+  updateLineQuantity: (orderLineId: string, qty: number) => Promise<CartActionResult>;
+  removeLine: (orderLineId: string) => Promise<CartActionResult>;
+  emptyCart: () => Promise<CartActionResult>;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "tecnox.cart.v1";
+function readMutationError(payload: Record<string, unknown> | null | undefined): string | null {
+  if (!payload) return "Ugyldig svar fra butikk-API.";
+  const tn = typeof payload.__typename === "string" ? payload.__typename : "";
+  if (tn === "Order") return null;
+  const msg = typeof payload.message === "string" ? payload.message.trim() : "";
+  if (msg) return msg;
+  if (typeof payload.errorCode === "string" && payload.errorCode.trim()) return payload.errorCode.trim();
+  return tn ? `Kunne ikke oppdatere handlekurven (${tn}).` : "Kunne ikke oppdatere handlekurven.";
+}
 
-export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+function pickMutationPayload(data: unknown, key: string): Record<string, unknown> | null {
+  if (!data || typeof data !== "object") return null;
+  const v = (data as Record<string, unknown>)[key];
+  if (!v || typeof v !== "object") return null;
+  return v as Record<string, unknown>;
+}
+
+export function CartProvider({
+  children,
+  locale = "nb",
+}: {
+  children: ReactNode;
+  locale?: string;
+}) {
+  const [order, setOrder] = useState<unknown>(null);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [bootstrapError, setBootstrapError] = useState<string | null>(null);
+  const [lastActionError, setLastActionError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw) as CartItem[]);
-    } catch {
-      /* ignore */
+  const lines = useMemo(() => cartLinesFromActiveOrder(order), [order]);
+  const itemCount = useMemo(() => orderTotalQuantity(order), [order]);
+  const subtotal = useMemo(() => orderSubtotalExTaxKr(order), [order]);
+
+  const refresh = useCallback(async () => {
+    const res = await shopGraphql<ActiveOrderQueryResult>(GQL_ACTIVE_ORDER, undefined, locale);
+    const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
+    if (outer) {
+      setBootstrapError(outer);
+      setOrder(null);
+      return;
     }
+    setBootstrapError(null);
+    setOrder(res.data?.activeOrder ?? null);
+  }, [locale]);
+
+  useEffect(() => {
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      /* ignore */
-    }
-  }, [items, hydrated]);
+    let cancelled = false;
+    setLoading(true);
+    void (async () => {
+      await refresh();
+      if (!cancelled) setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, refresh]);
 
-  const addItem = useCallback((slug: string, qty = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.slug === slug);
-      if (existing) {
-        return prev.map((i) => (i.slug === slug ? { ...i, qty: i.qty + qty } : i));
+  const clearLastActionError = useCallback(() => setLastActionError(null), []);
+  const clearCartOptimistic = useCallback(() => {
+    setOrder(null);
+    setBootstrapError(null);
+  }, []);
+
+  const addItemFromSnapshot = useCallback(
+    async (snapshot: CartProductSnapshot | null | undefined, qty = 1): Promise<CartActionResult> => {
+      if (!snapshot?.variantId?.trim()) {
+        const msg =
+          "Fant ikke produktvariant. Oppdater produktsiden eller velg en gyldig konfigurasjon før du legger i kurv.";
+        setLastActionError(msg);
+        return { ok: false, message: msg };
       }
-      return [...prev, { slug, qty }];
-    });
-  }, []);
-
-  const removeItem = useCallback((slug: string) => {
-    setItems((prev) => prev.filter((i) => i.slug !== slug));
-  }, []);
-
-  const updateQty = useCallback((slug: string, qty: number) => {
-    if (qty <= 0) {
-      setItems((prev) => prev.filter((i) => i.slug !== slug));
-      return;
-    }
-    setItems((prev) => prev.map((i) => (i.slug === slug ? { ...i, qty } : i)));
-  }, []);
-
-  const clear = useCallback(() => setItems([]), []);
-
-  const detailedItems = useMemo(
-    () =>
-      items
-        .map((i) => {
-          const product = PRODUCTS.find((p) => p.slug === i.slug);
-          if (!product) return null;
-          return { product, qty: i.qty, lineTotal: product.priceNumeric * i.qty };
-        })
-        .filter((x): x is { product: Product; qty: number; lineTotal: number } => x !== null),
-    [items],
+      const productVariantId = snapshot.variantId.trim();
+      if (qty < 1) return { ok: true };
+      setSyncing(true);
+      setLastActionError(null);
+      const res = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+        const r = await shopGraphql<{ addItemToOrder: unknown }>(
+          GQL_ADD_ITEM_TO_ORDER,
+          { productVariantId, quantity: qty },
+          locale,
+        );
+        return {
+          networkError: r.networkError,
+          graphqlErrors: r.graphqlErrors,
+          payload: pickMutationPayload(r.data, "addItemToOrder"),
+        };
+      });
+      setSyncing(false);
+      const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
+      if (outer) {
+        setLastActionError(outer);
+        return { ok: false, message: outer };
+      }
+      const payload = res.payload;
+      const err = readMutationError(payload);
+      if (err) {
+        setLastActionError(err);
+        return { ok: false, message: err };
+      }
+      await refresh();
+      return { ok: true };
+    },
+    [locale, refresh],
   );
 
-  const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.qty, 0), [items]);
-  const subtotal = useMemo(() => detailedItems.reduce((sum, i) => sum + i.lineTotal, 0), [detailedItems]);
+  const updateLineQuantity = useCallback(
+    async (orderLineId: string, qty: number): Promise<CartActionResult> => {
+      if (!orderLineId.trim()) return { ok: false, message: "Mangler linje-ID." };
+      setSyncing(true);
+      setLastActionError(null);
+      if (qty <= 0) {
+        const res = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+          const r = await shopGraphql<{ removeOrderLine: unknown }>(
+            GQL_REMOVE_ORDER_LINE,
+            { orderLineId },
+            locale,
+          );
+          return {
+            networkError: r.networkError,
+            graphqlErrors: r.graphqlErrors,
+            payload: pickMutationPayload(r.data, "removeOrderLine"),
+          };
+        });
+        setSyncing(false);
+        const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
+        if (outer) {
+          setLastActionError(outer);
+          return { ok: false, message: outer };
+        }
+        const payload = res.payload;
+        const err = readMutationError(payload);
+        if (err) {
+          setLastActionError(err);
+          return { ok: false, message: err };
+        }
+        await refresh();
+        return { ok: true };
+      }
 
-  const value = useMemo(
+      const adjRes = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+        const r = await shopGraphql<{ adjustOrderLine: unknown }>(
+          GQL_ADJUST_ORDER_LINE,
+          { orderLineId, quantity: qty },
+          locale,
+        );
+        return {
+          networkError: r.networkError,
+          graphqlErrors: r.graphqlErrors,
+          payload: pickMutationPayload(r.data, "adjustOrderLine"),
+        };
+      });
+      setSyncing(false);
+      const outerAdj = errorMessageFromShopResult(adjRes.networkError, adjRes.graphqlErrors);
+      if (outerAdj) {
+        setLastActionError(outerAdj);
+        return { ok: false, message: outerAdj };
+      }
+      const payloadAdj = adjRes.payload;
+      const errAdj = readMutationError(payloadAdj);
+      if (errAdj) {
+        setLastActionError(errAdj);
+        return { ok: false, message: errAdj };
+      }
+      await refresh();
+      return { ok: true };
+    },
+    [locale, refresh],
+  );
+
+  const removeLine = useCallback(
+    async (orderLineId: string) => updateLineQuantity(orderLineId, 0),
+    [updateLineQuantity],
+  );
+
+  const emptyCart = useCallback(async (): Promise<CartActionResult> => {
+    setSyncing(true);
+    setLastActionError(null);
+    const res = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+      const r = await shopGraphql<{ removeAllOrderLines: unknown }>(GQL_REMOVE_ALL_ORDER_LINES, undefined, locale);
+      return {
+        networkError: r.networkError,
+        graphqlErrors: r.graphqlErrors,
+        payload: pickMutationPayload(r.data, "removeAllOrderLines"),
+      };
+    });
+    setSyncing(false);
+    const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
+    if (outer) {
+      setLastActionError(outer);
+      return { ok: false, message: outer };
+    }
+    const payload = res.payload;
+    const err = readMutationError(payload);
+    if (err) {
+      setLastActionError(err);
+      return { ok: false, message: err };
+    }
+    await refresh();
+    return { ok: true };
+  }, [locale, refresh]);
+
+  const value = useMemo<CartContextValue>(
     () => ({
-      items,
+      locale,
+      lines,
       itemCount,
       subtotal,
-      addItem,
-      removeItem,
-      updateQty,
-      clear,
-      detailedItems,
+      loading,
+      syncing,
+      bootstrapError,
+      lastActionError,
+      clearLastActionError,
+      clearCartOptimistic,
+      refresh,
+      addItemFromSnapshot,
+      updateLineQuantity,
+      removeLine,
+      emptyCart,
     }),
-    [items, itemCount, subtotal, addItem, removeItem, updateQty, clear, detailedItems],
+    [
+      locale,
+      lines,
+      itemCount,
+      subtotal,
+      loading,
+      syncing,
+      bootstrapError,
+      lastActionError,
+      clearLastActionError,
+      clearCartOptimistic,
+      refresh,
+      addItemFromSnapshot,
+      updateLineQuantity,
+      removeLine,
+      emptyCart,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-export function useCart() {
+export function useCart(): CartContextValue {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart must be used within CartProvider");
   return ctx;
-}
-
-export function formatNOK(n: number): string {
-  return new Intl.NumberFormat("nb-NO").format(n);
 }

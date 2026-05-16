@@ -1,0 +1,295 @@
+[
+  {
+    "slug": "kombidamper-icombi-pro-10-1-1",
+    "skuBase": "TECNOX-RATI-ICOMBI1011",
+    "brand": "Rational",
+    "filterCategoryNb": "Kombidamp",
+    "suggestedLeafCollectionIds": ["kom-r-pro", "kom-rational"],
+    "priceMinorOreExVat": 18490000,
+    "currency": "NOK",
+    "badge": "BESTSELGER",
+    "featuredAssetFile": "prod-combi.jpg",
+    "nameNb": "Kombidamper iCombi Pro 10-1/1",
+    "nameEn": "Combi Oven iCombi Pro 10-1/1",
+    "descriptionNb": "Markedets mest intelligente kombidamper. Kjenner igjen produktet, justerer kokemiljøet og leverer perfekt resultat — gang etter gang. Bygget for europeisk profesjonell drift."
+  },
+  {
+    "slug": "underbenkskjoler-gn-2-1",
+    "skuBase": "TECNOX-GRAM-UBGN21",
+    "brand": "Gram Commercial",
+    "filterCategoryNb": "Kjøling",
+    "suggestedLeafCollectionIds": ["kjol-sk-u"],
+    "priceMinorOreExVat": 2890000,
+    "currency": "NOK",
+    "featuredAssetFile": "prod-underbenk.jpg",
+    "nameNb": "Underbenkskjøler GN 2/1",
+    "nameEn": "Undercounter Refrigerator GN 2/1",
+    "descriptionNb": "Robust dansk konstruksjon i rustfritt stål, dimensjonert for daglig bruk i krevende miljø. Stille drift og klassens laveste energiforbruk."
+  },
+  {
+    "slug": "hetteoppvasker-ae-50",
+    "skuBase": "TECNOX-ELEC-AE50",
+    "brand": "Electrolux Professional",
+    "filterCategoryNb": "Oppvask",
+    "suggestedLeafCollectionIds": ["opp-kupp", "opp-ku-konv"],
+    "priceMinorOreExVat": 6450000,
+    "currency": "NOK",
+    "badge": "NYHET",
+    "featuredAssetFile": "prod-hetteoppvask.jpg",
+    "nameNb": "Hetteoppvasker AE-50",
+    "nameEn": "Hood Dishwasher AE-50",
+    "descriptionNb": "Hettemaskinen som fjerner flaskehalsen i oppvaskstasjonen. Smart vannstyring og innebygd avløpspumpe gir konsistent vaskeresultat ved høy belastning."
+  },
+  {
+    "slug": "pizzaovn-modular-pyralis-9",
+    "skuBase": "TECNOX-MODU-PYR9",
+    "brand": "Modular",
+    "filterCategoryNb": "Pizza",
+    "suggestedLeafCollectionIds": ["pz-ov-elek", "pz-ovn"],
+    "priceMinorOreExVat": 9240000,
+    "currency": "NOK",
+    "featuredAssetFile": "prod-pizzaovn.jpg",
+    "nameNb": "Pizzaovn Modular Pyralis 9",
+    "nameEn": "Pizza Oven Modular Pyralis 9",
+    "descriptionNb": "Italiensk håndverk for autentisk napoletansk pizza. Cordieritsten og separat sone-styring gir nøyaktig kontroll på over- og undervarme."
+  },
+  {
+    "slug": "induksjonstopp-4-soner",
+    "skuBase": "TECNOX-ELEC-IND4",
+    "brand": "Electrolux Professional",
+    "filterCategoryNb": "Kok og stek",
+    "suggestedLeafCollectionIds": ["kok-ind-4", "kok-induksjon"],
+    "priceMinorOreExVat": 4780000,
+    "currency": "NOK",
+    "featuredAssetFile": "prod-induksjon.jpg",
+    "nameNb": "Induksjonstopp 4-soner",
+    "nameEn": "Induction Hob 4 Zones",
+    "descriptionNb": "Profesjonell induksjon med ekstrem responstid og 90 % virkningsgrad. Lukket glassflate gir hurtig rengjøring og redusert kjøkkentemperatur."
+  },
+  {
+    "slug": "frittstaende-fryseskap",
+    "skuBase": "TECNOX-GRAM-FRZ610",
+    "brand": "Gram Commercial",
+    "filterCategoryNb": "Kjøling",
+    "suggestedLeafCollectionIds": ["kjol-frys", "kjol-fr-lade"],
+    "priceMinorOreExVat": 3420000,
+    "currency": "NOK",
+    "featuredAssetFile": "prod-fryseskap.jpg",
+    "nameNb": "Frittstående fryseskap",
+    "nameEn": "Free-standing Freezer Cabinet",
+    "descriptionNb": "Stort fryseskap med klassens laveste energiforbruk og solid konstruksjon for hardbruk. Naturlig kuldemedium og fremtidssikker styring."
+  },
+  {
+    "slug": "konvektomat-convovent-mini",
+    "skuBase": "TECNOX-CONV-MINI611",
+    "brand": "Convotherm",
+    "filterCategoryNb": "Kombidamp",
+    "suggestedLeafCollectionIds": ["kok-konv-6", "kok-konvek"],
+    "priceMinorOreExVat": 7860000,
+    "currency": "NOK",
+    "badge": "BESTSELGER",
+    "featuredAssetFile": "prod-konvektomat.jpg",
+    "nameNb": "Konvektomat ConvoVent Mini",
+    "nameEn": "Convection Oven ConvoVent Mini",
+    "descriptionNb": "Kompakt tysk kvalitet for caféer, bakerier og mindre kjøkken. Direkte dampgenerator og enkel touchstyring — uten kompromiss på resultat."
+  },
+  {
+    "slug": "demo-arbeidsbord-prof-lengder",
+    "brand": "Tecnox",
+    "filterCategoryNb": "Kok og stek",
+    "suggestedLeafCollectionIds": ["kok-st-grill", "kok-steke"],
+    "featuredAssetFile": "prod-stekebord.jpg",
+    "nameNb": "Profesjonelt arbeidsbord — modulerbar lengde",
+    "nameEn": "Professional work table — modular lengths",
+    "descriptionNb": "Demonstrasjonsprodukt med tre varianter (lengder) på samme produktside. Velg ønsket modul på produktkortet. Rustfritt toppplate og industriunderstell — monterbar med justerbare ben.",
+    "storefrontReviewsJson": "[{\"author\":\"Kari Lunde\",\"rating\":5,\"title\":\"Klart til drift\",\"body\":\"Bestilte 150 cm-varianten til vårt storkjøkken. Stabil konstruksjon og enkel hygienisk overflate. God oppfølging fra Tecnox.\",\"dateIso\":\"2025-10-18\"},{\"author\":\"Mohamed A.\",\"rating\":4,\"title\":\"Solid arbeidsflate\",\"body\":\"180 cm passer perfekt mellom kjølebord og kokeøy. Ønsket meg hurtigkoplinger for vegg — ellers fem stjerner.\",\"dateIso\":\"2025-11-02\"},{\"author\":\"Restaurant Bryggen\",\"rating\":5,\"title\":\"Ink. montering\",\"body\":\"Vi tok 120 cm-varianten på et trangt kjøkkenspor. Montering gjort samme uke og alt stemte mot tegning.\",\"dateIso\":\"2026-01-08\"}]",
+    "storefrontServiceBulletsJson": "{\"nb\":[\"Levering over hele landet på avtalt dato\",\"Teknisk opplæring og serviceavtaler\",\"Garantiprogram på kommersielle installasjoner\"],\"en\":[\"Nationwide delivery on agreed schedule\",\"Technical training & service programmes\",\"Commercial installation warranty\"]}"
+    ,
+    "storefrontQuoteBulletsJson": "{\"nb\":[\"Direktelinje til kjøkkentekniker\",\"Rabatter for restauranter og kjeder\",\"Levering, montering og CE-dokumentasjon ved behov\"],\"en\":[\"Direct line to a kitchen specialist\",\"Chain & restaurant volume pricing\",\"Delivery, installation, and CE paperwork on request\"]}"
+    ,
+    "optionGroupCode": "tec-seed-prof-bord-length",
+    "optionGroupNameNb": "Lengde",
+    "optionGroupNameEn": "Length",
+    "variants": [
+      {
+        "optionCode": "prof-blen-120",
+        "sku": "TECNOX-DEMO-TABL-120",
+        "nameNb": "120 cm",
+        "nameEn": "120 cm",
+        "priceMinorOreExVat": 1540000,
+        "featuredAssetFile": "prod-stekebord.jpg"
+      },
+      {
+        "optionCode": "prof-blen-150",
+        "sku": "TECNOX-DEMO-TABL-150",
+        "nameNb": "150 cm",
+        "nameEn": "150 cm",
+        "priceMinorOreExVat": 1720000,
+        "featuredAssetFile": "prod-induksjon.jpg"
+      },
+      {
+        "optionCode": "prof-blen-180",
+        "sku": "TECNOX-DEMO-TABL-180",
+        "nameNb": "180 cm",
+        "nameEn": "180 cm",
+        "priceMinorOreExVat": 1890000,
+        "featuredAssetFile": "prod-combi.jpg"
+      },
+      {
+        "optionCode": "prof-blen-200",
+        "sku": "TECNOX-DEMO-TABL-200",
+        "nameNb": "200 cm",
+        "nameEn": "200 cm",
+        "priceMinorOreExVat": 2050000,
+        "featuredAssetFile": "prod-stekebord.jpg"
+      },
+      {
+        "optionCode": "prof-blen-090",
+        "sku": "TECNOX-DEMO-TABL-090",
+        "nameNb": "90 cm (compact)",
+        "nameEn": "90 cm (compact)",
+        "priceMinorOreExVat": 1320000,
+        "featuredAssetFile": "prod-underbenk.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "stekebord-800-mm",
+    "skuBase": "TECNOX-SIRM-GRID800",
+    "brand": "Sirman",
+    "filterCategoryNb": "Kok og stek",
+    "suggestedLeafCollectionIds": ["kok-st-grill", "kok-steke"],
+    "priceMinorOreExVat": 1940000,
+    "currency": "NOK",
+    "featuredAssetFile": "prod-stekebord.jpg",
+    "nameNb": "Stekebord 800 mm",
+    "nameEn": "Griddle Plate 800 mm",
+    "descriptionNb": "Italiensk håndverk i rustfritt stål. Tykk stekeplate for jevn varmefordeling og lang levetid — laget for kontinuerlig drift."
+  },
+  {
+    "slug": "demo-var-induksjon-prof",
+    "brand": "Electrolux Professional",
+    "filterCategoryNb": "Kok og stek",
+    "suggestedLeafCollectionIds": ["kok-ind-4", "kok-induksjon"],
+    "currency": "NOK",
+    "featuredAssetFile": "prod-induksjon.jpg",
+    "nameNb": "Profesjonell induksjonstopp (demo-varianter)",
+    "nameEn": "Professional induction hob (demo variants)",
+    "descriptionNb": "Demonstrasjonsprodukt for variantvelger: samme listing, fem varianter med ulik sonetelling og ytelse.",
+    "optionGroupCode": "demo-ind-prof-zones",
+    "optionGroupNameNb": "Konfigurasjon",
+    "optionGroupNameEn": "Configuration",
+    "variants": [
+      {"optionCode": "dip-4x32", "sku": "TECNOX-DEMO-IND-4X32", "nameNb": "4 soner / 720 mm", "nameEn": "4 zones / 720 mm", "priceMinorOreExVat": 4290000, "featuredAssetFile": "prod-induksjon.jpg"},
+      {"optionCode": "dip-4x40", "sku": "TECNOX-DEMO-IND-4X40", "nameNb": "4 soner / 900 mm", "nameEn": "4 zones / 900 mm", "priceMinorOreExVat": 4890000, "featuredAssetFile": "prod-induksjon.jpg"},
+      {"optionCode": "dip-6x40", "sku": "TECNOX-DEMO-IND-6X40", "nameNb": "6 soner / 900 mm", "nameEn": "6 zones / 900 mm", "priceMinorOreExVat": 5620000, "featuredAssetFile": "prod-induksjon.jpg"},
+      {"optionCode": "dip-6flex", "sku": "TECNOX-DEMO-IND-6FLEX", "nameNb": "6 soner / Bridge flex", "nameEn": "6 zones / Bridge flex", "priceMinorOreExVat": 6180000, "featuredAssetFile": "prod-induksjon.jpg"},
+      {"optionCode": "dip-ind-wok", "sku": "TECNOX-DEMO-IND-WOK", "nameNb": "4 soner + wok booster", "nameEn": "4 zones + wok booster", "priceMinorOreExVat": 5340000, "featuredAssetFile": "prod-induksjon.jpg"}
+    ]
+  },
+  {
+    "slug": "demo-underbenk-kjol-liters",
+    "brand": "Gram Commercial",
+    "filterCategoryNb": "Kjøling",
+    "suggestedLeafCollectionIds": ["kjol-sk-u", "kjol-skap"],
+    "currency": "NOK",
+    "featuredAssetFile": "prod-underbenk.jpg",
+    "nameNb": "Underbenkskjøler — volumserie (demo)",
+    "nameEn": "Undercounter fridge — capacity series (demo)",
+    "descriptionNb": "Variantprodukt: velg nettovolum til kjøkkens BIM og energibudsjett. Alle varianter deler samme SKU-familie og merkelappfelt.",
+    "optionGroupCode": "demo-ufridge-volume-l",
+    "optionGroupNameNb": "Nettovolum",
+    "optionGroupNameEn": "Net capacity",
+    "variants": [
+      {"optionCode": "uf-v140", "sku": "TECNOX-DEMO-UFR-140", "nameNb": "140 L", "nameEn": "140 L", "priceMinorOreExVat": 2290000, "featuredAssetFile": "prod-underbenk.jpg"},
+      {"optionCode": "uf-v180", "sku": "TECNOX-DEMO-UFR-180", "nameNb": "180 L", "nameEn": "180 L", "priceMinorOreExVat": 2590000, "featuredAssetFile": "prod-underbenk.jpg"},
+      {"optionCode": "uf-v220", "sku": "TECNOX-DEMO-UFR-220", "nameNb": "220 L", "nameEn": "220 L", "priceMinorOreExVat": 2895000, "featuredAssetFile": "prod-underbenk.jpg"},
+      {"optionCode": "uf-v260", "sku": "TECNOX-DEMO-UFR-260", "nameNb": "260 L (GN 2/3 mix)", "nameEn": "260 L (GN 2/3 mix)", "priceMinorOreExVat": 3190000, "featuredAssetFile": "prod-underbenk.jpg"},
+      {"optionCode": "uf-v320gl", "sku": "TECNOX-DEMO-UFR-320G", "nameNb": "320 L glassfront", "nameEn": "320 L glass door", "priceMinorOreExVat": 3580000, "featuredAssetFile": "prod-underbenk.jpg"}
+    ]
+  },
+  {
+    "slug": "demo-kombidamper-format-gn",
+    "brand": "Rational",
+    "filterCategoryNb": "Kombidamp",
+    "suggestedLeafCollectionIds": ["kom-r-pro", "kom-rational"],
+    "currency": "NOK",
+    "featuredAssetFile": "prod-combi.jpg",
+    "nameNb": "Kombidamper iCombi — GN-format (demo)",
+    "nameEn": "Combi oven iCombi — GN layout (demo)",
+    "descriptionNb": "Fem populære GN-konfigurasjoner på én PDP for testing av bilder, prisdelta og lagertilpasning.",
+    "optionGroupCode": "demo-combi-gn-layout",
+    "optionGroupNameNb": "Kapasitet (GN)",
+    "optionGroupNameEn": "Capacity (GN)",
+    "variants": [
+      {"optionCode": "cdb-6gn", "sku": "TECNOX-DEMO-CMB-6GN", "nameNb": "6 x GN 1/1", "nameEn": "6 x GN 1/1", "priceMinorOreExVat": 6980000, "featuredAssetFile": "prod-combi.jpg"},
+      {"optionCode": "cdb-10gn11", "sku": "TECNOX-DEMO-CMB-10G1", "nameNb": "10 x GN 1/1", "nameEn": "10 x GN 1/1", "priceMinorOreExVat": 8490000, "featuredAssetFile": "prod-combi.jpg"},
+      {"optionCode": "cdb-10gn21", "sku": "TECNOX-DEMO-CMB-10G2", "nameNb": "10 x GN 2/1", "nameEn": "10 x GN 2/1", "priceMinorOreExVat": 9120000, "featuredAssetFile": "prod-konvektomat.jpg"},
+      {"optionCode": "cdb-20gn11", "sku": "TECNOX-DEMO-CMB-20G1", "nameNb": "20 x GN 1/1", "nameEn": "20 x GN 1/1", "priceMinorOreExVat": 12490000, "featuredAssetFile": "prod-combi.jpg"},
+      {"optionCode": "cdb-xs6", "sku": "TECNOX-DEMO-CMB-XS6", "nameNb": "Compact 6 x GN (XS)", "nameEn": "Compact 6 x GN (XS)", "priceMinorOreExVat": 5790000, "featuredAssetFile": "hero-combi.jpg"}
+    ]
+  },
+  {
+    "slug": "demo-pizza-deck-stein",
+    "brand": "Modular",
+    "filterCategoryNb": "Pizza",
+    "suggestedLeafCollectionIds": ["pz-ov-elek", "pz-ovn"],
+    "currency": "NOK",
+    "featuredAssetFile": "prod-pizzaovn.jpg",
+    "nameNb": "Elektrisk pizza steindeck (demo Ø)",
+    "nameEn": "Electric pizza stone deck (demo Ø)",
+    "descriptionNb": "Velg bredde eller steintykkelse; nyttig for å verifisere variantliste og min/max pris på produktsiden.",
+    "optionGroupCode": "demo-pizza-deck-mm",
+    "optionGroupNameNb": "Bakeflate",
+    "optionGroupNameEn": "Bake surface",
+    "variants": [
+      {"optionCode": "pz-66cm", "sku": "TECNOX-DEMO-PZA-066", "nameNb": "Ø 66 cm én deck", "nameEn": "Ø 66 cm single deck", "priceMinorOreExVat": 7640000, "featuredAssetFile": "prod-pizzaovn.jpg"},
+      {"optionCode": "pz-74cm", "sku": "TECNOX-DEMO-PZA-074", "nameNb": "Ø 74 cm én deck", "nameEn": "Ø 74 cm single deck", "priceMinorOreExVat": 8490000, "featuredAssetFile": "prod-pizzaovn.jpg"},
+      {"optionCode": "pz-66tw", "sku": "TECNOX-DEMO-PZA-066D", "nameNb": "Dobbel deck Ø 66", "nameEn": "Double deck Ø 66", "priceMinorOreExVat": 9980000, "featuredAssetFile": "prod-pizzaovn.jpg"},
+      {"optionCode": "pz-thick", "sku": "TECNOX-DEMO-PZA-CORD", "nameNb": "Ekstra cordieritt 52 mm", "nameEn": "Extra cordierite 52 mm", "priceMinorOreExVat": 8890000, "featuredAssetFile": "hero-combi.jpg"},
+      {"optionCode": "pz-rot", "sku": "TECNOX-DEMO-PZA-PROT", "nameNb": "Pro rotasjon ±20°", "nameEn": "Pro rotation ±20°", "priceMinorOreExVat": 9340000, "featuredAssetFile": "prod-pizzaovn.jpg"}
+    ]
+  },
+  {
+    "slug": "demo-frontoppvask-kurvmaal",
+    "brand": "Electrolux Professional",
+    "filterCategoryNb": "Oppvask",
+    "suggestedLeafCollectionIds": ["opp-fr-500", "opp-fr-600"],
+    "currency": "NOK",
+    "featuredAssetFile": "prod-hetteoppvask.jpg",
+    "nameNb": "Tunnelfront oppvask (demo kurvserie)",
+    "nameEn": "Tunnel front dishwasher (demo rack series)",
+    "descriptionNb": "Fem maskiner definert rundt kurvdimensjon og pumpepakke — klassisk eksempel på tekniske varianter i katalog.",
+    "optionGroupCode": "demo-fw-rack-mm",
+    "optionGroupNameNb": "Kurvmål og pumpe",
+    "optionGroupNameEn": "Rack size & pumps",
+    "variants": [
+      {"optionCode": "fw500-2p", "sku": "TECNOX-DEMO-FW500-2P", "nameNb": "500 × 500 mm · 2 pumper", "nameEn": "500 × 500 mm · dual pump", "priceMinorOreExVat": 4890000, "featuredAssetFile": "prod-hetteoppvask.jpg"},
+      {"optionCode": "fw500-3p", "sku": "TECNOX-DEMO-FW500-3P", "nameNb": "500 × 500 mm · 3 pumper", "nameEn": "500 × 500 mm · triple pump", "priceMinorOreExVat": 5290000, "featuredAssetFile": "prod-hetteoppvask.jpg"},
+      {"optionCode": "fw600-2p", "sku": "TECNOX-DEMO-FW600-2P", "nameNb": "600 × 500 mm · 2 pumper", "nameEn": "600 × 500 mm · dual pump", "priceMinorOreExVat": 5560000, "featuredAssetFile": "prod-hetteoppvask.jpg"},
+      {"optionCode": "fw600-ht", "sku": "TECNOX-DEMO-FW600-HR", "nameNb": "600 mm · HE varmeveksler", "nameEn": "600 mm · heat-recovery exchanger", "priceMinorOreExVat": 6180000, "featuredAssetFile": "prod-hetteoppvask.jpg"},
+      {"optionCode": "fw500-ez", "sku": "TECNOX-DEMO-FW500-EZ", "nameNb": "500 mm · EASY clean filter", "nameEn": "500 mm · EASY clean filter", "priceMinorOreExVat": 5120000, "featuredAssetFile": "prod-hetteoppvask.jpg"}
+    ]
+  },
+  {
+    "slug": "demo-espresso-gruppe-antall",
+    "brand": "La Cimbali",
+    "filterCategoryNb": "Kaffe",
+    "suggestedLeafCollectionIds": ["kf-es-2gr", "kf-espresso"],
+    "currency": "NOK",
+    "featuredAssetFile": "hero-combi.jpg",
+    "nameNb": "Tradisjonell espressomaskin (demo grupper)",
+    "nameEn": "Traditional espresso machine (demo groups)",
+    "descriptionNb": "Konfigurasjoner fra 2 til 4 grupper for UI-tester på prisstriper og bildeswitch per variant.",
+    "optionGroupCode": "demo-espresso-groups-count",
+    "optionGroupNameNb": "Antall grupper",
+    "optionGroupNameEn": "Number of groups",
+    "variants": [
+      {"optionCode": "esp-2gr", "sku": "TECNOX-DEMO-ESP-2GR", "nameNb": "2-gruppers", "nameEn": "2-group", "priceMinorOreExVat": 9240000, "featuredAssetFile": "hero-combi.jpg"},
+      {"optionCode": "esp-2hp", "sku": "TECNOX-DEMO-ESP-2HP", "nameNb": "2-grupp · høy tavle", "nameEn": "2-group · tall profile", "priceMinorOreExVat": 9580000, "featuredAssetFile": "prod-induksjon.jpg"},
+      {"optionCode": "esp-3gr", "sku": "TECNOX-DEMO-ESP-3GR", "nameNb": "3-gruppers", "nameEn": "3-group", "priceMinorOreExVat": 11580000, "featuredAssetFile": "hero-combi.jpg"},
+      {"optionCode": "esp-3pid", "sku": "TECNOX-DEMO-ESP-3PD", "nameNb": "3-grupp PID multi-boiler", "nameEn": "3-group PID multi-boiler", "priceMinorOreExVat": 13420000, "featuredAssetFile": "prod-combi.jpg"},
+      {"optionCode": "esp-4gr", "sku": "TECNOX-DEMO-ESP-4GR", "nameNb": "4-gruppers showrom", "nameEn": "4-group showroom line", "priceMinorOreExVat": 15240000, "featuredAssetFile": "hero-combi.jpg"}
+    ]
+  }
+]

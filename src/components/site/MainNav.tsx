@@ -4,10 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, User, ShoppingBag, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
+import { User, ShoppingBag, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { getMegaMenuTree } from "@/data/megaMenu";
+import { useShopAuth } from "@/contexts/ShopAuthContext";
+import type { MegaMain } from "@/data/megaMenu";
+import { useStorefrontSearch } from "@/hooks/use-storefront-search";
+import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { getClientLocale, type Locale, setClientLocale, tr } from "@/lib/locale";
+import { NavSearchDesktop, NavSearchMobile } from "@/components/site/NavSearch";
 
 const NAV_LINKS = [
   { nb: "Hjem", en: "Home", href: "/" as const },
@@ -18,14 +22,20 @@ const NAV_LINKS = [
   { nb: "Kontakt", en: "Contact", href: "/kontakt" as const },
 ];
 
-function pickFirstSubWithChildren(mainId: string, megaMenuTree: ReturnType<typeof getMegaMenuTree>) {
+const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
+
+function catHref(collectionSlug: string) {
+  return `/produkter?cat=${encodeURIComponent(collectionSlug)}`;
+}
+
+function pickFirstSubWithChildren(mainId: string, megaMenuTree: MegaMain[]) {
   const main = megaMenuTree.find((m) => m.id === mainId);
   return main?.subs.find((s) => s.children && s.children.length > 0)?.id ?? null;
 }
 
 const MEGA_CLOSE_MS = 140;
 
-export function MainNav() {
+export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: MegaMenuLocales }) {
   const pathname = usePathname();
   const router = useRouter();
   const [locale, setLocale] = useState<Locale>("nb");
@@ -35,7 +45,15 @@ export function MainNav() {
   const [megaSubId, setMegaSubId] = useState<string | null>(null);
   const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { itemCount } = useCart();
-  const megaMenuTree = useMemo(() => getMegaMenuTree(locale), [locale]);
+  const { customer: authCustomer } = useShopAuth();
+  const megaMenuTree = useMemo(() => {
+    const pick = megaMenuByLocale[locale];
+    if (pick?.length) return pick;
+    if (megaMenuByLocale.nb.length) return megaMenuByLocale.nb;
+    return megaMenuByLocale.en;
+  }, [locale, megaMenuByLocale]);
+
+  const storefrontSearch = useStorefrontSearch(locale, megaMenuTree);
 
   useEffect(() => {
     setLocale(getClientLocale());
@@ -139,7 +157,7 @@ export function MainNav() {
             })}
           </ul>
 
-          {megaOpen && (
+          {megaOpen && megaMenuTree.length > 0 && (
             <div
               className="absolute left-1/2 top-full z-70 -translate-x-1/2 pt-8  animate-fade-in"
               onMouseEnter={() => {
@@ -181,7 +199,7 @@ export function MainNav() {
                       {activeMain?.subs.map((sub) => (
                         <li key={sub.id}>
                           <Link
-                            href="/produkter"
+                            href={catHref(sub.id)}
                             onMouseEnter={() => setMegaSubId(sub.id)}
                             onClick={closeMega}
                             className={`flex items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
@@ -207,7 +225,7 @@ export function MainNav() {
                         activeSub.children.map((leaf) => (
                           <li key={leaf.id}>
                             <Link
-                              href="/produkter"
+                              href={catHref(leaf.id)}
                               onClick={closeMega}
                               className="block px-4 py-2.5 text-[13px] text-[var(--color-ink)] border-l-[3px] border-transparent hover:border-[var(--color-copper)] hover:bg-[var(--color-stone)]/35 hover:text-[var(--color-copper)] transition-colors"
                             >
@@ -261,18 +279,14 @@ export function MainNav() {
               EN
             </button>
           </div>
-          <button
-            aria-label={tr(locale, "Søk", "Search")}
-            className="hidden sm:block text-[var(--color-ink)] hover:text-[var(--color-copper)] transition-colors"
-          >
-            <Search className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          </button>
-          <button
-            aria-label={tr(locale, "Min konto", "My account")}
+          <NavSearchDesktop locale={locale} search={storefrontSearch} />
+          <Link
+            href={authCustomer ? "/konto" : "/logg-inn"}
+            aria-label={authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Logg inn", "Sign in")}
             className="hidden sm:block text-[var(--color-ink)] hover:text-[var(--color-copper)] transition-colors"
           >
             <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          </button>
+          </Link>
           <Link
             href="/handlekurv"
             aria-label={tr(locale, "Handlekurv", "Cart")}
@@ -296,6 +310,13 @@ export function MainNav() {
       {/* Mobile menu */}
       {open && (
         <div className="lg:hidden border-t border-[var(--color-divider)] bg-[var(--color-stone)] animate-fade-in">
+          <div className="container-x pt-4">
+            <NavSearchMobile
+              locale={locale}
+              search={storefrontSearch}
+              onResultPick={() => setOpen(false)}
+            />
+          </div>
           <ul className="container-x py-4 flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
@@ -308,6 +329,15 @@ export function MainNav() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                href={authCustomer ? "/konto" : "/logg-inn"}
+                onClick={() => setOpen(false)}
+                className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+              >
+                {authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Logg inn", "Sign in")}
+              </Link>
+            </li>
             <li className="pt-1">
               <div className="inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
                 <button

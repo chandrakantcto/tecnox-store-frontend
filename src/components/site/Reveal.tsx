@@ -2,9 +2,17 @@
 
 import type { ReactNode } from "react";
 
-export function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+export function Reveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
   return (
-    <div className="opacity-100" style={{ animationDelay: `${delay}s` }}>
+    <div className={className ? `opacity-100 ${className}` : "opacity-100"} style={{ animationDelay: `${delay}s` }}>
       {children}
     </div>
   );

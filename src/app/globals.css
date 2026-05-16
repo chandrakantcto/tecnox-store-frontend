@@ -369,4 +369,24 @@
   .reveal {
     animation: fade-up 700ms var(--ease-editorial) both;
   }
+
+  /**
+   * Native `<dialog>` for `storefront-dialogs`.
+   * Do not set `display:flex` on `<dialog>` — Tailwind would override UA `display:none`
+   * for closed dialogs and flash the modal on load. Layout lives on an inner wrapper.
+   */
+  .storefront-dialog {
+    margin: auto;
+    max-height: 100dvh;
+    max-width: 100dvw;
+    border: none;
+    padding: 0;
+    background: transparent;
+  }
+  .storefront-dialog:not([open]) {
+    display: none !important;
+  }
+  .storefront-dialog::backdrop {
+    background: oklch(0.18 0.01 80 / 0.52);
+  }
 }

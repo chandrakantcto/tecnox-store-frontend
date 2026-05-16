@@ -1,35 +1,51 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SingleProductPage } from "@/components/site/SingleProductPage";
-import { getServerLocale } from "@/lib/locale.server";
+import { getMegaMenuBothLocales } from "@/lib/vendure/catalog-data";
+import { getStorefrontProductDetail } from "@/lib/vendure/product-detail-data";
 import { staticSrc } from "@/lib/static-asset";
-import { getLocalizedProduct, getProductBySlug, getRelatedProducts, PRODUCTS } from "@/lib/products";
+import { getServerLocale } from "@/lib/locale.server";
 
-type Props = { params: Promise<{ slug: string }> };
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }));
-}
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ v?: string }>;
+};
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const sp = await searchParams;
   const locale = await getServerLocale();
-  const product = getProductBySlug(slug);
-  if (!product) return { title: "Produkt" };
-  const localized = getLocalizedProduct(product, locale);
+  const variantParam = typeof sp.v === "string" ? sp.v.trim() : "";
+  const bundle = await getStorefrontProductDetail(locale, slug, variantParam || null);
+  const product = bundle.product;
+  if (!product) return { title: locale === "en" ? "Product" : "Produkt" };
+
+  const desc = product.description.replace(/\s+/g, " ").trim().slice(0, 160);
   return {
-    title: localized.name,
-    description: localized.description.slice(0, 160),
+    title: product.name,
+    description: desc,
     openGraph: { images: [{ url: staticSrc(product.img) }] },
   };
 }
 
-export default async function ProductDetailPage({ params }: Props) {
+export default async function ProductDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
   const locale = await getServerLocale();
-  const product = getProductBySlug(slug);
+  const variantParam = typeof sp.v === "string" ? sp.v.trim() : "";
+  const { product, relatedProducts } = await getStorefrontProductDetail(locale, slug, variantParam || null);
   if (!product) notFound();
-  const localizedProduct = getLocalizedProduct(product, locale);
-  const relatedProducts = getRelatedProducts(product).map((related) => getLocalizedProduct(related, locale));
-  return <SingleProductPage product={localizedProduct} relatedProducts={relatedProducts} locale={locale} />;
+
+  const { data: megaMenuByLocale } = await getMegaMenuBothLocales();
+
+  return (
+    <SingleProductPage
+      product={product}
+      relatedProducts={relatedProducts}
+      locale={locale}
+      megaMenuByLocale={megaMenuByLocale}
+    />
+  );
 }

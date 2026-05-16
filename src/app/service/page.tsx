@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import bgImg from "@/assets/ref-restaurant.jpg";
 import { Footer } from "@/components/site/Footer";
-import { MainNav } from "@/components/site/MainNav";
 import { Newsletter } from "@/components/site/Newsletter";
 import { PageHero } from "@/components/site/PageHero";
 import { References } from "@/components/site/References";
 import { Reveal } from "@/components/site/Reveal";
 import { Service } from "@/components/site/Service";
-import { TopBar } from "@/components/site/TopBar";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
 
@@ -58,10 +57,7 @@ export default async function ServicePage() {
 
   return (
     <main className="min-h-screen bg-[var(--color-stone)]">
-      <header className="sticky top-0 z-50">
-        <TopBar locale={locale} />
-        <MainNav />
-      </header>
+      <SiteHeader locale={locale} />
       <PageHero
         label={tr(locale, "Service og support", "Service and support")}
         title={<>{tr(locale, "Vi tar ansvar — fra første tegning til siste skrue.", "We take responsibility - from first sketch to final screw.")}</>}

@@ -1,11 +1,63 @@
 "use client";
 
+import type { FormEvent } from "react";
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
 export function Newsletter({ locale = "nb" }: { locale?: Locale }) {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setFeedback(null);
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setFeedback({
+        kind: "err",
+        text: tr(locale, "Skriv inn e-postadresse.", "Please enter your email address."),
+      });
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await fetch("/api/storefront/newsletter-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed, locale }),
+      });
+      const json = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !json.ok) {
+        setFeedback({
+          kind: "err",
+          text: json.error ?? tr(locale, "Kunne ikke melde på. Prøv igjen.", "Could not subscribe. Please try again."),
+        });
+        return;
+      }
+      setEmail("");
+      setFeedback({
+        kind: "ok",
+        text: tr(
+          locale,
+          "Takk — du er påmeldt nyhetsbrevet.",
+          "Thank you — you are subscribed to the newsletter.",
+        ),
+      });
+    } catch {
+      setFeedback({
+        kind: "err",
+        text: tr(locale, "Nettverksfeil. Prøv igjen.", "Network error. Please try again."),
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="bg-white text-[var(--color-ink)] py-16 lg:py-20 border-t border-[var(--color-divider)]">
       <div className="container-x grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16">
@@ -27,21 +79,33 @@ export function Newsletter({ locale = "nb" }: { locale?: Locale }) {
               )}
             </p>
 
-            <form
-              className="mt-6 flex flex-col sm:flex-row gap-2 max-w-lg"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className="mt-6 flex flex-col sm:flex-row gap-2 max-w-lg" onSubmit={(e) => void onSubmit(e)} noValidate>
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
                 placeholder={tr(locale, "Din e-postadresse", "Your email address")}
-                className="flex-1 bg-white text-[var(--color-ink)] placeholder:text-[var(--color-muted)] border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:ring-2 focus:ring-[var(--color-copper)] focus:border-transparent"
+                value={email}
+                disabled={busy}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 bg-white text-[var(--color-ink)] placeholder:text-[var(--color-muted)] border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:ring-2 focus:ring-[var(--color-copper)] focus:border-transparent disabled:opacity-60"
               />
-              <button type="submit" className="btn-primary whitespace-nowrap">
-                {tr(locale, "Meld meg på", "Subscribe")}
+              <button type="submit" disabled={busy} className="btn-primary whitespace-nowrap disabled:opacity-60">
+                {busy
+                  ? tr(locale, "Sender …", "Sending …")
+                  : tr(locale, "Meld meg på", "Subscribe")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 
+            {feedback ? (
+              <p
+                role={feedback.kind === "err" ? "alert" : "status"}
+                className={`mt-3 text-[13px] ${feedback.kind === "ok" ? "text-[var(--color-ink)]" : "text-red-800"}`}
+              >
+                {feedback.text}
+              </p>
+            ) : null}
             <p className="mt-3 text-[11px] text-[var(--color-muted)]">
               {tr(locale, "Maks 2 e-poster per måned. Ingen spam.", "Max 2 emails per month. No spam.")}
             </p>

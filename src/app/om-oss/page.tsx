@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import bgImg from "@/assets/ref-hotell.jpg";
 import { Brands } from "@/components/site/Brands";
 import { Footer } from "@/components/site/Footer";
-import { MainNav } from "@/components/site/MainNav";
 import { Newsletter } from "@/components/site/Newsletter";
 import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/site/Reveal";
-import { TopBar } from "@/components/site/TopBar";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import { TrustStats } from "@/components/site/TrustStats";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
@@ -70,10 +69,7 @@ export default async function OmOssPage() {
 
   return (
     <main className="min-h-screen bg-[var(--color-stone)]">
-      <header className="sticky top-0 z-50">
-        <TopBar locale={locale} />
-        <MainNav />
-      </header>
+      <SiteHeader locale={locale} />
       <PageHero
         label={tr(locale, "Om oss", "About us")}
         title={<>{tr(locale, "30 år med kompromissløst håndverk.", "30 years of uncompromising craftsmanship.")}</>}
