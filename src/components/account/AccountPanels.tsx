@@ -22,18 +22,18 @@ export function AccountDashboardPanel() {
   const { locale, customer } = useShopAuth();
   const lc: Locale = locale === "en" ? "en" : "nb";
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8">
+    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-10" style={{ height: "40vh" }}>
       <p className="text-[14px] text-[var(--color-muted)]">
         {tr(lc, `Hei, ${customer?.firstName || ""}!`, `Hi, ${customer?.firstName || ""}!`)}
       </p>
-      <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-        <Link href="/konto/ordrer" className="rounded-[3px] border border-[var(--color-divider)] p-6 hover:border-[var(--color-copper)]">
+      <ul className="mt-10 grid gap-3 sm:grid-cols-2">
+        <Link href="/konto/ordrer" className="rounded-[3px] border border-[var(--color-divider)]  p-8 hover:border-[var(--color-copper)]">
           <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
             {tr(lc, "Ordrer", "Orders")}
           </p>
           <p className="mt-2 text-[15px] text-[var(--color-ink)]">{tr(lc, "Se historikk og status.", "See history and states.")}</p>
         </Link>
-        <Link href="/konto/profil" className="rounded-[3px] border border-[var(--color-divider)] p-6 hover:border-[var(--color-copper)]">
+        <Link href="/konto/profil" className="rounded-[3px] border border-[var(--color-divider)] p-8 hover:border-[var(--color-copper)]">
           <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
             {tr(lc, "Profil", "Profile")}
           </p>
@@ -87,10 +87,10 @@ export function AccountProfilePanel() {
   };
 
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8">
+    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white height-full p-8 w-3/5 ">
       <h2 className="text-[18px] font-bold text-[var(--color-ink)]">{tr(lc, "Profil", "Profile")}</h2>
       <p className="mt-1 text-[13px] text-[var(--color-muted)]">{customer?.emailAddress}</p>
-      <form onSubmit={(e) => void save(e)} className="mt-8 space-y-4 max-w-md">
+      <form onSubmit={(e) => void save(e)} className="mt-8 space-y-4 max-w-md ml-5">
         <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
           {tr(lc, "Fornavn", "First name")}
           <input
@@ -118,9 +118,9 @@ export function AccountProfilePanel() {
           />
         </label>
         {msg ? <p className="text-[13px] text-[var(--color-ink)]">{msg}</p> : null}
-        <button type="submit" disabled={busy} className="btn-primary disabled:opacity-60">
+        <button type="submit" disabled={busy} className="h-2  btn-primary disabled:opacity-60 rounded-2xl">
           {tr(lc, "Lagre", "Save")}
-        </button>
+        </button> 
       </form>
     </div>
   );
@@ -174,7 +174,7 @@ export function AccountPasswordPanel() {
   };
 
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8 max-w-md">
+    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8  height-full w-3/5">
       <h2 className="text-[18px] font-bold">{tr(lc, "Bytt passord", "Change password")}</h2>
       <form onSubmit={(e) => void submit(e)} className="mt-6 space-y-4">
         <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
@@ -186,7 +186,7 @@ export function AccountPasswordPanel() {
             autoComplete="current-password"
             showLabel={tr(lc, "Vis passord", "Show password")}
             hideLabel={tr(lc, "Skjul passord", "Hide password")}
-            className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-2 pr-10"
+            className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-2  "
           />
         </label>
         <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
@@ -203,7 +203,7 @@ export function AccountPasswordPanel() {
         </label>
         <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
           {tr(lc, "Gjenta nytt passord", "Confirm new password")}
-          <PasswordWithToggle
+          <PasswordWithToggle 
             value={confirm}
             onChange={setConfirm}
             required
@@ -214,7 +214,7 @@ export function AccountPasswordPanel() {
           />
         </label>
         {msg ? <p className="text-[13px]">{msg}</p> : null}
-        <button type="submit" disabled={busy} className="btn-primary disabled:opacity-60">
+        <button type="submit" disabled={busy} className=" h-2 rounded-2xl btn-primary disabled:opacity-60">
           {tr(lc, "Oppdater passord", "Update password")}
         </button>
       </form>
@@ -275,7 +275,7 @@ export function AccountOrdersPanel() {
   }, [load]);
 
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8">
+    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8 ">
       <h2 className="text-[18px] font-bold">{tr(lc, "Mine ordrer", "My orders")}</h2>
       {loading ? (
         <p className="mt-6 text-[14px] text-[var(--color-muted)]">{tr(lc, "Laster …", "Loading …")}</p>

@@ -254,12 +254,14 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
   return (
     <div ref={wrapRef} className="relative hidden sm:block">
       <div className="flex items-center justify-end gap-0">
-        <div
-          className={cn(
-            "overflow-hidden transition-[max-width,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
-            barOpen ? "max-w-[min(100vw,380px)] opacity-100" : "max-w-0 opacity-0 pointer-events-none",
-          )}
-        >
+     <div
+        className={cn(
+        "absolute right-10 top-1/2 -translate-y-1/2 overflow-hidden transition-[max-width,opacity] duration-300",
+         barOpen
+          ? "max-w-[380px] opacity-100"
+           : "max-w-0 opacity-0 pointer-events-none",
+            )}
+                 >
           <label className="sr-only" htmlFor={listId}>
             {tr(locale, "Søk i produkter og kategorier", "Search products and categories")}
           </label>
@@ -452,5 +454,6 @@ export function NavSearchMobile({
         />
       ) : null}
     </div>
+  
   );
 }
