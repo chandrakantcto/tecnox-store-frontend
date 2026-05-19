@@ -25,11 +25,14 @@ export function TopBar({
       )}
       <div className="bg-[var(--dark-bg)] text-[var(--stone)]">
         <div className="container-x flex h-9 items-center justify-center text-center max-w-screen">
-          <p className="text-[12px]  font-normal tracking-wide">
+          <p className="  text-[10px] sm:text-[12px]
+      font-normal tracking-wide
+      flex flex-wrap justify-center items-center
+      gap-y-1">
             <span>{delivery}</span>
-            <span className=" mx-2 text-[var(--dark-muted)]">·</span>
+            <span className=" mx-3 text-[var(--dark-muted)]">·</span>
             <span>{prices}</span>
-            <span className="mx-2 text-[var(--dark-muted)]">·</span>
+            <span className="mx-3 text-[var(--dark-muted)]">·</span>
             <span>
               {callUs} <span className="text-[var(--copper)] font-medium">922 22 800</span>
             </span>

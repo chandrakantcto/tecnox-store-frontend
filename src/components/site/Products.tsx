@@ -11,6 +11,7 @@ import type { ProductsSectionPayload, CatalogProductCard } from "@/lib/vendure/c
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { BsArrowUpRightCircleFill } from "react-icons/bs";
 
 type ProductsProps = {
   withCategorySidebar?: boolean;
@@ -26,7 +27,11 @@ function productImage(product: CatalogProductCard) {
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={product.img}
-        alt={`${product.name} — ${product.brand}`}
+        alt={
+  product.name.length > 10
+    ? product.name.slice(0, 10) + "..."
+    : product.name
+}
         loading="lazy"
         width={1024}
         height={768}
@@ -37,7 +42,11 @@ function productImage(product: CatalogProductCard) {
   return (
     <Image
       src={product.img}
-      alt={`${product.name} — ${product.brand}`}
+     alt={
+  product.name.length > 10
+    ? product.name.slice(0, 10) + "..."
+    : product.name
+}
       loading="lazy"
       width={1024}
       height={768}
@@ -201,7 +210,7 @@ export function Products({
             ) : (
               <div
                 className={cn(
-                  "grid grid-cols-2 gap-3 lg:gap-5",
+                  "grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-5",
                   withCategorySidebar ? "lg:grid-cols-3 xl:grid-cols-4" : "lg:grid-cols-4",
                 )}
               >
@@ -231,23 +240,22 @@ export function Products({
                         <h3 className="mt-1.5 text-[15px] font-bold text-[var(--color-ink)] leading-snug tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
                           {p.name}
                         </h3>
-                        {p.spec ? (
+                        {p.spec && p.spec.length > 30 ? (
                           <p className="mt-2 text-[12px] text-[var(--color-muted)] leading-relaxed font-mono">
-                            {p.spec}
+                            {p.spec.slice(0, 30) + "..."}
                           </p>
                         ) : null}
                         <div className="mt-auto pt-4 flex items-end justify-between gap-2 border-t border-[var(--color-divider)]">
-                          <div className="hidden md:block">
-                            <p className="text-[10px] text-[var(--color-muted)] uppercase tracking-[0.12em]">
+                          <div >
+                            <p className="text-[12px] text-[var(--color-muted)] uppercase tracking-[0.12em]">
                               {tr(locale, "Fra", "From")}
                             </p>
-                            <p className="text-[15px] font-bold text-[var(--color-copper)] tracking-[-0.01em] leading-tight">
+                            <p className="text-[12px] font-bold text-[var(--color-copper)] tracking-[-0.01em] leading-tight">
                               {p.price}
                             </p>
                           </div>
-                          <span className="text-[12px] font-medium text-[var(--color-ink)] inline-flex items-center gap-1 group-hover:text-[var(--color-copper)] transition-colors">
-                            {tr(locale, "Se produkt", "View product")}
-                            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          <span className="text-[5px] font-medium text-[var(--color-ink)] inline-flex items-center gap-1 group-hover:text-[var(--color-copper)] transition-colors">
+                             < BsArrowUpRightCircleFill   className="text-[16px] text-[var(--color-muted)] group-hover:text-[var(--color-copper)] transition-colors"/>
                           </span>
                         </div>
                       </div>

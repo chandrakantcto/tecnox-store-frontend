@@ -121,7 +121,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
             <Image
               src="/logo-tecno-x.webp"
               alt="TECNOX"
-              className="h-[52px] sm:h-[56px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
+              className="h-[52px] sm:h-[50px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
               width={380}
               height={70}
               priority

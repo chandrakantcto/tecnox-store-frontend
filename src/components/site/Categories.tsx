@@ -95,7 +95,7 @@ export function Categories({
             </p>
           </Reveal>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
             {cats.map((cat, i) => (
               <Reveal key={cat.slug} delay={Math.min(i * 0.04, 0.32)}>
                 <Link
@@ -137,7 +137,7 @@ export function Categories({
                       <h3 className="text-[13px] lg:text-[15px] font-bold text-[var(--color-ink)] leading-tight tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
                         {cat.name}
                       </h3>
-                      <p className="mt-1 text-[11px] text-[var(--color-muted)] tracking-[0.02em]">
+                      <p className="pt-4 text-[11px] text-[var(--color-muted)] tracking-[0.02em]">
                         <span className="text-[var(--color-copper)] font-semibold">{cat.count}</span>{" "}
                         {tr(locale, "produkter", "products")}
                       </p>
