@@ -247,25 +247,25 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
       navigateActive();
     }
   };
-
+ 
   const q = search.query.trim();
   const showDropdown = barOpen && (q.length >= 1 || search.loading);
 
   return (
-    <div ref={wrapRef} className="relative hidden sm:block">
+    <div ref={wrapRef} className="relative hidden lg:block">
       <div className="flex items-center justify-end gap-0">
      <div
         className={cn(
-        "absolute right-10 top-1/2 -translate-y-1/2 overflow-hidden transition-[max-width,opacity] duration-300",
+       "absolute right-0 top-full mt-3 overflow-hidden transition-[max-width,opacity] duration-300 ",
          barOpen
-          ? "max-w-[380px] opacity-100"
+          ? "max-w-[300px] xl:max-w-[350px] 2xl:max-w-[380px] opacity-100 "
            : "max-w-0 opacity-0 pointer-events-none",
             )}
                  >
           <label className="sr-only" htmlFor={listId}>
             {tr(locale, "Søk i produkter og kategorier", "Search products and categories")}
           </label>
-          <div className="flex h-9 min-w-[260px] items-center gap-2 rounded-[2px] border border-[var(--color-divider)] bg-white px-3 shadow-sm sm:min-w-[280px] md:min-w-[300px]">
+          <div className=" hidden lg:flex flex h-9 min-w-[260px] items-center gap-2 rounded-[2px] border border-[var(--color-divider)] bg-white px-3 shadow-sm sm:min-w-[280px] md:min-w-[300px]">
             <Search className="h-4 w-4 shrink-0 text-[var(--color-muted)]" aria-hidden />
             <input
               ref={inputRef}
@@ -304,15 +304,14 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
             barOpen ? tr(locale, "Lukk søk", "Close search") : tr(locale, "Åpne søk", "Open search")
           }
           aria-expanded={barOpen}
-          onClick={() => {
-            setBarOpen((v) => {
-              if (v) {
-                search.clearQuery();
-                setActiveIndex(-1);
-              }
-              return !v;
-            });
-          }}
+onClick={() => {
+  if (barOpen) {
+    search.clearQuery();
+    setActiveIndex(-1);
+  }
+
+  setBarOpen(!barOpen);
+}}
           className="shrink-0 p-2 text-[var(--color-ink)] transition-colors hover:text-[var(--color-copper)]"
         >
           {barOpen ? <X className="h-[18px] w-[18px]" strokeWidth={1.5} /> : <Search className="h-[18px] w-[18px]" strokeWidth={1.5} />}

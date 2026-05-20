@@ -75,7 +75,7 @@ export function AccountShell({
       <section className="border-b border-[var(--color-divider)] bg-white">
         <div className="container-x flex flex-col gap-4 py-10 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
           <div>
-            <p className="font-mono text-[12px] tracking-[0.16em] text-[var(--color-copper)]">/KONTO</p>
+            <p className="font-mono text-[12px] tracking-[0.16em] text-[var(--color-copper)]"> {tr(lc, "Konto", "Account")}</p>
             <h1 className="display-h3 mt-2 text-[var(--color-ink)]">
               {tr(lc, "Min konto", "My account")}
             </h1>
