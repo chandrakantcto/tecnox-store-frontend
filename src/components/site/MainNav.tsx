@@ -253,7 +253,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
         </div>
 
         <div className="flex min-w-0 flex-1 shrink-0 items-center justify-end gap-5">
-          <div className="hidden sm:inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
+          <div className="hidden lg:inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
             <button
               type="button"
               onClick={() => setSiteLocale("nb")}

@@ -71,18 +71,29 @@ function LoginForm({ megaMenuByLocale }: { megaMenuByLocale: MegaMenuLocales }) 
               className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px]"
             />
           </label>
-          <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
-            {tr(lc, "Passord", "Password")}
-            <PasswordWithToggle
-              value={password}
-              onChange={setPassword}
-              required
-              autoComplete="current-password"
-              showLabel={tr(lc, "Vis passord", "Show password")}
-              hideLabel={tr(lc, "Skjul passord", "Hide password")}
-              className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
-            />
-          </label>
+       <div>
+  <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
+    
+    <span>{tr(lc, "Passord", "Password")}</span>
+
+    <Link
+      href="/forgot-password"
+      className="text-[14px] normal-case tracking-normal text-[var(--color-copper)] hover:underline"
+    >
+      {tr(lc, "Glemt passord?", "Forgot password?")}
+    </Link>
+  </div>
+
+  <PasswordWithToggle
+    value={password}
+    onChange={setPassword}
+    required
+    autoComplete="current-password"
+    showLabel={tr(lc, "Vis passord", "Show password")}
+    hideLabel={tr(lc, "Skjul passord", "Hide password")}
+    className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
+  />
+</div>
           {err ? <p className="rounded-[2px] border border-red-600/35 bg-white px-3 py-2 text-[13px] text-red-800">{err}</p> : null}
           <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
             {busy ? tr(lc, "Logger inn …", "Signing in …") : tr(lc, "Logg inn", "Sign in")}
