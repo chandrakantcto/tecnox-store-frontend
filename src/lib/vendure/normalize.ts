@@ -208,6 +208,7 @@ export function formatNOKExclVatFromMinor(locale: string, minor: number | null):
   const nf = Intl.NumberFormat(locale === "en" ? "en-GB" : "nb-NO", {
     maximumFractionDigits: 0,
   });
-  if (locale === "en") return `From NOK ${nf.format(nok)} excl. VAT`;
-  return `Fra kr ${nf.format(nok).replace(/\u00a0/g, " ")} eks. MVA`;
+  const amount = nf.format(nok).replace(/\u00a0/g, " ");
+  if (locale === "en") return `From NOK ${amount},- excl. VAT`;
+  return `Fra kr ${amount},- eks. MVA`;
 }

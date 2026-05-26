@@ -11,6 +11,7 @@ import type { MegaMain } from "@/data/megaMenu";
 import { useStorefrontSearch } from "@/hooks/use-storefront-search";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { getClientLocale, type Locale, setClientLocale, tr } from "@/lib/locale";
+import { CartSidebar } from "@/components/site/CartSidebar";
 import { NavSearchDesktop, NavSearchMobile } from "@/components/site/NavSearch";
 
 const NAV_LINKS = [
@@ -40,6 +41,10 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   const router = useRouter();
   const [locale, setLocale] = useState<Locale>("nb");
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [mobileMegaMainId, setMobileMegaMainId] = useState<string | null>(null);
+  const [mobileMegaSubId, setMobileMegaSubId] = useState<string | null>(null);
   const [megaOpen, setMegaOpen] = useState(false);
   const [megaMainId, setMegaMainId] = useState<string | null>(null);
   const [megaSubId, setMegaSubId] = useState<string | null>(null);
@@ -58,6 +63,14 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   useEffect(() => {
     setLocale(getClientLocale());
   }, []);
+
+  useEffect(() => {
+    if (!open) {
+      setMobileProductsOpen(false);
+      setMobileMegaMainId(null);
+      setMobileMegaSubId(null);
+    }
+  }, [open]);
 
   const cancelMegaCloseTimer = () => {
     if (megaCloseTimer.current) {
@@ -287,19 +300,20 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
           >
             <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
           </Link>
-          <Link
-            href="/handlekurv"
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
             aria-label={tr(locale, "Handlekurv", "Cart")}
-            className="relative text-[var(--color-ink)] hover:text-[var(--color-copper)] transition-colors"
+            className="relative text-[var(--color-ink)] hover:text-[var(--color-copper)] transition-colors cursor-pointer"
           >
             <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.5} />
             <span className="absolute -top-1.5 -right-2 bg-[var(--color-copper)] text-white text-[10px] font-bold h-4 min-w-4 px-1 flex items-center justify-center rounded-[2px]">
               {itemCount}
             </span>
-          </Link>
+          </button>
           <button
             aria-label={tr(locale, "Meny", "Menu")}
-            className="lg:hidden text-[var(--color-ink)] ml-1"
+            className="lg:hidden text-[var(--color-ink)] ml-1 cursor-pointer"
             onClick={() => setOpen(!open)}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -318,17 +332,147 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
             />
           </div>
           <ul className="container-x py-4 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
-                >
-                  {tr(locale, link.nb, link.en)}
-                </Link>
-              </li>
-            ))}
+            {NAV_LINKS.map((link) => {
+              if (link.mega) {
+                return (
+                  <li key={link.href}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (megaMenuTree.length === 0) {
+                          router.push(link.href);
+                          setOpen(false);
+                          return;
+                        }
+                        setMobileProductsOpen((v) => !v);
+                      }}
+                      aria-expanded={mobileProductsOpen}
+                      className="flex w-full items-center justify-between gap-2 border-b border-[var(--color-divider)] py-3 text-left text-[15px] text-[var(--color-ink)] hover:text-[var(--color-copper)]"
+                    >
+                      <span>{tr(locale, link.nb, link.en)}</span>
+                      {megaMenuTree.length > 0 ? (
+                        <ChevronDown
+                          className={`h-4 w-4 shrink-0 opacity-60 transition-transform ${mobileProductsOpen ? "rotate-180" : ""}`}
+                          strokeWidth={2}
+                        />
+                      ) : null}
+                    </button>
+
+                    {mobileProductsOpen && megaMenuTree.length > 0 ? (
+                      <div className="border-b border-[var(--color-divider)] pb-3 pt-2">
+                        <nav
+                          aria-label={tr(locale, "Produktkategorier", "Product categories")}
+                          className="rounded-[3px] border border-[var(--color-divider)] bg-[oklch(0.98_0.005_80)] p-1"
+                        >
+                          <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]">
+                            {tr(locale, "Kategori", "Category")}
+                          </p>
+                          <div className="flex flex-col gap-0.5">
+                            {megaMenuTree.map((main) => {
+                              const mainOpen = mobileMegaMainId === main.id;
+                              return (
+                                <div key={main.id}>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setMobileMegaMainId((id) => (id === main.id ? null : main.id));
+                                      setMobileMegaSubId(null);
+                                    }}
+                                    className={`flex w-full items-center justify-between gap-2 rounded-[3px] border px-3 py-2.5 text-left text-[13px] font-medium transition-colors ${
+                                      mainOpen
+                                        ? "border-[var(--color-divider)] border-l-[3px] border-l-[var(--color-copper)] bg-white text-[var(--color-ink)] shadow-sm"
+                                        : "border-transparent text-[var(--color-muted)] hover:bg-white/70 hover:text-[var(--color-ink)]"
+                                    }`}
+                                  >
+                                    <span className="min-w-0 truncate">{main.label}</span>
+                                    <span className="flex shrink-0 items-center gap-1 tabular-nums text-[11px] font-normal text-[var(--color-muted)]">
+                                      ({main.count})
+                                      <ChevronRight
+                                        className={`h-3.5 w-3.5 opacity-50 transition-transform ${mainOpen ? "rotate-90" : ""}`}
+                                        strokeWidth={2}
+                                      />
+                                    </span>
+                                  </button>
+
+                                  {mainOpen ? (
+                                    <ul className="mt-0.5 flex flex-col gap-0.5 border-l border-[var(--color-divider)] py-1 pl-2 ml-2">
+                                      {main.subs.map((sub) => {
+                                        const hasChildren = Boolean(sub.children && sub.children.length > 0);
+                                        const subOpen = mobileMegaSubId === sub.id;
+                                        return (
+                                          <li key={sub.id}>
+                                            {hasChildren ? (
+                                              <>
+                                                <button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    setMobileMegaSubId((id) => (id === sub.id ? null : sub.id))
+                                                  }
+                                                  className={`flex w-full items-center justify-between gap-2 rounded-[3px] px-3 py-2 text-left text-[13px] transition-colors ${
+                                                    subOpen
+                                                      ? "bg-white/90 font-medium text-[var(--color-copper)]"
+                                                      : "text-[var(--color-ink)] hover:bg-white/70 hover:text-[var(--color-copper)]"
+                                                  }`}
+                                                >
+                                                  <span className="min-w-0 truncate">{sub.label}</span>
+                                                  <ChevronRight
+                                                    className={`h-3.5 w-3.5 shrink-0 opacity-45 transition-transform ${subOpen ? "rotate-90" : ""}`}
+                                                    strokeWidth={2}
+                                                  />
+                                                </button>
+                                                {subOpen ? (
+                                                  <ul className="flex flex-col gap-0.5 py-1 pl-2">
+                                                    {sub.children!.map((leaf) => (
+                                                      <li key={leaf.id}>
+                                                        <Link
+                                                          href={catHref(leaf.id)}
+                                                          onClick={() => setOpen(false)}
+                                                          className="block rounded-[3px] px-3 py-2 text-[12.5px] text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
+                                                        >
+                                                          {leaf.label}
+                                                        </Link>
+                                                      </li>
+                                                    ))}
+                                                  </ul>
+                                                ) : null}
+                                              </>
+                                            ) : (
+                                              <Link
+                                                href={catHref(sub.id)}
+                                                onClick={() => setOpen(false)}
+                                                className="block rounded-[3px] px-3 py-2 text-[13px] text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
+                                              >
+                                                {sub.label}
+                                              </Link>
+                                            )}
+                                          </li>
+                                        );
+                                      })}
+                                    </ul>
+                                  ) : null}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </nav>
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              }
+
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, link.nb, link.en)}
+                  </Link>
+                </li>
+              );
+            })}
             <li>
               <Link
                 href={authCustomer ? "/konto" : "/logg-inn"}
@@ -376,6 +520,8 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
           </ul>
         </div>
       )}
+
+      <CartSidebar open={cartOpen} onOpenChange={setCartOpen} locale={locale} />
     </nav>
   );
 }
