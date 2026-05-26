@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ArrowUpRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { ProductsSectionPayload, CatalogProductCard } from "@/lib/vendure/catalog-types";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
@@ -95,6 +95,7 @@ export function Products({
   const [activeSlug, setActiveSlug] = useState<string | null>(() =>
     syncSlugAllowed(initialCatSlug, catalog.filterSlugs),
   );
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
 
   useEffect(() => {
     setActiveSlug(syncSlugAllowed(initialCatSlug, catalog.filterSlugs));
@@ -130,11 +131,20 @@ export function Products({
 
   const apiMsg = catalog.error ? formatShopBannerError(catalog.error) : null;
 
+  const activeFilterLabel = useMemo(() => {
+    const match = pairs.find((p) => (p.slug === null ? activeSlug === null : p.slug === activeSlug));
+    if (!match) return tr(locale, "Kategori", "Category");
+    return `${match.label} (${countForFilter(match.slug)})`;
+  }, [pairs, activeSlug, countForFilter, locale]);
+
   const filterButtons = pairs.map(({ label, slug }) => (
     <button
       key={label + String(slug)}
       type="button"
-      onClick={() => navigateTab(slug)}
+      onClick={() => {
+        navigateTab(slug);
+        if (withCategorySidebar) setCategoryMenuOpen(false);
+      }}
       className={cn(
         withCategorySidebar
           ? "w-full text-left px-3 py-2.5 rounded-[3px] text-[13px] font-medium transition-colors border border-transparent"
@@ -182,10 +192,40 @@ export function Products({
                 aria-label={tr(locale, "Produktkategorier", "Product categories")}
                 className="rounded-[3px] border border-[var(--color-divider)] bg-[oklch(0.98_0.005_80)] p-1"
               >
-                <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left lg:hidden"
+                  onClick={() => setCategoryMenuOpen((v) => !v)}
+                  aria-expanded={categoryMenuOpen}
+                >
+                  <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]">
+                    {tr(locale, "Kategori", "Category")}
+                  </span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="truncate text-[13px] font-medium text-[var(--color-ink)]">{activeFilterLabel}</span>
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 shrink-0 text-[var(--color-muted)] transition-transform",
+                        categoryMenuOpen && "rotate-180",
+                      )}
+                      strokeWidth={2}
+                    />
+                  </span>
+                </button>
+
+                <p className="hidden px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)] lg:block">
                   {tr(locale, "Kategori", "Category")}
                 </p>
-                <div className="flex flex-col gap-0.5">{filterButtons}</div>
+
+                <div
+                  className={cn(
+                    "flex flex-col gap-0.5",
+                    categoryMenuOpen ? "block" : "hidden",
+                    "lg:block",
+                  )}
+                >
+                  {filterButtons}
+                </div>
               </nav>
             </aside>
           )}

@@ -10,16 +10,9 @@ import { TopBar } from "@/components/site/TopBar";
 
 import heroImg from "@/assets/hero-combi.jpg";
 
-import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { getClientLocale, tr } from "@/lib/locale";
 
-const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
-
-export default function ForgotPasswordPage({
-  megaMenuByLocale = EMPTY_MEGA,
-}: {
-  megaMenuByLocale?: MegaMenuLocales;
-}) {
+export default function ForgotPasswordPage() {
   const lc = getClientLocale();
 
   const [email, setEmail] = useState("");
@@ -35,7 +28,7 @@ export default function ForgotPasswordPage({
       
       <header className="sticky top-0 z-50">
         <TopBar locale={lc} />
-        <MainNav megaMenuByLocale={megaMenuByLocale} />
+        <MainNav />
       </header>
 
       <PageHero

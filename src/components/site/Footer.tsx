@@ -4,21 +4,38 @@ import { Linkedin, Instagram, Youtube } from "lucide-react";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
+/** Root collection slugs — same targets as /produkter sidebar (`?cat=`). */
+const FOOTER_ROOT_CATEGORIES = [
+  { slug: "kaffe", nameNb: "kaffitraktar", nameEn: "Coffee and bar" },
+  { slug: "kjolerom", nameNb: "Kjølerom og fryserom", nameEn: "Cold rooms and freezer rooms" },
+  { slug: "kjoling", nameNb: "Kjøle- og frysutstyr", nameEn: "Cooling and freezing" },
+  { slug: "kok-stek", nameNb: "Kok og stek", nameEn: "Cook and fry" },
+  { slug: "kombi", nameNb: "Kombidampere", nameEn: "Combi ovens" },
+  { slug: "maskiner", nameNb: "Kjøkkenmaskiner", nameEn: "Kitchen machinery" },
+  { slug: "oppvask", nameNb: "Oppvaskmaskiner", nameEn: "Dishwashers" },
+  { slug: "pizza", nameNb: "Pizzautstyr", nameEn: "Pizza equipment" },
+  { slug: "rengjoring", nameNb: "Rengjøring og hygiene", nameEn: "Cleaning and hygiene" },
+  { slug: "servering", nameNb: "Serveringsutstyr", nameEn: "Serving equipment" },
+] as const;
+
+function produkterCatHref(slug: string) {
+  return `/produkter?cat=${encodeURIComponent(slug)}`;
+}
+
 export function Footer({ locale = "nb" }: { locale?: Locale }) {
   const colKat: { label: string; to: string }[] = [
-    { label: tr(locale, "Kok og stek", "Cook & fry"), to: "/produkter" },
-    { label: tr(locale, "Kjøling", "Cooling"), to: "/produkter" },
-    { label: tr(locale, "Oppvask", "Dishwashing"), to: "/produkter" },
-    { label: tr(locale, "Kombidamp", "Combi ovens"), to: "/produkter" },
-    { label: tr(locale, "Pizzautstyr", "Pizza equipment"), to: "/produkter" },
+    ...FOOTER_ROOT_CATEGORIES.map((c) => ({
+      label: tr(locale, c.nameNb, c.nameEn),
+      to: produkterCatHref(c.slug),
+    })),
     { label: tr(locale, "Se alle →", "See all →"), to: "/kategorier" },
   ];
 
   const colSel: { label: string; to: string }[] = [
     { label: tr(locale, "Om oss", "About"), to: "/om-oss" },
     { label: tr(locale, "Service", "Service"), to: "/service" },
-    { label: tr(locale, "Referanser", "References"), to: "/om-oss" },
-    { label: tr(locale, "Karriere", "Careers"), to: "/om-oss" },
+    { label: tr(locale, "Referanser", "References"), to: "/referanser" },
+    { label: tr(locale, "Karriere", "Careers"), to: "/karriere" },
     { label: tr(locale, "Kontakt", "Contact"), to: "/kontakt" },
   ];
 
@@ -58,7 +75,7 @@ export function Footer({ locale = "nb" }: { locale?: Locale }) {
             <h4 className="text-[13px] font-bold text-white mb-4">{tr(locale, "Kategorier", "Categories")}</h4>
             <ul className="space-y-2.5">
               {colKat.map((l) => (
-                <li key={l.label}>
+                <li key={l.to}>
                   <Link
                     href={l.to}
                     className="text-[13px] text-[var(--color-dark-muted)] hover:text-[var(--color-copper)] transition-colors"

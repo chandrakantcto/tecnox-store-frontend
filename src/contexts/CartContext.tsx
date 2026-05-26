@@ -29,7 +29,7 @@ import {
 export type { VendureCartLine };
 
 export function formatNOK(n: number): string {
-  return new Intl.NumberFormat("nb-NO").format(n);
+  return `${new Intl.NumberFormat("nb-NO").format(n)},-`;
 }
 
 type ActiveOrderQueryResult = { activeOrder: unknown };
