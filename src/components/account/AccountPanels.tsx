@@ -22,11 +22,11 @@ export function AccountDashboardPanel() {
   const { locale, customer } = useShopAuth();
   const lc: Locale = locale === "en" ? "en" : "nb";
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-10" style={{ height: "40vh" }}>
+    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-10" >
       <p className="text-[14px] text-[var(--color-muted)]">
         {tr(lc, `Hei, ${customer?.firstName || ""}!`, `Hi, ${customer?.firstName || ""}!`)}
       </p>
-      <ul className="mt-10 grid gap-3 sm:grid-cols-2">
+      <ul className="mt-6 md:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link href="/konto/ordrer" className="rounded-[3px] border border-[var(--color-divider)]  p-8 hover:border-[var(--color-copper)]">
           <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
             {tr(lc, "Ordrer", "Orders")}
@@ -87,42 +87,57 @@ export function AccountProfilePanel() {
   };
 
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white height-full p-8 w-3/5 ">
-      <h2 className="text-[18px] font-bold text-[var(--color-ink)]">{tr(lc, "Profil", "Profile")}</h2>
-      <p className="mt-1 text-[13px] text-[var(--color-muted)]">{customer?.emailAddress}</p>
-      <form onSubmit={(e) => void save(e)} className="mt-8 space-y-4 max-w-md ml-5">
-        <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-          {tr(lc, "Fornavn", "First name")}
-          <input
-            className="mt-1 w-full rounded-[2px] border px-4 py-2 text-[14px]"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-        </label>
-        <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-          {tr(lc, "Etternavn", "Last name")}
-          <input
-            className="mt-1 w-full rounded-[2px] border px-4 py-2 text-[14px]"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </label>
-        <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-          {tr(lc, "Telefon", "Phone")}
-          <input
-            className="mt-1 w-full rounded-[2px] border px-4 py-2 text-[14px]"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </label>
-        {msg ? <p className="text-[13px] text-[var(--color-ink)]">{msg}</p> : null}
-        <button type="submit" disabled={busy} className="h-2  btn-primary disabled:opacity-60 rounded-2xl">
-          {tr(lc, "Lagre", "Save")}
-        </button> 
-      </form>
-    </div>
+   <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-4 sm:p-6 md:p-8 min-h-[40vh] max-w-f1/2 mx-auto">
+  <h2 className="text-[16px] sm:text-[18px] font-bold text-[var(--color-ink)]">
+    {tr(lc, "Profil", "Profile")}
+  </h2>
+  <p className="mt-1 text-[12px] sm:text-[13px] text-[var(--color-muted)]">
+    {customer?.emailAddress}
+  </p>
+
+  <form onSubmit={(e) => void save(e)} className="mt-6 sm:mt-8 space-y-4 w-full max-w-md">
+    <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
+      {tr(lc, "Fornavn", "First name")}
+      <input
+        className="mt-1 w-full rounded-[2px] border px-3 sm:px-4 py-2 text-[13px] sm:text-[14px]"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        required
+      />
+    </label>
+
+    <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
+      {tr(lc, "Etternavn", "Last name")}
+      <input
+        className="mt-1 w-full rounded-[2px] border px-3 sm:px-4 py-2 text-[13px] sm:text-[14px]"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        required
+      />
+    </label>
+
+    <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
+      {tr(lc, "Telefon", "Phone")}
+      <input
+        className="mt-1 w-full rounded-[2px] border px-3 sm:px-4 py-2 text-[13px] sm:text-[14px]"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+      />
+    </label>
+
+    {msg ? (
+      <p className="text-[12px] sm:text-[13px] text-[var(--color-ink)]">{msg}</p>
+    ) : null}
+
+    <button
+      type="submit"
+      disabled={busy}
+      className="w-full sm:w-auto px-6 py-2.5 rounded-[3px] text-sm font-medium btn-primary disabled:opacity-60"
+    >
+      {tr(lc, "Lagre", "Save")}
+    </button>
+  </form>
+</div>
   );
 }
 
@@ -174,51 +189,66 @@ export function AccountPasswordPanel() {
   };
 
   return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8  height-full w-3/5">
-      <h2 className="text-[18px] font-bold">{tr(lc, "Bytt passord", "Change password")}</h2>
-      <form onSubmit={(e) => void submit(e)} className="mt-6 space-y-4">
-        <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-          {tr(lc, "Nåværende passord", "Current password")}
-          <PasswordWithToggle
-            value={current}
-            onChange={setCurrent}
-            required
-            autoComplete="current-password"
-            showLabel={tr(lc, "Vis passord", "Show password")}
-            hideLabel={tr(lc, "Skjul passord", "Hide password")}
-            className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-2  "
-          />
-        </label>
-        <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-          {tr(lc, "Nytt passord", "New password")}
-          <PasswordWithToggle
-            value={next}
-            onChange={setNext}
-            required
-            autoComplete="new-password"
-            showLabel={tr(lc, "Vis passord", "Show password")}
-            hideLabel={tr(lc, "Skjul passord", "Hide password")}
-            className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-2 pr-10"
-          />
-        </label>
-        <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-          {tr(lc, "Gjenta nytt passord", "Confirm new password")}
-          <PasswordWithToggle 
-            value={confirm}
-            onChange={setConfirm}
-            required
-            autoComplete="new-password"
-            showLabel={tr(lc, "Vis passord", "Show password")}
-            hideLabel={tr(lc, "Skjul passord", "Hide password")}
-            className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-2 pr-10"
-          />
-        </label>
-        {msg ? <p className="text-[13px]">{msg}</p> : null}
-        <button type="submit" disabled={busy} className=" h-2 rounded-2xl btn-primary disabled:opacity-60">
-          {tr(lc, "Oppdater passord", "Update password")}
-        </button>
-      </form>
-    </div>
+   <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-4 sm:p-6 md:p-8 w-full sm:w-4/5 md:w-3/5 xl:w-2/5 mx-auto">
+  <h2 className="text-[16px] sm:text-[18px] font-bold">
+    {tr(lc, "Bytt passord", "Change password")}
+  </h2>
+
+  <form onSubmit={(e) => void submit(e)} className="mt-4 sm:mt-6 space-y-4 w-full">
+
+    <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
+      {tr(lc, "Nåværende passord", "Current password")}
+      <PasswordWithToggle
+        value={current}
+        onChange={setCurrent}
+        required
+        autoComplete="current-password"
+        showLabel={tr(lc, "Vis passord", "Show password")}
+        hideLabel={tr(lc, "Skjul passord", "Hide password")}
+        className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 text-sm sm:text-base"
+      />
+    </label>
+
+    <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
+      {tr(lc, "Nytt passord", "New password")}
+      <PasswordWithToggle
+        value={next}
+        onChange={setNext}
+        required
+        autoComplete="new-password"
+        showLabel={tr(lc, "Vis passord", "Show password")}
+        hideLabel={tr(lc, "Skjul passord", "Hide password")}
+        className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
+      />
+    </label>
+
+    <label className="block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
+      {tr(lc, "Gjenta nytt passord", "Confirm new password")}
+      <PasswordWithToggle
+        value={confirm}
+        onChange={setConfirm}
+        required
+        autoComplete="new-password"
+        showLabel={tr(lc, "Vis passord", "Show password")}
+        hideLabel={tr(lc, "Skjul passord", "Hide password")}
+        className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
+      />
+    </label>
+
+    {msg ? (
+      <p className="text-[12px] sm:text-[13px]">{msg}</p>
+    ) : null}
+
+    <button
+      type="submit"
+      disabled={busy}
+      className="w-full sm:w-auto px-6 py-2.5 rounded-[3px] text-sm sm:text-base font-medium btn-primary disabled:opacity-60"
+    >
+      {tr(lc, "Oppdater passord", "Update password")}
+    </button>
+
+  </form>
+</div>
   );
 }
 
