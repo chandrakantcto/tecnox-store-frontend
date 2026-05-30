@@ -38,6 +38,7 @@ export function HandlekurvView({
   } = useCart();
 
   const [emptyCartConfirmOpen, setEmptyCartConfirmOpen] = useState(false);
+  const itemLabel = itemCount === 1 ? tr(locale, "vare", "item") : tr(locale, "varer", "items");
 
   return (
     <main className="min-h-screen bg-[var(--color-stone)]">
@@ -47,10 +48,15 @@ export function HandlekurvView({
       </header>
 
       <PageHero
-        label="Handlekurv"
-        title={<>Din kurv ({itemCount} {itemCount === 1 ? "vare" : "varer"})</>}
-        crumbs={[{ label: "Handlekurv" }]}
+        label={tr(locale, "Handlekurv", "Cart")}
+        title={
+          <>
+            {tr(locale, "Din kurv", "Your cart")} ({itemCount} {itemLabel})
+          </>
+        }
+        crumbs={[{ label: tr(locale, "Handlekurv", "Cart") }]}
         bgImage={heroImg}
+        locale={locale}
       />
 
       <section className="section-pad bg-[var(--color-stone)] pt-12 lg:pt-16">
@@ -58,8 +64,12 @@ export function HandlekurvView({
           {bootstrapError ? (
             <Reveal>
               <div className="mb-8 rounded-[3px] border border-red-700/35 bg-white px-4 py-3 text-[14px] text-red-800">
-                Kunne ikke hente handlekurven: {bootstrapError}. Sjekk at nettbutikk-API (
-                <code>NEXT_PUBLIC_VENDURE_SHOP_API_URL</code>) og kanal-token er konfigurert for denne storefront-prosessen.
+                {tr(locale, "Kunne ikke hente handlekurven:", "Could not load your cart:")} {bootstrapError}.{" "}
+                {tr(
+                  locale,
+                  "Sjekk at nettbutikk-API (NEXT_PUBLIC_VENDURE_SHOP_API_URL) og kanal-token er konfigurert for denne storefront-prosessen.",
+                  "Check that the shop API (NEXT_PUBLIC_VENDURE_SHOP_API_URL) and channel token are configured for this storefront process.",
+                )}
               </div>
             </Reveal>
           ) : null}
@@ -71,15 +81,22 @@ export function HandlekurvView({
                 onClick={() => clearLastActionError()}
                 className="mb-6 w-full rounded-[3px] border border-[var(--color-copper)]/40 bg-white px-4 py-3 text-left text-[14px] text-[var(--color-ink)]"
               >
-                <span className="font-semibold text-[var(--color-copper)]">Kundeoppdatering:</span> {lastActionError}
-                <span className="block text-[12px] text-[var(--color-muted)]">Trykk for å lukke meldingen.</span>
+                <span className="font-semibold text-[var(--color-copper)]">
+                  {tr(locale, "Kundeoppdatering:", "Cart update:")}
+                </span>{" "}
+                {lastActionError}
+                <span className="block text-[12px] text-[var(--color-muted)]">
+                  {tr(locale, "Trykk for å lukke meldingen.", "Tap to dismiss this message.")}
+                </span>
               </button>
             </Reveal>
           ) : null}
 
           {loading ? (
             <Reveal>
-              <p className="py-24 text-center text-[15px] text-[var(--color-muted)]">Laster inn handlekurven…</p>
+              <p className="py-24 text-center text-[15px] text-[var(--color-muted)]">
+                {tr(locale, "Laster inn handlekurven …", "Loading your cart …")}
+              </p>
             </Reveal>
           ) : lines.length === 0 ? (
             <Reveal>
@@ -87,13 +104,19 @@ export function HandlekurvView({
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-[var(--color-divider)] text-[var(--color-muted)]">
                   <ShoppingBag className="h-6 w-6" strokeWidth={1.5} />
                 </div>
-                <h2 className="display-h3 mt-6 text-[var(--color-ink)]">Handlekurven er tom.</h2>
+                <h2 className="display-h3 mt-6 text-[var(--color-ink)]">
+                  {tr(locale, "Handlekurven er tom.", "Your cart is empty.")}
+                </h2>
                 <p className="mt-4 text-[15px] text-[var(--color-muted)]">
-                  Bla gjennom utvalget vårt og legg produkter i kurven direkte fra produktsidene — priser og beholdning synkroniseres fra Vendure.
+                  {tr(
+                    locale,
+                    "Bla gjennom utvalget vårt og legg produkter i kurven direkte fra produktsidene — priser og beholdning synkroniseres fra Vendure.",
+                    "Browse our range and add products from product pages — prices and stock sync from Vendure.",
+                  )}
                 </p>
                 <div className="mt-8">
                   <Link href="/produkter" className="btn-primary inline-flex">
-                    Se produkter
+                    {tr(locale, "Se produkter", "View products")}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -142,7 +165,7 @@ export function HandlekurvView({
                               disabled={syncing}
                               onClick={() => void updateLineQuantity(line.orderLineId, line.quantity - 1)}
                               className="px-2.5 transition-colors hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] disabled:opacity-50"
-                              aria-label="Reduser"
+                              aria-label={tr(locale, "Reduser", "Decrease")}
                             >
                               <Minus className="h-3.5 w-3.5" />
                             </button>
@@ -152,7 +175,7 @@ export function HandlekurvView({
                               disabled={syncing}
                               onClick={() => void updateLineQuantity(line.orderLineId, line.quantity + 1)}
                               className="px-2.5 transition-colors hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] disabled:opacity-50"
-                              aria-label="Øk"
+                              aria-label={tr(locale, "Øk", "Increase")}
                             >
                               <Plus className="h-3.5 w-3.5" />
                             </button>
@@ -163,13 +186,15 @@ export function HandlekurvView({
                             onClick={() => void removeLine(line.orderLineId)}
                             className="inline-flex items-center gap-1.5 text-[12px] text-[var(--color-muted)] hover:text-[var(--color-copper)] disabled:opacity-50"
                           >
-                            <Trash2 className="h-3.5 w-3.5" /> Fjern
+                            <Trash2 className="h-3.5 w-3.5" /> {tr(locale, "Fjern", "Remove")}
                           </button>
                         </div>
                       </div>
 
                       <div className="col-span-2 text-right sm:col-span-1">
-                        <p className="text-[12px] text-[var(--color-muted)]">kr {formatNOK(Math.round(line.unitPriceKr))} eks. MVA</p>
+                        <p className="text-[12px] text-[var(--color-muted)]">
+                          kr {formatNOK(Math.round(line.unitPriceKr))} {tr(locale, "eks. MVA", "excl. VAT")}
+                        </p>
                         <p className="mt-1 text-[18px] font-bold tracking-[-0.015em] text-[var(--color-copper)]">
                           kr {formatNOK(Math.round(line.lineTotalKr))}
                         </p>
@@ -210,33 +235,41 @@ export function HandlekurvView({
 
               <Reveal delay={0.15}>
                 <aside className="rounded-[3px] bg-[var(--color-dark-bg)] p-6 text-[var(--color-stone)] lg:sticky lg:top-28 lg:p-8">
-                  <h3 className="text-[18px] font-bold tracking-[-0.02em] text-white">Sammendrag</h3>
+                  <h3 className="text-[18px] font-bold tracking-[-0.02em] text-white">
+                    {tr(locale, "Sammendrag", "Summary")}
+                  </h3>
 
                   <dl className="mt-6 space-y-3 text-[14px]">
                     <div className="flex justify-between">
-                      <dt className="text-[var(--color-dark-muted)]">Antall varer</dt>
+                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Antall varer", "Item count")}</dt>
                       <dd>{itemCount}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-[var(--color-dark-muted)]">Sum (eks. MVA)</dt>
+                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum (eks. MVA)", "Subtotal (excl. VAT)")}</dt>
                       <dd className="font-mono">kr {formatNOK(Math.round(subtotal))}</dd>
                     </div>
                   </dl>
 
                   <div className="mt-6 flex items-baseline justify-between border-t border-[var(--color-dark-border)] pt-5">
-                    <span className="text-[12px] uppercase tracking-[0.14em] text-[var(--color-dark-muted)]">Total eks. MVA</span>
+                    <span className="text-[12px] uppercase tracking-[0.14em] text-[var(--color-dark-muted)]">
+                      {tr(locale, "Total eks. MVA", "Total excl. VAT")}
+                    </span>
                     <span className="text-[24px] font-bold tracking-[-0.02em] text-[var(--color-copper)]">
                       kr {formatNOK(Math.round(subtotal))}
                     </span>
                   </div>
 
                   <Link href="/kasse" className="btn-primary mt-7 flex w-full justify-center opacity-100">
-                    Til kassen
+                    {tr(locale, "Til kassen", "Checkout")}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
 
                   <p className="mt-4 text-[11px] leading-[1.6] text-[var(--color-dark-muted)]">
-                    Bestillingen sendes gjennom Vendure Shop API og behandles videre fra Admin når ordren er betalt eller manuelt bokført.
+                    {tr(
+                      locale,
+                      "Bestillingen sendes gjennom Vendure Shop API og behandles videre fra Admin når ordren er betalt eller manuelt bokført.",
+                      "The order is sent through the Vendure Shop API and processed in Admin once paid or manually recorded.",
+                    )}
                   </p>
                 </aside>
               </Reveal>
@@ -245,7 +278,7 @@ export function HandlekurvView({
         </div>
       </section>
 
-      <Footer />
+      <Footer locale={locale} />
     </main>
   );
 }

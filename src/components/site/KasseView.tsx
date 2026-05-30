@@ -172,13 +172,14 @@ export function KasseView({
           <MainNav megaMenuByLocale={megaMenuByLocale} />
         </header>
         <PageHero
-          label="Ordre bekreftet"
-          title={<>Bestilling registrert!</>}
+          label={tr(locale, "Ordre bekreftet", "Order confirmed")}
+          title={<>{tr(locale, "Bestilling registrert!", "Order placed!")}</>}
           crumbs={[
-            { label: "Handlekurv", to: "/handlekurv" },
-            { label: "Kvittering" },
+            { label: tr(locale, "Handlekurv", "Cart"), to: "/handlekurv" },
+            { label: tr(locale, "Kvittering", "Receipt") },
           ]}
           bgImage={heroImg}
+          locale={locale}
         />
         <section className="container-x py-16 lg:py-24">
           <Reveal>
@@ -200,7 +201,9 @@ export function KasseView({
                     "The order has been created in Vendure using your offline/manual payment flow.",
                   )}
               </p>
-              <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)]">Ordrekode</p>
+              <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
+                {tr(locale, "Ordrekode", "Order code")}
+              </p>
               <p className="mt-1 font-mono text-[18px] font-bold text-[var(--color-ink)]">{placedOrderCode}</p>
               {postAuthBusy ? (
                 <p className="mt-4 text-[14px] text-[var(--color-muted)]">
@@ -236,7 +239,7 @@ export function KasseView({
             </div>
           </Reveal>
         </section>
-        <Footer />
+        <Footer locale={locale} />
       </main>
     );
   }
@@ -249,18 +252,22 @@ export function KasseView({
       </header>
 
       <PageHero
-        label="Kasse"
-        title={<>Fullfør bestillingen</>}
+        label={tr(locale, "Kasse", "Checkout")}
+        title={<>{tr(locale, "Fullfør bestillingen", "Complete your order")}</>}
         description={tr(locale, "Fyll inn dine opplysninger — ordren sendes gjennom Vendure.", "Fill in your details — the order flows through Vendure.")}
-        crumbs={[{ label: "Handlekurv", to: "/handlekurv" }, { label: "Kasse" }]}
+        crumbs={[
+          { label: tr(locale, "Handlekurv", "Cart"), to: "/handlekurv" },
+          { label: tr(locale, "Kasse", "Checkout") },
+        ]}
         bgImage={heroImg}
+        locale={locale}
       />
 
       <section className="section-pad bg-[var(--color-stone)] pt-12 lg:pt-16">
         <div className="container-x">
           {bootstrapError ? (
             <div className="mb-8 rounded-[3px] border border-red-700/35 bg-white px-4 py-3 text-[14px] text-red-800">
-              Cannot load cart: {bootstrapError}
+              {tr(locale, "Kunne ikke laste handlekurv:", "Cannot load cart:")} {bootstrapError}
             </div>
           ) : null}
 
@@ -548,7 +555,7 @@ export function KasseView({
         </div>
       </section>
 
-      <Footer />
+      <Footer locale={locale} />
     </main>
   );
 }

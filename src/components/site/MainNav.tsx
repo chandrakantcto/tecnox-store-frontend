@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { User, ShoppingBag, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
+import { useCartItemCount } from "@/contexts/CartContext";
+import { useLocale } from "@/contexts/LocaleContext";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
 import type { MegaMain } from "@/data/megaMenu";
 import { useStorefrontSearch } from "@/hooks/use-storefront-search";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
-import { getClientLocale, type Locale, setClientLocale, tr } from "@/lib/locale";
+import { type Locale, tr } from "@/lib/locale";
 import { CartSidebar } from "@/components/site/CartSidebar";
 import { NavSearchDesktop, NavSearchMobile } from "@/components/site/NavSearch";
 
@@ -29,17 +30,87 @@ function catHref(collectionSlug: string) {
   return `/produkter?cat=${encodeURIComponent(collectionSlug)}`;
 }
 
-function pickFirstSubWithChildren(mainId: string, megaMenuTree: MegaMain[]) {
-  const main = megaMenuTree.find((m) => m.id === mainId);
-  return main?.subs.find((s) => s.children && s.children.length > 0)?.id ?? null;
+function pickFirstSubWithChildren(mainCollectionId: string, megaMenuTree: MegaMain[]) {
+  const main = megaMenuTree.find((m) => m.collectionId === mainCollectionId);
+  return main?.subs.find((s) => s.children && s.children.length > 0)?.collectionId ?? null;
 }
 
 const MEGA_CLOSE_MS = 140;
 
+function UserAccountMenu({ locale, authCustomer }: { locale: Locale; authCustomer: unknown }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { logout } = useShopAuth();
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
+
+  const itemClass =
+    "block w-full px-4 py-2.5 text-left text-[13px] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-stone)] hover:text-[var(--color-copper)] cursor-pointer";
+
+  const handleLogout = () => {
+    setOpen(false);
+    void logout().then(() => router.push("/"));
+  };
+
+  return (
+    <div ref={menuRef} className="relative hidden sm:block">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={
+          authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Konto", "Account")
+        }
+        className="text-[var(--color-ink)] transition-colors hover:text-[var(--color-copper)] cursor-pointer"
+      >
+        <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
+      </button>
+      {open ? (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-50 mt-2 min-w-[190px] rounded-[3px] border border-[var(--color-divider)] bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+        >
+          {authCustomer ? (
+            <>
+              <Link href="/konto" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Min konto", "My account")}
+              </Link>
+              <Link href="/konto/ordrer" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Bestillinger", "Orders")}
+              </Link>
+              <button type="button" role="menuitem" onClick={handleLogout} className={itemClass}>
+                {tr(locale, "Logg ut", "Log out")}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/logg-inn" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Logg inn", "Sign in")}
+              </Link>
+              <Link href="/registrer" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Registrer", "Register")}
+              </Link>
+            </>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: MegaMenuLocales }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [locale, setLocale] = useState<Locale>("nb");
+  const { locale, setLocale: setSiteLocale } = useLocale();
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
@@ -49,8 +120,8 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   const [megaMainId, setMegaMainId] = useState<string | null>(null);
   const [megaSubId, setMegaSubId] = useState<string | null>(null);
   const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { itemCount } = useCart();
-  const { customer: authCustomer } = useShopAuth();
+  const itemCount = useCartItemCount();
+  const { customer: authCustomer, logout } = useShopAuth();
   const megaMenuTree = useMemo(() => {
     const pick = megaMenuByLocale[locale];
     if (pick?.length) return pick;
@@ -59,10 +130,6 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   }, [locale, megaMenuByLocale]);
 
   const storefrontSearch = useStorefrontSearch(locale, megaMenuTree);
-
-  useEffect(() => {
-    setLocale(getClientLocale());
-  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -91,11 +158,11 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   };
 
   const activeMain = useMemo(
-    () => megaMenuTree.find((m) => m.id === megaMainId) ?? megaMenuTree[0],
+    () => megaMenuTree.find((m) => m.collectionId === megaMainId) ?? megaMenuTree[0],
     [megaMainId, megaMenuTree],
   );
   const activeSub = useMemo(
-    () => activeMain?.subs.find((s) => s.id === megaSubId),
+    () => activeMain?.subs.find((s) => s.collectionId === megaSubId),
     [activeMain, megaSubId],
   );
 
@@ -104,8 +171,8 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
     const first = megaMenuTree[0];
     if (!first) return;
     setMegaOpen(true);
-    setMegaMainId(first.id);
-    setMegaSubId(pickFirstSubWithChildren(first.id, megaMenuTree));
+    setMegaMainId(first.collectionId);
+    setMegaSubId(pickFirstSubWithChildren(first.collectionId, megaMenuTree));
   };
 
   const closeMega = () => {
@@ -114,16 +181,9 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
     setMegaSubId(null);
   };
 
-  const onMainEnter = (mainId: string) => {
-    setMegaMainId(mainId);
-    setMegaSubId(pickFirstSubWithChildren(mainId, megaMenuTree));
-  };
-
-  const setSiteLocale = (nextLocale: Locale) => {
-    if (nextLocale === locale) return;
-    setClientLocale(nextLocale);
-    setLocale(nextLocale);
-    router.refresh();
+  const onMainEnter = (mainCollectionId: string) => {
+    setMegaMainId(mainCollectionId);
+    setMegaSubId(pickFirstSubWithChildren(mainCollectionId, megaMenuTree));
   };
 
   return (
@@ -185,15 +245,15 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                   <div className="border-r border-[var(--color-divider)] bg-[var(--color-stone)]/40">
                     <ul className="py-2 max-h-[min(320px,50vh)] overflow-y-auto overscroll-contain">
                       {megaMenuTree.map((main) => (
-                        <li key={main.id}>
+                        <li key={main.collectionId}>
                           <button
                             type="button"
                             className={`w-full text-left flex items-center justify-between gap-2 px-4 py-3 text-[13.5px] font-medium transition-colors border-l-[3px] ${
-                              megaMainId === main.id
+                              megaMainId === main.collectionId
                                 ? "border-[var(--color-copper)] bg-white text-[var(--color-copper)]"
                                 : "border-transparent text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
                             }`}
-                            onMouseEnter={() => onMainEnter(main.id)}
+                            onMouseEnter={() => onMainEnter(main.collectionId)}
                           >
                             <span className="min-w-0 truncate">{main.label}</span>
                             <span className="flex items-center gap-1 shrink-0">
@@ -210,13 +270,13 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                   <div className="border-r border-[var(--color-divider)] bg-white pl-5">
                     <ul className="py-2 max-h-[min(320px,50vh)] overflow-y-auto overscroll-contain">
                       {activeMain?.subs.map((sub) => (
-                        <li key={sub.id}>
+                        <li key={sub.collectionId}>
                           <Link
                             href={catHref(sub.id)}
-                            onMouseEnter={() => setMegaSubId(sub.id)}
+                            onMouseEnter={() => setMegaSubId(sub.collectionId)}
                             onClick={closeMega}
                             className={`flex items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
-                              megaSubId === sub.id
+                              megaSubId === sub.collectionId
                                 ? "border-[var(--color-copper)] bg-[var(--color-stone)]/35 text-[var(--color-copper)] font-medium"
                                 : "border-transparent text-[var(--color-ink)] hover:bg-[var(--color-stone)]/50 hover:text-[var(--color-copper)]"
                             }`}
@@ -236,7 +296,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                     <ul className="py-2 max-h-[min(320px,50vh)] overflow-y-auto overscroll-contain">
                       {activeSub?.children && activeSub.children.length > 0 ? (
                         activeSub.children.map((leaf) => (
-                          <li key={leaf.id}>
+                          <li key={leaf.collectionId}>
                             <Link
                               href={catHref(leaf.id)}
                               onClick={closeMega}
@@ -293,13 +353,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
             </button>
           </div>
           <NavSearchDesktop locale={locale} search={storefrontSearch} />
-          <Link
-            href={authCustomer ? "/konto" : "/logg-inn"}
-            aria-label={authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Logg inn", "Sign in")}
-            className="hidden sm:block text-[var(--color-ink)] hover:text-[var(--color-copper)] transition-colors"
-          >
-            <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          </Link>
+          <UserAccountMenu locale={locale} authCustomer={authCustomer} />
           <button
             type="button"
             onClick={() => setCartOpen(true)}
@@ -369,13 +423,13 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                           </p>
                           <div className="flex flex-col gap-0.5">
                             {megaMenuTree.map((main) => {
-                              const mainOpen = mobileMegaMainId === main.id;
+                              const mainOpen = mobileMegaMainId === main.collectionId;
                               return (
-                                <div key={main.id}>
+                                <div key={main.collectionId}>
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      setMobileMegaMainId((id) => (id === main.id ? null : main.id));
+                                      setMobileMegaMainId((id) => (id === main.collectionId ? null : main.collectionId));
                                       setMobileMegaSubId(null);
                                     }}
                                     className={`flex w-full items-center justify-between gap-2 rounded-[3px] border px-3 py-2.5 text-left text-[13px] font-medium transition-colors ${
@@ -398,15 +452,15 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                     <ul className="mt-0.5 flex flex-col gap-0.5 border-l border-[var(--color-divider)] py-1 pl-2 ml-2">
                                       {main.subs.map((sub) => {
                                         const hasChildren = Boolean(sub.children && sub.children.length > 0);
-                                        const subOpen = mobileMegaSubId === sub.id;
+                                        const subOpen = mobileMegaSubId === sub.collectionId;
                                         return (
-                                          <li key={sub.id}>
+                                          <li key={sub.collectionId}>
                                             {hasChildren ? (
                                               <>
                                                 <button
                                                   type="button"
                                                   onClick={() =>
-                                                    setMobileMegaSubId((id) => (id === sub.id ? null : sub.id))
+                                                    setMobileMegaSubId((id) => (id === sub.collectionId ? null : sub.collectionId))
                                                   }
                                                   className={`flex w-full items-center justify-between gap-2 rounded-[3px] px-3 py-2 text-left text-[13px] transition-colors ${
                                                     subOpen
@@ -423,7 +477,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                                 {subOpen ? (
                                                   <ul className="flex flex-col gap-0.5 py-1 pl-2">
                                                     {sub.children!.map((leaf) => (
-                                                      <li key={leaf.id}>
+                                                      <li key={leaf.collectionId}>
                                                         <Link
                                                           href={catHref(leaf.id)}
                                                           onClick={() => setOpen(false)}
@@ -473,15 +527,61 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                 </li>
               );
             })}
-            <li>
-              <Link
-                href={authCustomer ? "/konto" : "/logg-inn"}
-                onClick={() => setOpen(false)}
-                className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
-              >
-                {authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Logg inn", "Sign in")}
-              </Link>
-            </li>
+            {authCustomer ? (
+              <>
+                <li>
+                  <Link
+                    href="/konto"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Min konto", "My account")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/konto/ordrer"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Bestillinger", "Orders")}
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      void logout().then(() => router.push("/"));
+                    }}
+                    className="block w-full py-3 text-left text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)] cursor-pointer"
+                  >
+                    {tr(locale, "Logg ut", "Log out")}
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link
+                    href="/logg-inn"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Logg inn", "Sign in")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/registrer"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Registrer", "Register")}
+                  </Link>
+                </li>
+              </>
+            )}
             <li className="pt-1">
               <div className="inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
                 <button

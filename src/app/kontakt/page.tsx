@@ -54,6 +54,7 @@ export default async function KontaktPage() {
         )}
         crumbs={[{ label: tr(locale, "Kontakt", "Contact") }]}
         bgImage={bgImg}
+        locale={locale}
       />
 
       <section className="bg-[var(--color-stone)] section-pad">

@@ -3,6 +3,8 @@ import type { StaticImageData } from "next/image";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
+import type { Locale } from "@/lib/locale";
+import { tr } from "@/lib/locale";
 import { Reveal } from "@/components/site/Reveal";
 
 export type Crumb = {
@@ -16,9 +18,10 @@ interface PageHeroProps {
   description?: string;
   crumbs?: Crumb[];
   bgImage?: string | StaticImageData;
+  locale?: Locale;
 }
 
-export function PageHero({ label, title, description, crumbs, bgImage }: PageHeroProps) {
+export function PageHero({ label, title, description, crumbs, bgImage, locale = "nb" }: PageHeroProps) {
   return (
     <section className="relative bg-[var(--color-stone)] text-[var(--color-ink)] border-b border-[var(--color-divider)] overflow-hidden">
       {/* Right-side image accent rather than full-bleed dark overlay */}
@@ -59,7 +62,7 @@ export function PageHero({ label, title, description, crumbs, bgImage }: PageHer
       <div className="relative container-x pt-10 pb-10 lg:pt-12 lg:pb-14">
         {/* Breadcrumb */}
         {crumbs && crumbs.length > 0 && (
-          <nav aria-label="Brødsmuler" className="mb-5">
+          <nav aria-label={tr(locale, "Brødsmuler", "Breadcrumbs")} className="mb-5">
             <ol className="flex flex-wrap items-center gap-1.5 text-[12px] text-[var(--color-muted)]">
               <li>
                 <Link
@@ -67,7 +70,7 @@ export function PageHero({ label, title, description, crumbs, bgImage }: PageHer
                   className="inline-flex items-center gap-1.5 hover:text-[var(--color-copper)] transition-colors"
                 >
                   <Home className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="sr-only">Hjem</span>
+                  <span className="sr-only">{tr(locale, "Hjem", "Home")}</span>
                 </Link>
               </li>
               {crumbs.map((c, i) => {

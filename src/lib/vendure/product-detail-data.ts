@@ -10,11 +10,16 @@ import type { Locale } from "@/lib/locale";
 import { staticSrc } from "@/lib/static-asset";
 import type { CatalogProductCard } from "@/lib/vendure/catalog-types";
 import {
+  applyLocaleToSearchHit,
+  buildLocalizedCategoryNameMap,
   fetchNavRoots,
+  getGlobalProductSearchHitsDual,
+  pickLocalizedText,
   searchHitToCatalogCard,
 } from "@/lib/vendure/catalog-data";
 import {
   absoluteAssetUrl,
+  dedupeNavRootsBySlug,
   formatNOKExclVatFromMinor,
   inferBrandFromSku,
   minorUnitsFromMoney,
@@ -231,8 +236,19 @@ async function fetchRelatedProductsForPdp(
   idToRoot: Map<string, string>,
   slugToCategoryName: Map<string, string>,
 ): Promise<Product[]> {
+  const dualSearch = await getGlobalProductSearchHitsDual();
+  const nbBySlug = new Map(dualSearch.nb.map((h) => [h.slug, h]));
+  const enBySlug = new Map(dualSearch.en.map((h) => [h.slug, h]));
+
   const toCard = (h: SearchHitRaw) =>
-    catalogCardToProductStub(searchHitToCatalogCard(locale, h, idToRoot, slugToCategoryName));
+    catalogCardToProductStub(
+      searchHitToCatalogCard(
+        locale,
+        applyLocaleToSearchHit(h, locale, nbBySlug, enBySlug),
+        idToRoot,
+        slugToCategoryName,
+      ),
+    );
 
   const seen = new Set<string>();
   const out: Product[] = [];
@@ -299,11 +315,15 @@ export const getStorefrontProductDetail = cache(
     preferredVariantId?: string | null,
   ): Promise<StorefrontProductDetailPayload> => {
     const lc = locale === "en" ? "en" : "nb";
+    const altLc = lc === "en" ? "nb" : "en";
 
     try {
-      const [{ roots }, productRes, pdpExtrasRes] = await Promise.all([
+      const [{ roots }, navNb, navEn, productRes, productResAlt, pdpExtrasRes] = await Promise.all([
         fetchNavRoots(lc),
+        fetchNavRoots("nb"),
+        fetchNavRoots("en"),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, lc),
+        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, altLc),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT_PDP_EXTRA, { slug }, lc),
       ]);
 
@@ -317,7 +337,12 @@ export const getStorefrontProductDetail = cache(
       };
       for (const r of roots) attachNav(r, r.slug);
 
-      const slugToCategoryName = new Map(roots.map((r) => [r.slug, r.name] as const));
+      const slugToCategoryName = buildLocalizedCategoryNameMap(
+        dedupeNavRootsBySlug(roots),
+        locale,
+        navNb.roots,
+        navEn.roots,
+      );
 
       if (err || !rawRoot || typeof rawRoot !== "object") {
         return {
@@ -329,10 +354,18 @@ export const getStorefrontProductDetail = cache(
       }
 
       const p = rawRoot as Record<string, unknown>;
+      const pAlt =
+        productResAlt.data?.product && typeof productResAlt.data.product === "object"
+          ? (productResAlt.data.product as Record<string, unknown>)
+          : null;
 
       const productSlug = typeof p.slug === "string" ? p.slug : slug;
-      const name = typeof p.name === "string" ? p.name : "";
-      const descriptionHtml = typeof p.description === "string" ? p.description : "";
+      const namePrimary = typeof p.name === "string" ? p.name : "";
+      const nameAlternate = typeof pAlt?.name === "string" ? pAlt.name : "";
+      const name = pickLocalizedText(namePrimary, nameAlternate, locale);
+      const descriptionPrimary = typeof p.description === "string" ? p.description : "";
+      const descriptionAlternate = typeof pAlt?.description === "string" ? pAlt.description : "";
+      const descriptionHtml = pickLocalizedText(descriptionPrimary, descriptionAlternate, locale);
 
       const collections = Array.isArray(p.collections)
         ? (p.collections.filter((x) => x && typeof x === "object") as Record<string, unknown>[])
@@ -378,6 +411,17 @@ export const getStorefrontProductDetail = cache(
       const variantRowsRaw = Array.isArray(p.variants)
         ? (p.variants.filter((x) => x && typeof x === "object") as Record<string, unknown>[])
         : [];
+
+      const altVariantNames = new Map<string, string>();
+      if (pAlt && Array.isArray(pAlt.variants)) {
+        for (const row of pAlt.variants) {
+          if (!row || typeof row !== "object") continue;
+          const vr = row as Record<string, unknown>;
+          const id = typeof vr.id === "string" || typeof vr.id === "number" ? String(vr.id) : "";
+          const vn = typeof vr.name === "string" ? vr.name : "";
+          if (id && vn) altVariantNames.set(id, vn);
+        }
+      }
 
       if (!variantRowsRaw.length) {
         return {
@@ -458,7 +502,7 @@ export const getStorefrontProductDetail = cache(
         storefrontVariants.push({
           id,
           sku,
-          name: typeof vr.name === "string" ? vr.name : sku,
+          name: pickLocalizedText(typeof vr.name === "string" ? vr.name : sku, altVariantNames.get(id) ?? "", locale),
           stockLevel:
             typeof vr.stockLevel === "string" ? vr.stockLevel : String(vr.stockLevel ?? "—"),
           options,

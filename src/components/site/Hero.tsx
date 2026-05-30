@@ -18,10 +18,14 @@ const SLIDE_INTERVAL_MS = 3000;
 type HeroSlide = {
   id: string;
   image: StaticImageData;
-  alt: string;
-  spec: string;
-  badge: string;
-  ctaLine: string;
+  altNb: string;
+  altEn: string;
+  specNb: string;
+  specEn: string;
+  badgeNb: string;
+  badgeEn: string;
+  ctaLineNb: string;
+  ctaLineEn: string;
   ctaHref: string;
 };
 
@@ -29,54 +33,74 @@ const SLIDES: HeroSlide[] = [
   {
     id: "combi",
     image: heroCombi,
-    alt: "Profesjonell kombidamper for storhusholdning",
-    spec: "Rational · iCombi Pro",
-    badge: "NYHET",
-    ctaLine: "Kombidampere 2025-serien",
+    altNb: "Profesjonell kombidamper for storhusholdning",
+    altEn: "Professional combi oven for commercial kitchens",
+    specNb: "Rational · iCombi Pro",
+    specEn: "Rational · iCombi Pro",
+    badgeNb: "NYHET",
+    badgeEn: "NEW",
+    ctaLineNb: "Kombidampere 2025-serien",
+    ctaLineEn: "Combi ovens 2025 series",
     ctaHref: "/produkter",
   },
   {
     id: "restaurant",
     image: heroRestaurant,
-    alt: "Kjøkkenløsning for restaurant og HoReCa",
-    spec: "Prosjektering · Montering",
-    badge: "REFERANSE",
-    ctaLine: "Se utvalgte prosjekter",
+    altNb: "Kjøkkenløsning for restaurant og HoReCa",
+    altEn: "Kitchen solution for restaurant and HoReCa",
+    specNb: "Prosjektering · Montering",
+    specEn: "Planning · Installation",
+    badgeNb: "REFERANSE",
+    badgeEn: "REFERENCE",
+    ctaLineNb: "Se utvalgte prosjekter",
+    ctaLineEn: "View selected projects",
     ctaHref: "/service",
   },
   {
     id: "hotell",
     image: heroHotell,
-    alt: "Storkjøkken for hotell og konferanse",
-    spec: "Hotell & storhusholdning",
-    badge: "24/7 SERVICE",
-    ctaLine: "Serviceavtaler for drift",
+    altNb: "Storkjøkken for hotell og konferanse",
+    altEn: "Commercial kitchen for hotels and conferences",
+    specNb: "Hotell & storhusholdning",
+    specEn: "Hotel & foodservice",
+    badgeNb: "24/7 SERVICE",
+    badgeEn: "24/7 SERVICE",
+    ctaLineNb: "Serviceavtaler for drift",
+    ctaLineEn: "Service agreements for operations",
     ctaHref: "/service",
   },
   {
     id: "kantine",
     image: heroKantine,
-    alt: "Kantine og institusjonskjøkken",
-    spec: "Kantine · Skole · Offentlig",
-    badge: "KOMPLETT",
-    ctaLine: "Be om tilbud til kantine",
+    altNb: "Kantine og institusjonskjøkken",
+    altEn: "Canteen and institutional kitchen",
+    specNb: "Kantine · Skole · Offentlig",
+    specEn: "Canteen · School · Public sector",
+    badgeNb: "KOMPLETT",
+    badgeEn: "COMPLETE",
+    ctaLineNb: "Be om tilbud til kantine",
+    ctaLineEn: "Request a canteen quote",
     ctaHref: "/kontakt",
   },
   {
     id: "kjoling",
     image: heroKjoling,
-    alt: "Kjøle- og frysutstyr for profesjonelt kjøkken",
-    spec: "Gram · Kjøl & frys",
-    badge: "LAGER",
-    ctaLine: "Utforsk kjøleutstyr",
+    altNb: "Kjøle- og frysutstyr for profesjonelt kjøkken",
+    altEn: "Refrigeration and freezing for professional kitchens",
+    specNb: "Gram · Kjøl & frys",
+    specEn: "Gram · Chill & freeze",
+    badgeNb: "LAGER",
+    badgeEn: "IN STOCK",
+    ctaLineNb: "Utforsk kjøleutstyr",
+    ctaLineEn: "Explore refrigeration",
     ctaHref: "/produkter",
   },
 ];
 
 const TRUST = [
-  { icon: Truck, label: "Rask levering" },
-  { icon: Wrench, label: "Montering & service" },
-  { icon: ShieldCheck, label: "30 års erfaring" },
+  { icon: Truck, labelNb: "Rask levering", labelEn: "Fast delivery" },
+  { icon: Wrench, labelNb: "Montering & service", labelEn: "Installation & service" },
+  { icon: ShieldCheck, labelNb: "30 års erfaring", labelEn: "30 years of experience" },
 ];
 
 export function Hero({ locale = "nb" }: { locale?: Locale }) {
@@ -152,10 +176,10 @@ export function Hero({ locale = "nb" }: { locale?: Locale }) {
 
           {/* Trust row — denser, icon-led */}
           <div className="mt-10 pt-6 border-t border-[var(--color-divider)] flex flex-wrap gap-x-7 gap-y-3">
-            {TRUST.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-2 text-[13px] text-[var(--color-ink)]">
+            {TRUST.map(({ icon: Icon, labelNb, labelEn }) => (
+              <div key={labelNb} className="flex items-center gap-2 text-[13px] text-[var(--color-ink)]">
                 <Icon className="h-4 w-4 text-[var(--color-copper)]" strokeWidth={1.75} />
-                <span className="font-medium">{label}</span>
+                <span className="font-medium">{tr(locale, labelNb, labelEn)}</span>
               </div>
             ))}
           </div>
@@ -180,7 +204,7 @@ export function Hero({ locale = "nb" }: { locale?: Locale }) {
               >
                 <Image
                   src={s.image}
-                  alt={s.alt}
+                  alt={tr(locale, s.altNb, s.altEn)}
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -202,7 +226,7 @@ export function Hero({ locale = "nb" }: { locale?: Locale }) {
                 type="button"
                 role="tab"
                 aria-selected={i === index}
-                aria-label={`Slide ${i + 1}: ${s.alt}`}
+                aria-label={`Slide ${i + 1}: ${tr(locale, s.altNb, s.altEn)}`}
                 onClick={() => go(i)}
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
@@ -220,15 +244,15 @@ export function Hero({ locale = "nb" }: { locale?: Locale }) {
             className="absolute bottom-4 left-4 right-4 z-[2] sm:right-auto bg-white text-[var(--color-ink)] text-[12px] font-medium pl-3.5 pr-4 py-3 rounded-[3px] shadow-xl flex items-center gap-2.5 hover:bg-[var(--color-ink)] hover:text-white transition-colors group"
           >
             <span className="bg-[var(--color-copper)] text-white text-[9px] font-bold tracking-[0.14em] px-1.5 py-0.5 rounded-[2px]">
-              {slide.badge}
+              {tr(locale, slide.badgeNb, slide.badgeEn)}
             </span>
-            <span className="flex-1">{slide.ctaLine}</span>
+            <span className="flex-1">{tr(locale, slide.ctaLineNb, slide.ctaLineEn)}</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
 
           {/* Spec chip top-right */}
           <div className="absolute top-4 right-4 z-[2] bg-white/95 backdrop-blur-sm border border-[var(--color-divider)] text-[var(--color-ink)] text-[10px] font-semibold px-2.5 py-1.5 rounded-[2px] uppercase tracking-[0.14em]">
-            {slide.spec}
+            {tr(locale, slide.specNb, slide.specEn)}
           </div>
 
           {/* Stat overlay — bottom-right corner card */}

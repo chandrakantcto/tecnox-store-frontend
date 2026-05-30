@@ -36,6 +36,9 @@ export function Categories({
         t.name.length > 0,
     ) ?? [];
 
+  /** Homepage preview: 3 rows × 5 cols (xl). Full grid on /kategorier (`showSeeAllLink={false}`). */
+  const displayCats = showSeeAllLink ? cats.slice(0, 15) : cats;
+
   const apiMsg = catalogError ? formatShopBannerError(catalogError) : null;
 
   const eyebrowLabel =
@@ -96,8 +99,8 @@ export function Categories({
           </Reveal>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
-            {cats.map((cat, i) => (
-              <Reveal key={cat.slug} delay={Math.min(i * 0.04, 0.32)}>
+            {displayCats.map((cat, i) => (
+              <Reveal key={`${cat.slug}-${i}`} delay={Math.min(i * 0.04, 0.32)}>
                 <Link
                   href={cat.href}
                   className="group block bg-white relative overflow-hidden rounded-[3px] border border-[var(--color-divider)] hover:border-[var(--color-copper)] hover:shadow-[0_16px_32px_-12px_oklch(0.18_0.005_60/0.18)] transition-all duration-300 h-full"

@@ -10,10 +10,11 @@ import { TopBar } from "@/components/site/TopBar";
 
 import heroImg from "@/assets/hero-combi.jpg";
 
-import { getClientLocale, tr } from "@/lib/locale";
+import { useLocale } from "@/contexts/LocaleContext";
+import { tr } from "@/lib/locale";
 
 export default function ForgotPasswordPage() {
-  const lc = getClientLocale();
+  const { locale: lc } = useLocale();
 
   const [email, setEmail] = useState("");
 
@@ -45,6 +46,7 @@ export default function ForgotPasswordPage() {
           },
         ]}
         bgImage={heroImg}
+        locale={lc}
       />
 
       <section className="container-x section-pad max-w-xl">
@@ -103,7 +105,7 @@ export default function ForgotPasswordPage() {
         </form>
       </section>
 
-      <Footer />
+      <Footer locale={lc} />
     </main>
   );
 }
