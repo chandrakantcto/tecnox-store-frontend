@@ -8,12 +8,14 @@ import type { VCollectionNav } from "@/lib/vendure/normalize";
 function branchToMegaSub(mid: VCollectionNav): MegaSub {
   const leaves = mid.children ?? [];
   if (leaves.length === 0) {
-    return { id: mid.slug, label: mid.name };
+    return { collectionId: mid.id, id: mid.slug, label: mid.name };
   }
   return {
+    collectionId: mid.id,
     id: mid.slug,
     label: mid.name,
     children: leaves.map<MegaLeaf>((leaf) => ({
+      collectionId: leaf.id,
       id: leaf.slug,
       label: leaf.name,
     })),
@@ -28,6 +30,7 @@ export function navCollectionsToMegaMains(
   return navRoots.map((root) => {
     const subs: MegaSub[] = (root.children ?? []).map((mid) => branchToMegaSub(mid));
     return {
+      collectionId: root.id,
       id: root.slug,
       label: root.name,
       count: rollupVariantTotalsFromCounts(root, directCounts),
