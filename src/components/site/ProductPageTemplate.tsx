@@ -131,6 +131,7 @@ export function ProductPageTemplate({
           { label: product.name },
         ]}
         bgImage={mainImageSrc}
+        locale={locale}
       />
 
       <section className="bg-[var(--color-stone)] py-12 lg:py-16">
@@ -440,7 +441,7 @@ export function ProductPageTemplate({
         </section>
       )}
 
-      <Footer />
+      <Footer locale={locale} />
     </main>
   );
 }

@@ -34,6 +34,7 @@ export default async function KarrierePage() {
         )}
         crumbs={[{ label: tr(locale, "Karriere", "Careers") }]}
         bgImage={bgImg}
+        locale={locale}
       />
       <Careers locale={locale} />
       <Newsletter locale={locale} />

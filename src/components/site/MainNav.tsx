@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { User, ShoppingBag, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
+import { useCartItemCount } from "@/contexts/CartContext";
+import { useLocale } from "@/contexts/LocaleContext";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
 import type { MegaMain } from "@/data/megaMenu";
 import { useStorefrontSearch } from "@/hooks/use-storefront-search";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
-import { getClientLocale, type Locale, setClientLocale, tr } from "@/lib/locale";
+import { type Locale, tr } from "@/lib/locale";
 import { CartSidebar } from "@/components/site/CartSidebar";
 import { NavSearchDesktop, NavSearchMobile } from "@/components/site/NavSearch";
 
@@ -36,10 +37,80 @@ function pickFirstSubWithChildren(mainCollectionId: string, megaMenuTree: MegaMa
 
 const MEGA_CLOSE_MS = 140;
 
+function UserAccountMenu({ locale, authCustomer }: { locale: Locale; authCustomer: unknown }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { logout } = useShopAuth();
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
+
+  const itemClass =
+    "block w-full px-4 py-2.5 text-left text-[13px] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-stone)] hover:text-[var(--color-copper)] cursor-pointer";
+
+  const handleLogout = () => {
+    setOpen(false);
+    void logout().then(() => router.push("/"));
+  };
+
+  return (
+    <div ref={menuRef} className="relative hidden sm:block">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={
+          authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Konto", "Account")
+        }
+        className="text-[var(--color-ink)] transition-colors hover:text-[var(--color-copper)] cursor-pointer"
+      >
+        <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
+      </button>
+      {open ? (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-50 mt-2 min-w-[190px] rounded-[3px] border border-[var(--color-divider)] bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+        >
+          {authCustomer ? (
+            <>
+              <Link href="/konto" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Min konto", "My account")}
+              </Link>
+              <Link href="/konto/ordrer" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Bestillinger", "Orders")}
+              </Link>
+              <button type="button" role="menuitem" onClick={handleLogout} className={itemClass}>
+                {tr(locale, "Logg ut", "Log out")}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/logg-inn" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Logg inn", "Sign in")}
+              </Link>
+              <Link href="/registrer" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+                {tr(locale, "Registrer", "Register")}
+              </Link>
+            </>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: MegaMenuLocales }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [locale, setLocale] = useState<Locale>("nb");
+  const { locale, setLocale: setSiteLocale } = useLocale();
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
@@ -49,8 +120,8 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   const [megaMainId, setMegaMainId] = useState<string | null>(null);
   const [megaSubId, setMegaSubId] = useState<string | null>(null);
   const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { itemCount } = useCart();
-  const { customer: authCustomer } = useShopAuth();
+  const itemCount = useCartItemCount();
+  const { customer: authCustomer, logout } = useShopAuth();
   const megaMenuTree = useMemo(() => {
     const pick = megaMenuByLocale[locale];
     if (pick?.length) return pick;
@@ -59,10 +130,6 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   }, [locale, megaMenuByLocale]);
 
   const storefrontSearch = useStorefrontSearch(locale, megaMenuTree);
-
-  useEffect(() => {
-    setLocale(getClientLocale());
-  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -117,13 +184,6 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   const onMainEnter = (mainCollectionId: string) => {
     setMegaMainId(mainCollectionId);
     setMegaSubId(pickFirstSubWithChildren(mainCollectionId, megaMenuTree));
-  };
-
-  const setSiteLocale = (nextLocale: Locale) => {
-    if (nextLocale === locale) return;
-    setClientLocale(nextLocale);
-    setLocale(nextLocale);
-    router.refresh();
   };
 
   return (
@@ -293,13 +353,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
             </button>
           </div>
           <NavSearchDesktop locale={locale} search={storefrontSearch} />
-          <Link
-            href={authCustomer ? "/konto" : "/logg-inn"}
-            aria-label={authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Logg inn", "Sign in")}
-            className="hidden sm:block text-[var(--color-ink)] hover:text-[var(--color-copper)] transition-colors"
-          >
-            <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          </Link>
+          <UserAccountMenu locale={locale} authCustomer={authCustomer} />
           <button
             type="button"
             onClick={() => setCartOpen(true)}
@@ -473,15 +527,61 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                 </li>
               );
             })}
-            <li>
-              <Link
-                href={authCustomer ? "/konto" : "/logg-inn"}
-                onClick={() => setOpen(false)}
-                className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
-              >
-                {authCustomer ? tr(locale, "Min konto", "My account") : tr(locale, "Logg inn", "Sign in")}
-              </Link>
-            </li>
+            {authCustomer ? (
+              <>
+                <li>
+                  <Link
+                    href="/konto"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Min konto", "My account")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/konto/ordrer"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Bestillinger", "Orders")}
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      void logout().then(() => router.push("/"));
+                    }}
+                    className="block w-full py-3 text-left text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)] cursor-pointer"
+                  >
+                    {tr(locale, "Logg ut", "Log out")}
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link
+                    href="/logg-inn"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Logg inn", "Sign in")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/registrer"
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-[15px] text-[var(--color-ink)] border-b border-[var(--color-divider)] hover:text-[var(--color-copper)]"
+                  >
+                    {tr(locale, "Registrer", "Register")}
+                  </Link>
+                </li>
+              </>
+            )}
             <li className="pt-1">
               <div className="inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
                 <button

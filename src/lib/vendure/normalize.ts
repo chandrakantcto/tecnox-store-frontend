@@ -33,6 +33,16 @@ function sortCollections(items: VCollectionNav[]): VCollectionNav[] {
     .sort((a, b) => Number(a.position) - Number(b.position));
 }
 
+/** Drop later top-level rows that share a slug (duplicate Vendure collections). */
+export function dedupeNavRootsBySlug(roots: VCollectionNav[]): VCollectionNav[] {
+  const seen = new Set<string>();
+  return roots.filter((r) => {
+    if (seen.has(r.slug)) return false;
+    seen.add(r.slug);
+    return true;
+  });
+}
+
 /**
  * Flat pagination result from `collections` (no nested children): id → **direct**
  * variant count for that row only (Vendure’s cache warms counts for IDs in same request).

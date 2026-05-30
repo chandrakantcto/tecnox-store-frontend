@@ -80,6 +80,7 @@ export default async function OmOssPage() {
         )}
         crumbs={[{ label: tr(locale, "Om oss", "About us") }]}
         bgImage={bgImg}
+        locale={locale}
       />
 
       <section className="bg-[var(--color-stone)] section-pad">

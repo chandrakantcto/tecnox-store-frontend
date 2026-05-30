@@ -74,9 +74,14 @@ export const GQL_ACTIVE_CUSTOMER_PANEL = /* GraphQL */ `
       phoneNumber
       addresses {
         id
+        fullName
         streetLine1
+        streetLine2
         city
         postalCode
+        phoneNumber
+        defaultShippingAddress
+        defaultBillingAddress
         country {
           code
         }
@@ -157,6 +162,23 @@ export const GQL_ORDER_DETAIL = /* GraphQL */ `
             slug
           }
         }
+      }
+    }
+  }
+`;
+
+export const GQL_CREATE_CUSTOMER_ADDRESS = /* GraphQL */ `
+  mutation CreateCustomerAddress($input: CreateAddressInput!) {
+    createCustomerAddress(input: $input) {
+      id
+      fullName
+      streetLine1
+      streetLine2
+      city
+      postalCode
+      phoneNumber
+      country {
+        code
       }
     }
   }

@@ -68,6 +68,7 @@ export default async function ServicePage() {
         )}
         crumbs={[{ label: tr(locale, "Service", "Service") }]}
         bgImage={bgImg}
+        locale={locale}
       />
 
       <section className="bg-[var(--color-stone)] section-pad">

@@ -310,6 +310,11 @@ export function CartProvider({
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
+/** Nav badge — safe when provider is temporarily unavailable during RSC refresh. */
+export function useCartItemCount(): number {
+  return useContext(CartContext)?.itemCount ?? 0;
+}
+
 export function useCart(): CartContextValue {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart must be used within CartProvider");

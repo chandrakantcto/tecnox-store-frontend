@@ -34,6 +34,7 @@ export default async function ReferanserPage() {
         )}
         crumbs={[{ label: tr(locale, "Referanser", "References") }]}
         bgImage={bgImg}
+        locale={locale}
       />
       <References locale={locale} />
       <Newsletter locale={locale} />

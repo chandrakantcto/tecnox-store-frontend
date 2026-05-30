@@ -74,6 +74,7 @@ export default async function KategorierPage() {
         description={heroDescription}
         crumbs={[{ label: heroLabel }]}
         bgImage={heroBg}
+        locale={locale}
       />
       <Categories
         showSeeAllLink={false}
