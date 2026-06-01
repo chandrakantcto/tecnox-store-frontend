@@ -10,6 +10,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { TopBar } from "@/components/site/TopBar";
 import { formatNOK, useCart } from "@/contexts/CartContext";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { ConfirmDialog } from "@/components/ui/storefront-dialogs";
@@ -18,11 +19,12 @@ import heroImg from "@/assets/hero-combi.jpg";
 
 export function HandlekurvView({
   megaMenuByLocale,
-  locale = "nb",
+  locale: _locale,
 }: {
   megaMenuByLocale?: MegaMenuLocales;
   locale?: Locale;
 }) {
+  const locale = useActiveLocale();
   const {
     lines,
     subtotal,
@@ -43,7 +45,7 @@ export function HandlekurvView({
   return (
     <main className="min-h-screen bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
-        <TopBar locale={locale} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
 

@@ -42,6 +42,7 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
 
   return (
     <SingleProductPage
+      key={locale}
       product={product}
       relatedProducts={relatedProducts}
       locale={locale}

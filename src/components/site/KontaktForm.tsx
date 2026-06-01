@@ -2,10 +2,12 @@
 
 import { ArrowRight, Check } from "lucide-react";
 import { useState } from "react";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
-export function KontaktForm({ locale = "nb" }: { locale?: Locale }) {
+export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);

@@ -1,14 +1,15 @@
-import type { Locale } from "@/lib/locale";
+"use client";
+
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import { tr } from "@/lib/locale";
 
 export function TopBar({
-  locale = "nb",
   catalogError,
 }: {
-  locale?: Locale;
   /** Non-fatal API/config issues — slim storefront notice */
   catalogError?: string | null;
 }) {
+  const locale = useActiveLocale();
   const delivery = tr(locale, "Levering til hele Norge", "Delivery across Norway");
   const prices = tr(locale, "Alle priser eks. MVA", "All prices excl. VAT");
   const callUs = tr(locale, "Ring oss:", "Call us:");

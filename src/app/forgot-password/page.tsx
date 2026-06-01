@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
     <main className="min-h-screen bg-[var(--color-stone)]">
       
       <header className="sticky top-0 z-50">
-        <TopBar locale={lc} />
+        <TopBar />
         <MainNav />
       </header>
 

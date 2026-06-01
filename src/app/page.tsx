@@ -24,13 +24,14 @@ export default async function HomePage() {
       <SiteHeader locale={locale} />
       <Hero locale={locale} />
       <Categories
+        key={`home-categories-${locale}`}
         locale={locale}
         tiles={catalog.categories}
         categoriesCopy={catalog.categoriesSectionCopy}
         catalogError={catalog.error}
       />
       <WhyUs locale={locale} />
-      <Products locale={locale} catalog={catalog.productsBlock} />
+      <Products key={`home-products-${locale}`} locale={locale} catalog={catalog.productsBlock} />
       <TrustStats locale={locale} />
       <Brands locale={locale} />
       <ServiceBand locale={locale} />

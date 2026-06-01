@@ -38,10 +38,19 @@ export function LocaleProvider({
       if (next === locale) return;
       setClientLocale(next);
       setLocaleState(next);
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = next;
+      }
       router.refresh();
     },
     [locale, router],
   );
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = locale;
+    }
+  }, [locale]);
 
   const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
 

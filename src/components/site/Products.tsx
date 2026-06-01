@@ -9,6 +9,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { ProductsSectionPayload, CatalogProductCard } from "@/lib/vendure/catalog-types";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { BsArrowUpRightCircleFill } from "react-icons/bs";
@@ -89,10 +90,11 @@ function useHomeGridColumns(enabled: boolean) {
 
 export function Products({
   withCategorySidebar = false,
-  locale = "nb",
+  locale: _locale,
   catalog,
   initialCatSlug = null,
 }: ProductsProps) {
+  const locale = useActiveLocale();
   const router = useRouter();
   const pathname = usePathname() ?? "/";
   const isHomePreview = !withCategorySidebar;
@@ -236,7 +238,7 @@ export function Products({
       className={cn(
         withCategorySidebar
           ? "w-full text-left px-3 py-2.5 rounded-[3px] text-[13px] font-medium transition-colors border border-transparent"
-          : "nav-link shrink-0 whitespace-nowrap px-4 py-2.5 text-[13px] font-medium cursor-pointer",
+          : "nav-link shrink-0 whitespace-nowrap px-4 py-2.5 text-[14px] font-medium cursor-pointer",
         !withCategorySidebar && !isActive && "text-[var(--color-muted)]",
         isActive &&
           withCategorySidebar &&

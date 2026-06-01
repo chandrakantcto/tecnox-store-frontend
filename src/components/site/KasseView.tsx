@@ -11,6 +11,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/site/Reveal";
 import { formatNOK, useCart } from "@/contexts/CartContext";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { checkoutFormHasErrors, validateCheckoutForm, type CheckoutFormValues } from "@/lib/checkout/validate";
@@ -42,11 +43,12 @@ const emptyForm: CheckoutFormValues = {
 
 export function KasseView({
   megaMenuByLocale,
-  locale = "nb",
+  locale: _locale,
 }: {
   megaMenuByLocale?: MegaMenuLocales;
   locale?: Locale;
 }) {
+  const locale = useActiveLocale();
   const router = useRouter();
   const { refresh: refreshAuth, customer, initializing: authInitializing } = useShopAuth();
   const isLoggedIn = Boolean(customer);
@@ -168,7 +170,7 @@ export function KasseView({
     return (
       <main className="min-h-screen bg-[var(--color-stone)]">
         <header className="sticky top-0 z-50">
-          <TopBar locale={locale} />
+          <TopBar />
           <MainNav megaMenuByLocale={megaMenuByLocale} />
         </header>
         <PageHero
@@ -247,7 +249,7 @@ export function KasseView({
   return (
     <main className="min-h-screen bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
-        <TopBar locale={locale} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
 

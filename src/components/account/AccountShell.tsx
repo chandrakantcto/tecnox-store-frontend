@@ -55,7 +55,7 @@ export function AccountShell({
   if (initializing) {
     return (
       <main className={`min-h-screen bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
-        <TopBar locale={lc} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
         <p className="container-x py-24 text-center text-[var(--color-muted)]">
           {tr(lc, "Laster konto …", "Loading account …")}
@@ -68,7 +68,7 @@ export function AccountShell({
   if (!customer) {
     return (
       <main className={`min-h-screen bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
-        <TopBar locale={lc} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
         <p className="container-x py-24 text-center text-[var(--color-muted)]">
           {tr(lc, "Omdirigerer til innlogging …", "Redirecting to sign in …")}
@@ -81,7 +81,7 @@ export function AccountShell({
   return (
     <main className={`min-h-screen bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
       <header className="sticky top-0 z-50">
-        <TopBar locale={lc} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
       <div className="container-x py-10 lg:py-12">

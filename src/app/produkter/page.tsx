@@ -84,7 +84,7 @@ export default async function ProdukterPage(props: PageProps) {
         bgImage={heroBg}
         locale={locale}
       />
-      <Products withCategorySidebar locale={locale} catalog={catalog} initialCatSlug={validatedCatSlug} />
+      <Products key={locale} withCategorySidebar locale={locale} catalog={catalog} initialCatSlug={validatedCatSlug} />
       <Brands locale={locale} />
       <Newsletter locale={locale} />
       <Footer locale={locale} />
