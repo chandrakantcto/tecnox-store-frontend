@@ -7,6 +7,7 @@ import type {
   HomepageCategoryTile,
   CategoriesSectionCopy,
 } from "@/lib/vendure/catalog-types";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
@@ -22,11 +23,12 @@ export type CategoriesProps = {
 
 export function Categories({
   showSeeAllLink = true,
-  locale = "nb",
+  locale: _locale,
   tiles,
   categoriesCopy = null,
   catalogError = null,
 }: CategoriesProps) {
+  const locale = useActiveLocale();
   const cats =
     tiles?.filter(
       (t) =>
@@ -140,7 +142,7 @@ export function Categories({
                       <h3 className="text-[13px] lg:text-[15px] font-bold text-[var(--color-ink)] leading-tight tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
                         {cat.name}
                       </h3>
-                      <p className="pt-4 text-[11px] text-[var(--color-muted)] tracking-[0.02em]">
+                      <p className="pt-4 text-[14px] text-[var(--color-muted)] tracking-[0.02em]">
                         <span className="text-[var(--color-copper)] font-semibold">{cat.count}</span>{" "}
                         {tr(locale, "produkter", "products")}
                       </p>

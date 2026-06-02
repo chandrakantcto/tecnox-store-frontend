@@ -10,6 +10,7 @@ import heroRestaurant from "@/assets/ref-restaurant.jpg";
 import heroHotell from "@/assets/ref-hotell.jpg";
 import heroKantine from "@/assets/ref-kantine.jpg";
 import heroKjoling from "@/assets/cat-kjoling.jpg";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
@@ -103,7 +104,8 @@ const TRUST = [
   { icon: ShieldCheck, labelNb: "30 års erfaring", labelEn: "30 years of experience" },
 ];
 
-export function Hero({ locale = "nb" }: { locale?: Locale }) {
+export function Hero({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const len = SLIDES.length;

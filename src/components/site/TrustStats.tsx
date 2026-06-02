@@ -2,6 +2,7 @@
 
 import { Reveal } from "./Reveal";
 import { CountUp } from "./CountUp";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
@@ -46,7 +47,8 @@ const STATS = [
   },
 ];
 
-export function TrustStats({ locale = "nb" }: { locale?: Locale }) {
+export function TrustStats({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   return (
     <section className="bg-[var(--color-stone)] py-16 lg:py-20 border-y border-[var(--color-divider)]">
       <div className="container-x">

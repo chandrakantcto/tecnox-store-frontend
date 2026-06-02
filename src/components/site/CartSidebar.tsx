@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import { formatNOK, useCart } from "@/contexts/CartContext";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
@@ -15,7 +16,8 @@ type CartSidebarProps = {
   locale?: Locale;
 };
 
-export function CartSidebar({ open, onOpenChange, locale = "nb" }: CartSidebarProps) {
+export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebarProps) {
+  const locale = useActiveLocale();
   const {
     lines,
     subtotal,

@@ -19,6 +19,7 @@ import {
   type StorefrontVariantDetail,
 } from "@/lib/catalog/storefront-product";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { useCart } from "@/contexts/CartContext";
@@ -34,9 +35,10 @@ export type ProductPageTemplateProps = {
 export function ProductPageTemplate({
   product,
   relatedProducts = [],
-  locale = "nb",
+  locale: _locale,
   megaMenuByLocale,
 }: ProductPageTemplateProps) {
+  const locale = useActiveLocale();
   const router = useRouter();
   const { addItemFromSnapshot, syncing, lastActionError, clearLastActionError } = useCart();
   const variants = product.variants ?? [];
@@ -119,7 +121,7 @@ export function ProductPageTemplate({
   return (
     <main className="min-h-screen bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
-        <TopBar locale={locale} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
 

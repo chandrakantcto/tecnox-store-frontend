@@ -15,7 +15,7 @@ export async function SiteHeader({
 
   return (
     <header className="sticky top-0 z-50">
-      <TopBar locale={locale} catalogError={error ?? initialMegaError} />
+      <TopBar catalogError={error ?? initialMegaError} />
       <MainNav megaMenuByLocale={megaMenuByLocale} />
     </header>
   );

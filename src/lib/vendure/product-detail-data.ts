@@ -318,13 +318,14 @@ export const getStorefrontProductDetail = cache(
     const altLc = lc === "en" ? "nb" : "en";
 
     try {
-      const [{ roots }, navNb, navEn, productRes, productResAlt, pdpExtrasRes] = await Promise.all([
+      const [{ roots }, navNb, navEn, productRes, productResAlt, pdpExtrasRes, dualSearch] = await Promise.all([
         fetchNavRoots(lc),
         fetchNavRoots("nb"),
         fetchNavRoots("en"),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, lc),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, altLc),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT_PDP_EXTRA, { slug }, lc),
+        getGlobalProductSearchHitsDual(),
       ]);
 
       const err = productRes.error;
@@ -362,10 +363,29 @@ export const getStorefrontProductDetail = cache(
       const productSlug = typeof p.slug === "string" ? p.slug : slug;
       const namePrimary = typeof p.name === "string" ? p.name : "";
       const nameAlternate = typeof pAlt?.name === "string" ? pAlt.name : "";
-      const name = pickLocalizedText(namePrimary, nameAlternate, locale);
+      let name = pickLocalizedText(namePrimary, nameAlternate, locale);
       const descriptionPrimary = typeof p.description === "string" ? p.description : "";
       const descriptionAlternate = typeof pAlt?.description === "string" ? pAlt.description : "";
-      const descriptionHtml = pickLocalizedText(descriptionPrimary, descriptionAlternate, locale);
+      let descriptionHtml = pickLocalizedText(descriptionPrimary, descriptionAlternate, locale);
+
+      const nbBySlug = new Map(dualSearch.nb.map((h) => [h.slug, h]));
+      const enBySlug = new Map(dualSearch.en.map((h) => [h.slug, h]));
+      const searchOverlay = applyLocaleToSearchHit(
+        {
+          slug: productSlug,
+          sku: "",
+          productId: "",
+          productName: name,
+          description: descriptionHtml,
+        },
+        locale,
+        nbBySlug,
+        enBySlug,
+      );
+      if (searchOverlay.productName?.trim()) name = searchOverlay.productName.trim();
+      if (searchOverlay.description != null && String(searchOverlay.description).trim()) {
+        descriptionHtml = String(searchOverlay.description);
+      }
 
       const collections = Array.isArray(p.collections)
         ? (p.collections.filter((x) => x && typeof x === "object") as Record<string, unknown>[])
@@ -413,6 +433,8 @@ export const getStorefrontProductDetail = cache(
         : [];
 
       const altVariantNames = new Map<string, string>();
+      const altOptionNames = new Map<string, string>();
+      const altGroupNames = new Map<string, string>();
       if (pAlt && Array.isArray(pAlt.variants)) {
         for (const row of pAlt.variants) {
           if (!row || typeof row !== "object") continue;
@@ -420,6 +442,23 @@ export const getStorefrontProductDetail = cache(
           const id = typeof vr.id === "string" || typeof vr.id === "number" ? String(vr.id) : "";
           const vn = typeof vr.name === "string" ? vr.name : "";
           if (id && vn) altVariantNames.set(id, vn);
+          const altOpts = Array.isArray(vr.options)
+            ? (vr.options.filter((x) => x && typeof x === "object") as Record<string, unknown>[])
+            : [];
+          for (const opt of altOpts) {
+            const optId = typeof opt.id === "string" || typeof opt.id === "number" ? String(opt.id) : "";
+            const optName = typeof opt.name === "string" ? opt.name : "";
+            if (optId && optName) altOptionNames.set(optId, optName);
+            const gn = opt.group && typeof opt.group === "object" ? (opt.group as Record<string, unknown>) : null;
+            const groupId =
+              typeof opt.groupId === "string"
+                ? opt.groupId
+                : gn && typeof gn.id === "string"
+                  ? gn.id
+                  : "";
+            const groupName = gn && typeof gn.name === "string" ? gn.name : "";
+            if (groupId && groupName) altGroupNames.set(groupId, groupName);
+          }
         }
       }
 
@@ -476,18 +515,22 @@ export const getStorefrontProductDetail = cache(
         const options = optionsRaw.map((opt) => {
           const gn =
             opt.group && typeof opt.group === "object" ? (opt.group as Record<string, unknown>) : null;
+          const optId = typeof opt.id === "string" || typeof opt.id === "number" ? String(opt.id) : "";
+          const optNameRaw = typeof opt.name === "string" ? opt.name : "";
+          const groupId =
+            typeof opt.groupId === "string"
+              ? opt.groupId
+              : gn && typeof gn.id === "string"
+                ? gn.id
+                : "";
+          const groupNameRaw = gn && typeof gn.name === "string" ? gn.name : "";
           return {
-            id: typeof opt.id === "string" || typeof opt.id === "number" ? String(opt.id) : "",
+            id: optId,
             code: typeof opt.code === "string" ? opt.code : "",
-            name: typeof opt.name === "string" ? opt.name : "",
-            groupId:
-              typeof opt.groupId === "string"
-                ? opt.groupId
-                : gn && typeof gn.id === "string"
-                  ? gn.id
-                  : "",
+            name: pickLocalizedText(optNameRaw, altOptionNames.get(optId) ?? "", locale),
+            groupId,
             groupCode: gn && typeof gn.code === "string" ? gn.code : "",
-            groupName: gn && typeof gn.name === "string" ? gn.name : "",
+            groupName: pickLocalizedText(groupNameRaw, altGroupNames.get(groupId) ?? "", locale),
           };
         });
 

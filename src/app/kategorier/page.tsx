@@ -77,6 +77,7 @@ export default async function KategorierPage() {
         locale={locale}
       />
       <Categories
+        key={locale}
         showSeeAllLink={false}
         locale={locale}
         tiles={catalog.categories}

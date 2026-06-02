@@ -1,8 +1,11 @@
+"use client";
+
 import type { ReactNode } from "react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { Reveal } from "@/components/site/Reveal";
@@ -21,7 +24,16 @@ interface PageHeroProps {
   locale?: Locale;
 }
 
-export function PageHero({ label, title, description, crumbs, bgImage, locale = "nb" }: PageHeroProps) {
+export function PageHero({
+  label,
+  title,
+  description,
+  crumbs,
+  bgImage,
+  locale: _locale,
+}: PageHeroProps) {
+  const locale = useActiveLocale();
+
   return (
     <section className="relative bg-[var(--color-stone)] text-[var(--color-ink)] border-b border-[var(--color-divider)] overflow-hidden">
       {/* Right-side image accent rather than full-bleed dark overlay */}

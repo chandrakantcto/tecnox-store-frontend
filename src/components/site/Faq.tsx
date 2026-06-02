@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
@@ -49,7 +50,8 @@ const FAQS = [
   },
 ];
 
-export function Faq({ locale = "nb" }: { locale?: Locale }) {
+export function Faq({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   return (
     <section className="bg-[var(--color-stone)] section-pad border-y border-[var(--color-divider)]">
       <div className="container-x grid lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20">
@@ -86,7 +88,7 @@ export function Faq({ locale = "nb" }: { locale?: Locale }) {
               >
                 <AccordionTrigger className="py-5 text-left text-[15px] lg:text-[17px] font-semibold text-[var(--color-ink)] hover:text-[var(--color-copper)] hover:no-underline tracking-[-0.01em]">
                   <span className="flex items-baseline gap-4">
-                    <span className="text-[11px] font-mono text-[var(--color-copper)] tracking-[0.18em] shrink-0">
+                    <span className="text-[14px] font-mono text-[var(--color-copper)] tracking-[0.18em] shrink-0">
                       /{String(i + 1).padStart(2, "0")}
                     </span>
                     <span>{tr(locale, f.qNb, f.qEn)}</span>

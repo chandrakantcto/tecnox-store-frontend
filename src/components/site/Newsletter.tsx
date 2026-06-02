@@ -4,10 +4,12 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "./Reveal";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
-export function Newsletter({ locale = "nb" }: { locale?: Locale }) {
+export function Newsletter({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);

@@ -16,7 +16,7 @@ export function SiteShell({
   return (
     <>
       <header className="sticky top-0 z-50">
-        <TopBar locale={locale} />
+        <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
       {children}
