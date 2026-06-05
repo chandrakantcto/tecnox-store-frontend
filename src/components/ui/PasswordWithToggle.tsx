@@ -11,6 +11,7 @@ type PasswordWithToggleProps = {
   autoComplete?: string;
   name?: string;
   id?: string;
+  maxLength?: number;
   className?: string;
   showLabel: string;
   hideLabel: string;
@@ -24,6 +25,7 @@ export function PasswordWithToggle({
   autoComplete,
   name,
   id,
+  maxLength,
   className = "",
   showLabel,
   hideLabel,
@@ -40,6 +42,7 @@ export function PasswordWithToggle({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         disabled={disabled}
+        maxLength={maxLength}
         autoComplete={autoComplete}
         className={className}
       />

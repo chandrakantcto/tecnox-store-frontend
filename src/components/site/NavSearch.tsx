@@ -288,6 +288,7 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
                 className="min-w-0 flex-1 bg-transparent text-[14px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)] [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-ms-clear]:hidden"
                 role="combobox"
                 aria-expanded={showDropdown}
+                aria-controls={showDropdown ? `${listId}-suggestions` : undefined}
                 aria-autocomplete="list"
               />
               {search.query ? (
@@ -306,8 +307,9 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
             </div>
 
             {showDropdown ? (
-              <SuggestionRows
-                locale={locale}
+              <div id={`${listId}-suggestions`}>
+                <SuggestionRows
+                  locale={locale}
                 search={search}
                 activeIndex={activeIndex}
                 setActiveIndex={setActiveIndex}
@@ -317,6 +319,7 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
                   search.clearQuery();
                 }}
               />
+              </div>
             ) : null}
           </div>
         </div>
@@ -434,6 +437,7 @@ export function NavSearchMobile({
           className="min-w-0 flex-1 bg-transparent text-[15px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)] [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-ms-clear]:hidden"
           role="combobox"
           aria-expanded={showDropdown}
+          aria-controls={showDropdown ? `${listId}-suggestions-mobile` : undefined}
           aria-autocomplete="list"
         />
         {search.query ? (
@@ -452,14 +456,16 @@ export function NavSearchMobile({
       </div>
 
       {showDropdown ? (
-        <SuggestionRows
-          locale={locale}
+        <div id={`${listId}-suggestions-mobile`}>
+          <SuggestionRows
+            locale={locale}
           search={search}
           activeIndex={activeIndex}
           setActiveIndex={setActiveIndex}
           panelVariant="mobile"
           onPick={closePick}
         />
+        </div>
       ) : null}
     </div>
   

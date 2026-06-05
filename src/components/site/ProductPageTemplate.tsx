@@ -44,7 +44,7 @@ export function ProductPageTemplate({
   const locale = useActiveLocale();
   const router = useRouter();
   const { addItemFromSnapshot, syncing, lastActionError, clearLastActionError } = useCart();
-  const variants = product.variants ?? [];
+  const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const [selectedVid, setSelectedVid] = useState(() => {
     const v = product.hydratedVariantId ?? product.defaultVariantId ?? variants[0]?.id ?? "";
     return v;
@@ -60,15 +60,16 @@ export function ProductPageTemplate({
   }, [variants, selectedVid]);
 
   useEffect(() => {
+    const defaultVariantId = product.variants?.[0]?.id;
     const v =
       product.hydratedVariantId ??
       product.defaultVariantId ??
-      product.variants?.[0]?.id ??
+      defaultVariantId ??
       "";
     if (v) setSelectedVid(v);
-  }, [product.slug, product.hydratedVariantId, product.defaultVariantId, product.variants?.[0]?.id]);
+  }, [product.slug, product.hydratedVariantId, product.defaultVariantId, product.variants]);
 
-  const gallery = product.galleryImageUrls?.length ? product.galleryImageUrls : [product.img];
+  const gallery = useMemo(() => product.galleryImageUrls?.length ? product.galleryImageUrls : [product.img], [product.galleryImageUrls, product.img]);
 
   useEffect(() => {
     if (!effectiveVariant?.imageSrc?.trim()) return;
