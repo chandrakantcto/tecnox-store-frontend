@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className=" bg-[var(--color-stone)]">
-      
+
       <header className="sticky top-0 z-50">
         <TopBar />
         <MainNav />
@@ -50,12 +50,12 @@ export default function ForgotPasswordPage() {
       />
 
       <section className="container-x section-pad max-w-xl">
-        
+
         <form
           onSubmit={submit}
           className="space-y-5 rounded-[3px] border border-[var(--color-divider)] bg-white p-8"
         >
-          
+
           <div>
             <h1 className="mb-2 text-2xl font-semibold text-[var(--color-ink)]">
               {tr(lc, "Glemt passord", "Forgot Password")}
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
             <p className="text-[14px] text-[var(--color-muted)]">
               {tr(
                 lc,
-                "Skriv inn e-postadressen din for å tilbakestille passordet.",
+                "Skriv inn e-postadressen din for å tilbakestille passordet",
                 "Enter your email address to reset your password."
               )}
             </p>
