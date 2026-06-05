@@ -2,6 +2,7 @@ import { shopGraphql } from "@/lib/vendure/shop-client-browser";
 import {
   GQL_LOGIN_NATIVE,
   GQL_REGISTER_CUSTOMER,
+  GQL_REGISTER_ISOLATED_CUSTOMER,
 } from "@/lib/vendure/shop-auth-documents";
 
 export type PostCheckoutAuthResult =
@@ -75,8 +76,8 @@ export async function loginOrRegisterAfterCheckout(
     return { ok: false, error: errorMessageFromMutationPayload(loginPayload, "Innlogging mislyktes.") };
   }
 
-  const reg = await shopGraphql<{ registerCustomerAccount: unknown }>(
-    GQL_REGISTER_CUSTOMER,
+  const reg = await shopGraphql<{ registerIsolatedCustomerAccount: unknown }>(
+    GQL_REGISTER_ISOLATED_CUSTOMER,
     {
       input: {
         emailAddress: email,
@@ -94,7 +95,7 @@ export async function loginOrRegisterAfterCheckout(
       error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? "Kunne ikke opprette konto.",
     };
   }
-  const regPayload = pickMutation(reg.data, "registerCustomerAccount");
+  const regPayload = pickMutation(reg.data, "registerIsolatedCustomerAccount");
   const regTn = typeof regPayload?.__typename === "string" ? regPayload.__typename : "";
 
   if (regTn !== "Success") {
@@ -160,8 +161,8 @@ export async function shopRegisterAccount(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const lc = locale === "en" ? "en" : "nb";
   const email = input.email.trim().toLowerCase();
-  const reg = await shopGraphql<{ registerCustomerAccount: unknown }>(
-    GQL_REGISTER_CUSTOMER,
+  const reg = await shopGraphql<{ registerIsolatedCustomerAccount: unknown }>(
+    GQL_REGISTER_ISOLATED_CUSTOMER,
     {
       input: {
         emailAddress: email,
@@ -179,7 +180,7 @@ export async function shopRegisterAccount(
       error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? "Registrering feilet.",
     };
   }
-  const regPayload = pickMutation(reg.data, "registerCustomerAccount");
+  const regPayload = pickMutation(reg.data, "registerIsolatedCustomerAccount");
   const regTn = typeof regPayload?.__typename === "string" ? regPayload.__typename : "";
   if (regTn !== "Success") {
     return { ok: false, error: errorMessageFromMutationPayload(regPayload, "Registrering feilet.") };

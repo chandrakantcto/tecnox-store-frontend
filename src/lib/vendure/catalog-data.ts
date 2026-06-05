@@ -642,6 +642,63 @@ export function buildLocalizedCategoryNameMapsBoth(
 
 export { pickLocalizedText };
 
+function buildFlattenedTranslations(roots: VCollectionNav[]): Map<string, string> {
+  const map = new Map<string, string>();
+  const walk = (node: VCollectionNav) => {
+    map.set(node.slug, node.name);
+    for (const child of node.children ?? []) walk(child);
+  };
+  for (const r of roots) walk(r);
+  return map;
+}
+
+function localizedCategoryTilesAnyDepth(
+  nodes: VCollectionNav[],
+  locale: Locale,
+  nbRoots: VCollectionNav[],
+  enRoots: VCollectionNav[],
+  directVariantCounts: DirectVariantCounts,
+): HomepageCategoryTile[] {
+  const displayNodes = dedupeNavRootsBySlug(nodes);
+  const nbNames = buildFlattenedTranslations(nbRoots);
+  const enNames = buildFlattenedTranslations(enRoots);
+  
+  return displayNodes.map((r) => {
+    const nb = nbNames.get(r.slug) || r.name;
+    const en = enNames.get(r.slug) || nb;
+    const name = locale === "en" ? en : nb;
+    
+    return {
+      slug: r.slug,
+      name,
+      nameNb: nb,
+      nameEn: en,
+      count: rollupVariantTotalsFromCounts(r, directVariantCounts),
+      href: `/produkter?cat=${encodeURIComponent(r.slug)}`,
+      remoteImageSrc: absoluteAssetUrl(r.featuredAsset?.preview || r.featuredAsset?.source),
+    };
+  });
+}
+
+function findNavNodeBySlug(roots: VCollectionNav[], targetSlug: string): VCollectionNav | null {
+  for (const node of roots) {
+    if (node.slug === targetSlug) return node;
+    if (node.children?.length) {
+      const found = findNavNodeBySlug(node.children, targetSlug);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function extractAllDescendantIds(node: VCollectionNav): string[] {
+  const ids: string[] = [node.id];
+  for (const child of node.children ?? []) {
+    ids.push(...extractAllDescendantIds(child));
+  }
+  return ids;
+}
+
 export const getHomepageCatalogPayload = cache(
   async (locale: Locale): Promise<{
     categories: HomepageCategoryTile[];
@@ -760,9 +817,9 @@ export const getProductsListingCatalog = cache(
         };
       }
 
-      const allowed = new Set(nav.roots.map((r) => r.slug));
       const cat = requestedCatSlug?.trim();
-      const activeRootSlug = cat && allowed.has(cat) ? cat : null;
+      const activeNode = cat ? findNavNodeBySlug(nav.roots, cat) : null;
+      const validatedCatSlug = activeNode ? activeNode.slug : null;
 
       const idToRoot = buildCollectionIdToRootSlug(nav.roots);
       const displayRoots = dedupeNavRootsBySlug(nav.roots);
@@ -779,28 +836,42 @@ export const getProductsListingCatalog = cache(
 
       const sidebarCounts = sidebarProductCountsByRoot(localizedHits, displayRoots, idToRoot);
 
+      const allowedCollectionIds = activeNode ? new Set(extractAllDescendantIds(activeNode)) : null;
+
       const visibleHits =
-        activeRootSlug === null
+        allowedCollectionIds === null
           ? localizedHits
-          : localizedHits.filter((h) => rootSlugFromCollectionIds(h, idToRoot) === activeRootSlug);
+          : localizedHits.filter((h) => 
+              (h.collectionIds ?? []).some(id => allowedCollectionIds.has(id))
+            );
 
       const products = visibleHits.map((h) =>
         hitToCard(locale, h, idToRoot, slugToCategoryNameNb, slugToCategoryNameEn, nbBySlug, enBySlug),
       );
+      
       const labelAllNb = "Alle";
       const labelAllEn = "All";
       const filtersNb = [labelAllNb, ...displayRoots.map((r) => slugToCategoryNameNb.get(r.slug) ?? r.name)];
       const filtersEn = [labelAllEn, ...displayRoots.map((r) => slugToCategoryNameEn.get(r.slug) ?? r.name)];
 
+      // Compute subcategories
+      let subcategories: HomepageCategoryTile[] = [];
+      if (activeNode && activeNode.children && activeNode.children.length > 0) {
+        subcategories = localizedCategoryTilesAnyDepth(activeNode.children, locale, navNb.roots, navEn.roots, nav.directVariantCounts);
+      } else if (!activeNode) {
+        subcategories = localizedCategoryTilesAnyDepth(nav.roots, locale, navNb.roots, navEn.roots, nav.directVariantCounts);
+      }
+
       return {
         listing: nav.productsListingPage,
-        validatedCatSlug: activeRootSlug,
+        validatedCatSlug,
         catalog: {
           filters: locale === "en" ? filtersEn : filtersNb,
           filtersNb,
           filtersEn,
           filterSlugs: [null as string | null, ...displayRoots.map((r) => r.slug)],
           products,
+          subcategories,
           filterSidebarCounts: sidebarCounts,
           error: dualSearch.error ?? nav.error ?? null,
         },

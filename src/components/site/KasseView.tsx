@@ -110,7 +110,7 @@ export function KasseView({
     e.preventDefault();
     setSubmitError(null);
     clearLastActionError();
-    const errs = validateCheckoutForm(form, { skipPassword: isLoggedIn });
+    const errs = validateCheckoutForm(form, { skipPassword: isLoggedIn, locale });
     setFieldErrors(errs as Record<string, string>);
     if (checkoutFormHasErrors(errs)) return;
 
@@ -315,6 +315,7 @@ export function KasseView({
                         onChange={(v) => update({ firstName: v })}
                         error={fieldErrors.firstName}
                         disabled={submitting}
+                        maxLength={100}
                       />
                       <FieldInput
                         label={tr(locale, "Etternavn", "Last name")}
@@ -323,6 +324,7 @@ export function KasseView({
                         onChange={(v) => update({ lastName: v })}
                         error={fieldErrors.lastName}
                         disabled={submitting}
+                        maxLength={100}
                       />
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -334,6 +336,7 @@ export function KasseView({
                         onChange={(v) => update({ email: v })}
                         error={fieldErrors.email}
                         disabled={submitting || isLoggedIn}
+                        maxLength={255}
                       />
                       <FieldInput
                         label={tr(locale, "Telefon", "Phone")}
@@ -343,6 +346,7 @@ export function KasseView({
                         onChange={(v) => update({ phone: v })}
                         error={fieldErrors.phone}
                         disabled={submitting}
+                        maxLength={20}
                       />
                     </div>
                   </Section>
@@ -366,6 +370,7 @@ export function KasseView({
                           onChange={(v) => update({ password: v })}
                           error={fieldErrors.password}
                           disabled={submitting}
+                          maxLength={255}
                         />
                         <FieldInput
                           label={tr(locale, "Gjenta passord", "Confirm password")}
@@ -376,6 +381,7 @@ export function KasseView({
                           onChange={(v) => update({ confirmPassword: v })}
                           error={fieldErrors.confirmPassword}
                           disabled={submitting}
+                          maxLength={255}
                         />
                       </div>
                     </Section>
@@ -391,12 +397,14 @@ export function KasseView({
                         value={form.company}
                         onChange={(v) => update({ company: v })}
                         disabled={submitting}
+                        maxLength={100}
                       />
                       <FieldInput
                         label={tr(locale, "Organisasjonsnummer (org.nr.)", "Organization number (Org. No.)")}
                         value={form.orgNumber}
                         onChange={(v) => update({ orgNumber: v })}
                         disabled={submitting}
+                        maxLength={100}
                       />
                     </div>
                     <FieldInput
@@ -406,6 +414,7 @@ export function KasseView({
                       onChange={(v) => update({ addressLine1: v })}
                       error={fieldErrors.addressLine1}
                       disabled={submitting}
+                      maxLength={255}
                     />
                     <FieldInput
                       label={tr(locale, "Adresselinje 2 (valgfritt)", "Address line 2 (optional)")}
@@ -413,6 +422,7 @@ export function KasseView({
                       onChange={(v) => update({ addressLine2: v })}
                       error={fieldErrors.addressLine2}
                       disabled={submitting}
+                      maxLength={255}
                     />
                     <div className="grid gap-4 sm:grid-cols-2">
                       <FieldInput
@@ -422,6 +432,7 @@ export function KasseView({
                         onChange={(v) => update({ city: v })}
                         error={fieldErrors.city}
                         disabled={submitting}
+                        maxLength={255}
                       />
                       <FieldInput
                         label={tr(locale, "Delstat / fylke", "State / province")}
@@ -430,6 +441,7 @@ export function KasseView({
                         onChange={(v) => update({ state: v })}
                         error={fieldErrors.state}
                         disabled={submitting}
+                        maxLength={255}
                       />
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -440,6 +452,7 @@ export function KasseView({
                         onChange={(v) => update({ postalCode: v })}
                         error={fieldErrors.postalCode}
                         disabled={submitting}
+                        maxLength={20}
                       />
                       <div>
                         <label className="mb-2 block text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
@@ -588,6 +601,7 @@ function FieldInput({
   error,
   disabled,
   passwordToggle,
+  maxLength,
 }: {
   label: string;
   required?: boolean;
@@ -597,6 +611,7 @@ function FieldInput({
   error?: string;
   disabled?: boolean;
   passwordToggle?: { show: string; hide: string };
+  maxLength?: number;
 }) {
   const inputClasses = `w-full rounded-[2px] border bg-white px-4 py-3 text-[14px] transition-colors focus:outline-none ${
     error ? "border-red-600 focus:border-red-700" : "border-[var(--color-divider)] focus:border-[var(--color-copper)]"
@@ -614,6 +629,7 @@ function FieldInput({
           onChange={onChange}
           required={required}
           disabled={disabled}
+          maxLength={maxLength}
           autoComplete="new-password"
           showLabel={passwordToggle.show}
           hideLabel={passwordToggle.hide}
@@ -625,6 +641,7 @@ function FieldInput({
           onChange={(e) => onChange(e.target.value)}
           required={required}
           disabled={disabled}
+          maxLength={maxLength}
           className={inputClasses}
         />
       }

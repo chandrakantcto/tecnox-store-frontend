@@ -64,6 +64,7 @@ export type ProductsSectionPayload = {
   filtersEn?: string[];
   filterSlugs: (string | null)[];
   products: CatalogProductCard[];
+  subcategories?: HomepageCategoryTile[];
   /** When set (e.g. /produkter), sidebar counts reflect full catalogue; `products` may be filtered server-side */
   filterSidebarCounts?: {
     all: number;

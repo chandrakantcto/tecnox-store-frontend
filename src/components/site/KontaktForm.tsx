@@ -73,6 +73,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
             name="name"
             required
             disabled={submitting}
+            maxLength={100}
             className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors disabled:opacity-60"
           />
         </div>
@@ -84,6 +85,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
             type="text"
             name="company"
             disabled={submitting}
+            maxLength={100}
             className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors disabled:opacity-60"
           />
         </div>
@@ -98,6 +100,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
             name="email"
             required
             disabled={submitting}
+            maxLength={255}
             className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors disabled:opacity-60"
           />
         </div>
@@ -109,6 +112,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
             type="tel"
             name="phone"
             disabled={submitting}
+            maxLength={20}
             className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors disabled:opacity-60"
           />
         </div>
@@ -127,6 +131,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
             "Fortell oss kort om prosjektet eller utstyret du lurer på…",
             "Tell us briefly about your project or the equipment you need...",
           )}
+          maxLength={2000}
           className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors resize-none disabled:opacity-60"
         />
       </div>

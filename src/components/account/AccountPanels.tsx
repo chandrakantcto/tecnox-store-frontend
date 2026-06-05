@@ -19,6 +19,7 @@ import type { Locale } from "@/lib/locale";
 import { absoluteAssetUrl } from "@/lib/vendure/normalize";
 import { formatMoneyMinorKr } from "@/lib/vendure/money-display";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
+import { validatePasswordComplexity } from "@/lib/auth/validate";
 
 type CustomerAddress = {
   id: string;
@@ -257,6 +258,7 @@ export function AccountProfilePanel() {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
+              maxLength={100}
             />
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
@@ -266,6 +268,7 @@ export function AccountProfilePanel() {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
+              maxLength={100}
             />
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
@@ -274,6 +277,7 @@ export function AccountProfilePanel() {
               className={ACCOUNT_FIELD_INPUT}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              maxLength={20}
             />
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
@@ -376,11 +380,11 @@ function AccountAddressEditForm({
       <div className={ACCOUNT_FORM_GRID}>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Fullt navn", "Full name")} *
-          <input className={ACCOUNT_FIELD_INPUT} value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+          <input className={ACCOUNT_FIELD_INPUT} value={fullName} onChange={(e) => setFullName(e.target.value)} required maxLength={100} />
         </label>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Firma (valgfritt)", "Company (optional)")}
-          <input className={ACCOUNT_FIELD_INPUT} value={company} onChange={(e) => setCompany(e.target.value)} />
+          <input className={ACCOUNT_FIELD_INPUT} value={company} onChange={(e) => setCompany(e.target.value)} maxLength={100} />
         </label>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Land / region", "Country / region")} *
@@ -390,7 +394,7 @@ function AccountAddressEditForm({
         </label>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Telefonnummer", "Phone number")}
-          <input className={ACCOUNT_FIELD_INPUT} value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <input className={ACCOUNT_FIELD_INPUT} value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} />
         </label>
         <label className={`${ACCOUNT_FIELD_LABEL} sm:col-span-2`}>
           {tr(lc, "Gateadresse", "Street address")} *
@@ -400,6 +404,7 @@ function AccountAddressEditForm({
             onChange={(e) => setStreet1(e.target.value)}
             placeholder={tr(lc, "Gatenavn og nummer", "Street name and number")}
             required
+            maxLength={255}
           />
         </label>
         <label className={`${ACCOUNT_FIELD_LABEL} sm:col-span-2`}>
@@ -413,15 +418,16 @@ function AccountAddressEditForm({
               "Leilighet, suite, enhet, etc. (valgfritt)",
               "Apartment, suite, unit, etc. (optional)",
             )}
+            maxLength={255}
           />
         </label>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Postnummer", "Postal code")} *
-          <input className={ACCOUNT_FIELD_INPUT} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required />
+          <input className={ACCOUNT_FIELD_INPUT} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required maxLength={20} />
         </label>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Poststed (by)", "City")} *
-          <input className={ACCOUNT_FIELD_INPUT} value={city} onChange={(e) => setCity(e.target.value)} required />
+          <input className={ACCOUNT_FIELD_INPUT} value={city} onChange={(e) => setCity(e.target.value)} required maxLength={255} />
         </label>
       </div>
       {msg ? <p className="text-[12px] sm:text-[13px] text-[var(--color-ink)]">{msg}</p> : null}
@@ -559,8 +565,9 @@ export function AccountPasswordPanel() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
-    if (next.length < 8) {
-      setMsg(tr(lc, "Nytt passord må være minst 8 tegn.", "New password must be at least 8 characters."));
+    const pwdErr = validatePasswordComplexity(next, lc);
+    if (pwdErr) {
+      setMsg(pwdErr);
       return;
     }
     if (next !== confirm) {
@@ -609,6 +616,7 @@ export function AccountPasswordPanel() {
           onChange={setCurrent}
           required
           autoComplete="current-password"
+          maxLength={255}
           showLabel={tr(lc, "Vis passord", "Show password")}
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 text-sm sm:text-base"
@@ -623,6 +631,7 @@ export function AccountPasswordPanel() {
           onChange={setNext}
           required
           autoComplete="new-password"
+          maxLength={255}
           showLabel={tr(lc, "Vis passord", "Show password")}
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
@@ -636,6 +645,7 @@ export function AccountPasswordPanel() {
           onChange={setConfirm}
           required
           autoComplete="new-password"
+          maxLength={255}
           showLabel={tr(lc, "Vis passord", "Show password")}
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"

@@ -56,6 +56,34 @@ export const GQL_REGISTER_CUSTOMER = /* GraphQL */ `
   }
 `;
 
+export const GQL_REGISTER_ISOLATED_CUSTOMER = /* GraphQL */ `
+  mutation RegisterIsolatedCustomerAccount($input: RegisterCustomerInput!) {
+    registerIsolatedCustomerAccount(input: $input) {
+      __typename
+      ... on Success {
+        success
+      }
+      ... on MissingPasswordError {
+        errorCode
+        message
+      }
+      ... on PasswordValidationError {
+        errorCode
+        message
+        validationErrorMessage
+      }
+      ... on NativeAuthStrategyError {
+        errorCode
+        message
+      }
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`;
+
 export const GQL_LOGOUT = /* GraphQL */ `
   mutation ShopLogout {
     logout {

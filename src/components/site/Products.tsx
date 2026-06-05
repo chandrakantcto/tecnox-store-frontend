@@ -68,7 +68,7 @@ function productImage(product: CatalogProductCard, locale: Locale) {
 }
 
 function syncSlugAllowed(slug: string | null, allowed: (string | null)[]): string | null {
-  if (slug !== null && !allowed.includes(slug)) return null;
+  // Always keep the slug so we know we are in a subcategory, even if it's not a root tab
   return slug;
 }
 
@@ -217,9 +217,10 @@ export function Products({
 
   const visible = useMemo(() => {
     const list = catalog.products ?? [];
+    if (withCategorySidebar) return list; // Server already filtered exactly what we need
     if (activeSlug === null) return list;
     return list.filter((p) => p.categorySlug === activeSlug);
-  }, [catalog.products, activeSlug]);
+  }, [catalog.products, activeSlug, withCategorySidebar]);
 
   const homePreviewLimit = previewRows * homeGridCols;
   const gridProducts = isHomePreview ? visible.slice(0, homePreviewLimit) : visible;
@@ -366,6 +367,48 @@ export function Products({
                   ) : null}
                 </div>
               </Reveal>
+            )}
+
+            {!isHomePreview && catalog.subcategories && catalog.subcategories.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-[14px] font-bold uppercase tracking-[0.1em] text-[var(--color-muted)] mb-4">
+                  {tr(locale, "Underkategorier", "Subcategories")}
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {catalog.subcategories.map((sc, i) => (
+                    <Reveal key={sc.slug} delay={Math.min(i * 0.05, 0.3)}>
+                      <Link
+                        href={`/produkter?cat=${encodeURIComponent(sc.slug)}`}
+                        className="group flex flex-col bg-white border border-[var(--color-divider)] rounded-[3px] overflow-hidden hover:border-[var(--color-copper)] hover:shadow-sm transition-all h-full"
+                      >
+                        <div className="aspect-[4/3] bg-[oklch(0.96_0.005_80)] relative">
+                          {sc.remoteImageSrc ? (
+                            <Image
+                              src={sc.remoteImageSrc}
+                              alt={sc.name}
+                              fill
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center opacity-30">
+                              <ImageUnavailablePlaceholder locale={locale} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3 flex items-center justify-between">
+                          <span className="text-[13px] font-bold text-[var(--color-ink)] group-hover:text-[var(--color-copper)] transition-colors truncate pr-2">
+                            {sc.name}
+                          </span>
+                          <span className="text-[11px] text-[var(--color-muted)] tabular-nums bg-[oklch(0.96_0.005_80)] px-1.5 py-0.5 rounded-[2px]">
+                            {sc.count}
+                          </span>
+                        </div>
+                      </Link>
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
             )}
 
             {visible.length === 0 ? (

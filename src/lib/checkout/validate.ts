@@ -1,4 +1,5 @@
 import { CHECKOUT_ALLOWED_COUNTRY_CODES } from "@/lib/checkout/countries";
+import { validatePasswordComplexity } from "@/lib/auth/validate";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -25,6 +26,7 @@ export type CheckoutFormValues = {
 export type ValidateCheckoutOptions = {
   /** Signed-in shoppers: no password step; `setCustomerForOrder` is skipped server-side. */
   skipPassword?: boolean;
+  locale?: string;
 };
 
 /** Returns field-level validation errors keyed by logical field names (matching form data keys where possible). */
@@ -44,7 +46,10 @@ export function validateCheckoutForm(values: CheckoutFormValues, options?: Valid
 
   if (!skipPassword) {
     const pw = values.password.trim();
-    if (pw.length < 8) errs.password = "Passord må være minst 8 tegn.";
+    const pwdErr = validatePasswordComplexity(pw, options?.locale || "nb");
+    if (pwdErr) {
+      errs.password = pwdErr;
+    }
     const cp = values.confirmPassword.trim();
     if (pw !== cp) errs.confirmPassword = "Passordene er ikke like.";
   }
