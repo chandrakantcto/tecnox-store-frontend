@@ -10,7 +10,7 @@ export function LoginView({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[var(--color-stone)] p-8 text-center text-[var(--color-muted)]">Loading…</main>
+        <main className=" bg-[var(--color-stone)] p-8 text-center text-[var(--color-muted)]">Loading…</main>
       }
     >
       <AccountAuthView megaMenuByLocale={megaMenuByLocale} initialTab="login" />

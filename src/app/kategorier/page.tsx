@@ -66,7 +66,7 @@ export default async function KategorierPage() {
     : catHero;
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <SiteHeader locale={locale} />
       <PageHero
         label={heroLabel}

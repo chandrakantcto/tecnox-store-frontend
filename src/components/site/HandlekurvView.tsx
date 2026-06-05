@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
 import { MainNav } from "@/components/site/MainNav";
@@ -43,7 +43,7 @@ export function HandlekurvView({
   const itemLabel = itemCount === 1 ? tr(locale, "vare", "item") : tr(locale, "varer", "items");
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
@@ -137,17 +137,14 @@ export function HandlekurvView({
                         href={`/produkter/${encodeURIComponent(line.productSlug)}`}
                         className="relative block aspect-square overflow-hidden rounded-[2px] bg-[oklch(0.94_0.005_80)]"
                       >
-                        {line.imageSrc ? (
-                          <Image
-                            src={line.imageSrc}
-                            alt=""
-                            fill
-                            className="object-cover"
-                            sizes="120px"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 bg-[oklch(0.93_0.01_85)]" />
-                        )}
+                        <StorefrontRemoteImage
+                          src={line.imageSrc}
+                          alt=""
+                          locale={locale}
+                          fill
+                          compact
+                          className="object-cover"
+                        />
                       </Link>
 
                       <div className="min-w-0">

@@ -19,7 +19,7 @@ export default async function HomePage() {
   const catalog = await getHomepageCatalogPayload(locale);
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <ScrollProgress />
       <SiteHeader locale={locale} />
       <Hero locale={locale} />

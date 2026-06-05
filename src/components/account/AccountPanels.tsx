@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import { errorMessageFromShopResult, shopGraphql } from "@/lib/vendure/shop-client-browser";
 import {
   GQL_ACTIVE_CUSTOMER_PANEL,
@@ -900,7 +900,14 @@ function LinesBlock({ lines, locale }: { lines: unknown[] | undefined | null; lo
           const inner = (
             <div className="flex items-start gap-4 p-5">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[2px] bg-[var(--color-stone)]">
-                {img ? <Image src={img} alt="" fill sizes="64px" className="object-cover" /> : null}
+                <StorefrontRemoteImage
+                  src={img}
+                  alt=""
+                  locale={locale}
+                  fill
+                  compact
+                  className="object-cover"
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">{name}</p>

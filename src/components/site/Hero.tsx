@@ -243,7 +243,7 @@ export function Hero({ locale: _locale }: { locale?: Locale }) {
           {/* Floating chip — bottom-left */}
           <Link
             href={slide.ctaHref}
-            className="absolute bottom-4 left-4 right-4 z-[2] sm:right-auto bg-white text-[var(--color-ink)] text-[12px] font-medium pl-3.5 pr-4 py-3 rounded-[3px] shadow-xl flex items-center gap-2.5 hover:bg-[var(--color-ink)] hover:text-white transition-colors group"
+            className="absolute bottom-4 left-4 right-4 z-[2] sm:left-auto bg-white text-[var(--color-ink)] text-[12px] font-medium pl-3.5 pr-4 py-3 rounded-[3px] shadow-xl flex items-center gap-2.5 hover:bg-[var(--color-ink)] hover:text-white transition-colors group"
           >
             <span className="bg-[var(--color-copper)] text-white text-[9px] font-bold tracking-[0.14em] px-1.5 py-0.5 rounded-[2px]">
               {tr(locale, slide.badgeNb, slide.badgeEn)}
@@ -258,7 +258,7 @@ export function Hero({ locale: _locale }: { locale?: Locale }) {
           </div>
 
           {/* Stat overlay — bottom-right corner card */}
-          <div className="hidden lg:block absolute -bottom-8 -left-6 bg-[var(--color-ink)] text-white px-5 py-4 rounded-[3px] shadow-2xl border border-[oklch(0.28_0_0)]">
+          <div className="hidden lg:block absolute -bottom-8 -left-6 bg-[var(--color-ink)] text-white px-5 py-4 rounded-[3px] shadow-2xl border z-9 border-[oklch(0.28_0_0)]">
             <p className="text-[28px] font-bold leading-none tracking-[-0.025em]">5 000+</p>
             <p className="mt-1.5 text-[10px] uppercase tracking-[0.16em] text-[var(--color-dark-muted)]">
               {tr(locale, "Produkter på lager", "Products in stock")}

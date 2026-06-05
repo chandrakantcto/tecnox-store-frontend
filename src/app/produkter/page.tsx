@@ -74,7 +74,7 @@ export default async function ProdukterPage(props: PageProps) {
   const heroBg = lp.heroBgImageSrc?.trim() ? lp.heroBgImageSrc.trim() : heroImg;
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <SiteHeader locale={locale} />
       <PageHero
         label={heroLabel}

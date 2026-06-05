@@ -11,6 +11,11 @@ import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
+
+function categoryTileLabel(cat: HomepageCategoryTile, locale: Locale): string {
+  return tr(locale, cat.nameNb ?? cat.name, cat.nameEn ?? cat.name);
+}
 
 export type CategoriesProps = {
   showSeeAllLink?: boolean;
@@ -108,27 +113,15 @@ export function Categories({
                   className="group block bg-white relative overflow-hidden rounded-[3px] border border-[var(--color-divider)] hover:border-[var(--color-copper)] hover:shadow-[0_16px_32px_-12px_oklch(0.18_0.005_60/0.18)] transition-all duration-300 h-full"
                 >
                   <div className="aspect-[3/4] flex flex-col">
-                    <div className="flex-[7] relative overflow-hidden bg-[oklch(0.93_0.005_80)]">
-                      {cat.remoteImageSrc ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={cat.remoteImageSrc}
-                          alt={cat.name}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                          width={768}
-                          height={1024}
-                        />
-                      ) : (
-                        <div className="flex h-full min-h-[120px] w-full flex-col items-center justify-center gap-2 border-b border-[var(--color-divider)]/40 px-4 text-center">
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                            {cat.name.slice(0, 2).toUpperCase()}
-                          </span>
-                          <span className="text-[10px] leading-snug text-[var(--color-muted)]/85">
-                            {tr(locale, "Bilde kommer snart", "Image coming soon")}
-                          </span>
-                        </div>
-                      )}
+                    <div className="flex-[7] relative overflow-hidden bg-[var(--color-stone)]">
+                      <StorefrontRemoteImage
+                        src={cat.remoteImageSrc}
+                        alt={categoryTileLabel(cat, locale)}
+                        locale={locale}
+                        className="transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                        width={768}
+                        height={1024}
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.18_0.005_60/0.5)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                       <div className="absolute top-2.5 left-2.5 text-[10px] font-mono text-white/95 tracking-[0.1em] z-10 bg-[oklch(0.18_0.005_60/0.55)] backdrop-blur-sm px-1.5 py-0.5 rounded-[2px]">
                         /{String(i + 1).padStart(2, "0")}
@@ -140,7 +133,7 @@ export function Categories({
                     </div>
                     <div className="flex-[3] flex flex-col justify-center px-3.5 py-3 bg-white border-t border-[var(--color-divider)]">
                       <h3 className="text-[13px] lg:text-[15px] font-bold text-[var(--color-ink)] leading-tight tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
-                        {cat.name}
+                        {categoryTileLabel(cat, locale)}
                       </h3>
                       <p className="pt-4 text-[14px] text-[var(--color-muted)] tracking-[0.02em]">
                         <span className="text-[var(--color-copper)] font-semibold">{cat.count}</span>{" "}

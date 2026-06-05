@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -168,7 +168,7 @@ export function KasseView({
 
   if (confirmed) {
     return (
-      <main className="min-h-screen bg-[var(--color-stone)]">
+      <main className=" bg-[var(--color-stone)]">
         <header className="sticky top-0 z-50">
           <TopBar />
           <MainNav megaMenuByLocale={megaMenuByLocale} />
@@ -247,7 +247,7 @@ export function KasseView({
   }
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
@@ -510,9 +510,14 @@ export function KasseView({
                     {lines.map((line) => (
                       <li key={line.orderLineId} className="flex items-start gap-3 py-4">
                         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[2px] bg-[oklch(0.21_0_0)]">
-                          {line.imageSrc ?
-                            <Image src={line.imageSrc} alt="" fill className="object-cover" sizes="48px" />
-                          : null}
+                          <StorefrontRemoteImage
+                            src={line.imageSrc}
+                            alt=""
+                            locale={locale}
+                            fill
+                            compact
+                            className="object-cover"
+                          />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-[13px] font-bold leading-snug text-white">{line.productName}</p>

@@ -7,6 +7,9 @@ export type MegaMenuLocales = Record<Locale, MegaMain[]>;
 export type HomepageCategoryTile = {
   slug: string;
   name: string;
+  /** Both locale labels for live header switch (optional on older payloads). */
+  nameNb?: string;
+  nameEn?: string;
   count: number;
   href: string;
   remoteImageSrc: string | null;
@@ -37,19 +40,28 @@ export type ProductsListingPageCopy = CategoriesListingPageCopy;
 export type CatalogProductCard = {
   slug: string;
   name: string;
+  nameNb?: string;
+  nameEn?: string;
   brand: string;
   spec: string;
   price: string;
   priceNumeric: number;
   category: string;
+  categoryNb?: string;
+  categoryEn?: string;
   categorySlug: string;
   badge?: string;
   img: string | StaticImageData;
   description: string;
+  descriptionNb?: string;
+  descriptionEn?: string;
 };
 
 export type ProductsSectionPayload = {
   filters: string[];
+  /** Parallel NB/EN filter labels for client locale switch */
+  filtersNb?: string[];
+  filtersEn?: string[];
   filterSlugs: (string | null)[];
   products: CatalogProductCard[];
   /** When set (e.g. /produkter), sidebar counts reflect full catalogue; `products` may be filtered server-side */

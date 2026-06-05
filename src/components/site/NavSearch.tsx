@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import Image from "next/image";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
+import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { CategorySearchHit } from "@/hooks/use-storefront-search";
@@ -12,7 +13,7 @@ import { tr } from "@/lib/locale";
 import { absoluteAssetUrl } from "@/lib/vendure/normalize";
 import type { SearchHitRaw } from "@/lib/vendure/normalize";
 import { cn } from "@/lib/utils";
-import { FolderOpen, Loader2, Package, Search, X } from "lucide-react";
+import { FolderOpen, Loader2, Search, X } from "lucide-react";
 
 function catListingHref(slug: string) {
   return `/produkter?cat=${encodeURIComponent(slug)}`;
@@ -61,7 +62,7 @@ function SuggestionRows({
         "absolute top-full z-[90] mt-2 max-h-[min(70vh,520px)] overflow-y-auto overscroll-contain rounded-[3px] border border-[var(--color-divider)] bg-white py-2 shadow-[0_18px_48px_-16px_oklch(0.22_0.02_80_/_0.35)] animate-fade-in",
         panelVariant === "mobile"
           ? "left-0 right-0 w-full max-w-none"
-          : "right-0 w-[min(calc(100vw-2rem),420px)]",
+          : "left-0 right-0 w-full",
       )}
       role="listbox"
       aria-label={tr(locale, "Søkeforslag", "Search suggestions")}
@@ -135,13 +136,19 @@ function SuggestionRows({
                         : "text-[var(--color-ink)] hover:bg-[var(--color-stone)]/50",
                     )}
                   >
-                    <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[2px] bg-[oklch(0.94_0.005_80)]">
+                    <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[2px] bg-[var(--color-stone)]">
                       {img ? (
-                        <Image src={img} alt="" width={44} height={44} className="object-cover" unoptimized />
+                        <StorefrontRemoteImage
+                          src={img}
+                          alt=""
+                          locale={locale}
+                          width={44}
+                          height={44}
+                          compact
+                          className="object-cover"
+                        />
                       ) : (
-                        <span className="flex h-full w-full items-center justify-center text-[var(--color-muted)]">
-                          <Package className="h-4 w-4" aria-hidden />
-                        </span>
+                        <ImageUnavailablePlaceholder locale={locale} compact className="min-h-0 border-0" />
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
@@ -254,46 +261,62 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
   return (
     <div ref={wrapRef} className="relative hidden lg:block">
       <div className="flex items-center justify-end gap-0">
-     <div
-        className={cn(
-       "absolute right-0 top-full mt-3 overflow-hidden transition-[max-width,opacity] duration-300 ",
-         barOpen
-          ? "max-w-[300px] xl:max-w-[350px] 2xl:max-w-[380px] opacity-100 "
-           : "max-w-0 opacity-0 pointer-events-none",
-            )}
-                 >
-          <label className="sr-only" htmlFor={listId}>
-            {tr(locale, "Søk i produkter og kategorier", "Search products and categories")}
-          </label>
-          <div className=" hidden lg:flex flex h-9 min-w-[260px] items-center gap-2 rounded-[2px] border border-[var(--color-divider)] bg-white px-3 shadow-sm sm:min-w-[280px] md:min-w-[300px]">
-            <Search className="h-4 w-4 shrink-0 text-[var(--color-muted)]" aria-hidden />
-            <input
-              ref={inputRef}
-              id={listId}
-              type="search"
-              autoComplete="off"
-              enterKeyHint="search"
-              placeholder={tr(locale, "Søk produkter …", "Search products …")}
-              value={search.query}
-              onChange={(e) => search.setQuery(e.target.value)}
-              onKeyDown={onInputKeyDown}
-              className="min-w-0 flex-1 bg-transparent text-[14px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)]"
-              role="combobox"
-              aria-expanded={showDropdown}
-              aria-autocomplete="list"
-            />
-            {search.query ? (
-              <button
-                type="button"
-                className="shrink-0 text-[var(--color-muted)] hover:text-[var(--color-ink)]"
-                aria-label={tr(locale, "Tøm søk", "Clear search")}
-                onClick={() => {
+        <div
+          className={cn(
+            "absolute right-0 top-full z-[80] mt-3 w-[300px] overflow-visible transition-[opacity,transform] duration-300 ease-out xl:w-[350px] 2xl:w-[380px]",
+            barOpen
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-3 opacity-0",
+          )}
+        >
+          <div className="relative min-w-[260px] sm:min-w-[280px] md:min-w-[300px]">
+            <label className="sr-only" htmlFor={listId}>
+              {tr(locale, "Søk i produkter og kategorier", "Search products and categories")}
+            </label>
+            <div className="relative z-[2] flex h-9 w-full items-center gap-2 rounded-[2px] border border-[var(--color-divider)] bg-white px-3 shadow-sm">
+              <Search className="h-4 w-4 shrink-0 text-[var(--color-muted)]" aria-hidden />
+              <input
+                ref={inputRef}
+                id={listId}
+                type="search"
+                autoComplete="off"
+                enterKeyHint="search"
+                placeholder={tr(locale, "Søk produkter …", "Search products …")}
+                value={search.query}
+                onChange={(e) => search.setQuery(e.target.value)}
+                onKeyDown={onInputKeyDown}
+                className="min-w-0 flex-1 bg-transparent text-[14px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)] [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-ms-clear]:hidden"
+                role="combobox"
+                aria-expanded={showDropdown}
+                aria-autocomplete="list"
+              />
+              {search.query ? (
+                <button
+                  type="button"
+                  className="shrink-0 text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+                  aria-label={tr(locale, "Tøm søk", "Clear search")}
+                  onClick={() => {
+                    search.clearQuery();
+                    setActiveIndex(-1);
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+
+            {showDropdown ? (
+              <SuggestionRows
+                locale={locale}
+                search={search}
+                activeIndex={activeIndex}
+                setActiveIndex={setActiveIndex}
+                panelVariant="desktop"
+                onPick={() => {
+                  setBarOpen(false);
                   search.clearQuery();
-                  setActiveIndex(-1);
                 }}
-              >
-                <X className="h-4 w-4" />
-              </button>
+              />
             ) : null}
           </div>
         </div>
@@ -304,33 +327,19 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
             barOpen ? tr(locale, "Lukk søk", "Close search") : tr(locale, "Åpne søk", "Open search")
           }
           aria-expanded={barOpen}
-onClick={() => {
-  if (barOpen) {
-    search.clearQuery();
-    setActiveIndex(-1);
-  }
+          onClick={() => {
+            if (barOpen) {
+              search.clearQuery();
+              setActiveIndex(-1);
+            }
 
-  setBarOpen(!barOpen);
-}}
-          className="shrink-0 p-2 text-[var(--color-ink)] transition-colors hover:text-[var(--color-copper)]"
+            setBarOpen(!barOpen);
+          }}
+          className="relative z-[3] shrink-0 p-2 text-[var(--color-ink)] cursor-pointer transition-colors hover:text-[var(--color-copper)]"
         >
           {barOpen ? <X className="h-[18px] w-[18px]" strokeWidth={1.5} /> : <Search className="h-[18px] w-[18px]" strokeWidth={1.5} />}
         </button>
       </div>
-
-      {showDropdown ? (
-        <SuggestionRows
-          locale={locale}
-          search={search}
-          activeIndex={activeIndex}
-          setActiveIndex={setActiveIndex}
-          panelVariant="desktop"
-          onPick={() => {
-            setBarOpen(false);
-            search.clearQuery();
-          }}
-        />
-      ) : null}
     </div>
   );
 }
@@ -422,7 +431,7 @@ export function NavSearchMobile({
           value={search.query}
           onChange={(e) => search.setQuery(e.target.value)}
           onKeyDown={onInputKeyDown}
-          className="min-w-0 flex-1 bg-transparent text-[15px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)]"
+          className="min-w-0 flex-1 bg-transparent text-[15px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)] [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-ms-clear]:hidden"
           role="combobox"
           aria-expanded={showDropdown}
           aria-autocomplete="list"
