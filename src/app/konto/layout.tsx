@@ -6,8 +6,8 @@ export default async function KontoLayout({ children }: { children: React.ReactN
   const { data } = await getMegaMenuBothLocales();
   return <AccountShell megaMenuByLocale={data}>{children}</AccountShell>;
 }
-
 export const metadata: Metadata = {
   title: "Min konto",
   description: "Kontooversikt, profil og ordrehistorikk.",
 };
+

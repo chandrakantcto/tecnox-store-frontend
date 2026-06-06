@@ -12,6 +12,7 @@ import type { CatalogProductCard } from "@/lib/vendure/catalog-types";
 import {
   applyLocaleToSearchHit,
   buildLocalizedCategoryNameMap,
+  buildLocalizedCategoryNameMapsBoth,
   fetchNavRoots,
   getGlobalProductSearchHitsDual,
   pickLocalizedText,
@@ -234,7 +235,8 @@ async function fetchRelatedProductsForPdp(
   collSlugsOrdered: string[],
   excludeSlug: string,
   idToRoot: Map<string, string>,
-  slugToCategoryName: Map<string, string>,
+  slugToCategoryNameNb: Map<string, string>,
+  slugToCategoryNameEn: Map<string, string>,
 ): Promise<Product[]> {
   const dualSearch = await getGlobalProductSearchHitsDual();
   const nbBySlug = new Map(dualSearch.nb.map((h) => [h.slug, h]));
@@ -244,9 +246,12 @@ async function fetchRelatedProductsForPdp(
     catalogCardToProductStub(
       searchHitToCatalogCard(
         locale,
-        applyLocaleToSearchHit(h, locale, nbBySlug, enBySlug),
+        h,
         idToRoot,
-        slugToCategoryName,
+        slugToCategoryNameNb,
+        slugToCategoryNameEn,
+        nbBySlug,
+        enBySlug,
       ),
     );
 
@@ -341,6 +346,11 @@ export const getStorefrontProductDetail = cache(
       const slugToCategoryName = buildLocalizedCategoryNameMap(
         dedupeNavRootsBySlug(roots),
         locale,
+        navNb.roots,
+        navEn.roots,
+      );
+      const { nb: slugToCategoryNameNb, en: slugToCategoryNameEn } = buildLocalizedCategoryNameMapsBoth(
+        dedupeNavRootsBySlug(roots),
         navNb.roots,
         navEn.roots,
       );
@@ -608,7 +618,8 @@ export const getStorefrontProductDetail = cache(
         collSlugsOrdered,
         productSlug,
         idToRoot,
-        slugToCategoryName,
+        slugToCategoryNameNb,
+        slugToCategoryNameEn,
       );
 
       return { product: productRecord, relatedProducts, error: productRes.error ?? null };

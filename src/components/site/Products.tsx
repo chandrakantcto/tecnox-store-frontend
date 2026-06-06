@@ -13,6 +13,9 @@ import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { BsArrowUpRightCircleFill } from "react-icons/bs";
+import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
+import { isMissingStorefrontImage } from "@/lib/storefront-image";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 
 type ProductsProps = {
   withCategorySidebar?: boolean;
@@ -22,43 +25,50 @@ type ProductsProps = {
   initialCatSlug?: string | null;
 };
 
-function productImage(product: CatalogProductCard) {
-  if (typeof product.img === "string") {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={product.img}
-        alt={
-  product.name.length > 10
-    ? product.name.slice(0, 10) + "..."
-    : product.name
+function productDisplayName(product: CatalogProductCard, locale: Locale): string {
+  return tr(locale, product.nameNb ?? product.name, product.nameEn ?? product.name);
 }
+
+function productImage(product: CatalogProductCard, locale: Locale) {
+  const altName = productDisplayName(product, locale);
+  const alt = altName.length > 10 ? `${altName.slice(0, 10)}...` : altName;
+  const src = typeof product.img === "string" ? product.img : null;
+
+  if (typeof product.img !== "string") {
+    return (
+      <Image
+        src={product.img}
+        alt={alt}
         loading="lazy"
         width={1024}
         height={768}
+        sizes="(max-width: 1024px) 50vw, 25vw"
         className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
       />
     );
   }
+
+  if (isMissingStorefrontImage(src)) {
+    return (
+      <ImageUnavailablePlaceholder
+        locale={locale}
+        className="transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+      />
+    );
+  }
+
   return (
-    <Image
-      src={product.img}
-     alt={
-  product.name.length > 10
-    ? product.name.slice(0, 10) + "..."
-    : product.name
-}
-      loading="lazy"
-      width={1024}
-      height={768}
-      sizes="(max-width: 1024px) 50vw, 25vw"
-      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+    <StorefrontRemoteImage
+      src={src}
+      alt={alt}
+      locale={locale}
+      className="transition-transform duration-700 ease-out group-hover:scale-[1.05]"
     />
   );
 }
 
 function syncSlugAllowed(slug: string | null, allowed: (string | null)[]): string | null {
-  if (slug !== null && !allowed.includes(slug)) return null;
+  // Always keep the slug so we know we are in a subcategory, even if it's not a root tab
   return slug;
 }
 
@@ -104,10 +114,10 @@ export function Products({
   const pairs = useMemo(() => {
     const n = Math.min(catalog.filters.length, catalog.filterSlugs.length);
     return catalog.filters.slice(0, n).map((label, i) => ({
-      label,
+      label: tr(locale, catalog.filtersNb?.[i] ?? label, catalog.filtersEn?.[i] ?? label),
       slug: catalog.filterSlugs[i] ?? null,
     }));
-  }, [catalog]);
+  }, [catalog, locale]);
 
   const countForFilter = useCallback(
     (slug: string | null) => {
@@ -207,9 +217,10 @@ export function Products({
 
   const visible = useMemo(() => {
     const list = catalog.products ?? [];
+    if (withCategorySidebar) return list; // Server already filtered exactly what we need
     if (activeSlug === null) return list;
     return list.filter((p) => p.categorySlug === activeSlug);
-  }, [catalog.products, activeSlug]);
+  }, [catalog.products, activeSlug, withCategorySidebar]);
 
   const homePreviewLimit = previewRows * homeGridCols;
   const gridProducts = isHomePreview ? visible.slice(0, homePreviewLimit) : visible;
@@ -358,6 +369,48 @@ export function Products({
               </Reveal>
             )}
 
+            {!isHomePreview && catalog.subcategories && catalog.subcategories.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-[14px] font-bold uppercase tracking-[0.1em] text-[var(--color-muted)] mb-4">
+                  {tr(locale, "Underkategorier", "Subcategories")}
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {catalog.subcategories.map((sc, i) => (
+                    <Reveal key={sc.slug} delay={Math.min(i * 0.05, 0.3)}>
+                      <Link
+                        href={`/produkter?cat=${encodeURIComponent(sc.slug)}`}
+                        className="group flex flex-col bg-white border border-[var(--color-divider)] rounded-[3px] overflow-hidden hover:border-[var(--color-copper)] hover:shadow-sm transition-all h-full"
+                      >
+                        <div className="aspect-[4/3] bg-[oklch(0.96_0.005_80)] relative">
+                          {sc.remoteImageSrc ? (
+                            <Image
+                              src={sc.remoteImageSrc}
+                              alt={sc.name}
+                              fill
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center opacity-30">
+                              <ImageUnavailablePlaceholder locale={locale} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3 flex items-center justify-between">
+                          <span className="text-[13px] font-bold text-[var(--color-ink)] group-hover:text-[var(--color-copper)] transition-colors truncate pr-2">
+                            {sc.name}
+                          </span>
+                          <span className="text-[11px] text-[var(--color-muted)] tabular-nums bg-[oklch(0.96_0.005_80)] px-1.5 py-0.5 rounded-[2px]">
+                            {sc.count}
+                          </span>
+                        </div>
+                      </Link>
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {visible.length === 0 ? (
               <p className="text-[15px] text-[var(--color-muted)]">
                 {tr(
@@ -382,7 +435,7 @@ export function Products({
                     >
                       <div className="relative overflow-hidden">
                         <div className="aspect-[4/3] bg-[oklch(0.94_0.005_80)] overflow-hidden">
-                          {productImage(p)}
+                          {productImage(p, locale)}
                         </div>
                         {p.badge && (
                           <span className="absolute top-3 left-3 bg-[var(--color-copper)] text-white text-[10px] font-bold tracking-[0.14em] px-2 py-1 rounded-[2px] shadow-sm">
@@ -398,7 +451,7 @@ export function Products({
                           {p.brand}
                         </p>
                         <h3 className="mt-1.5 text-[15px] font-bold text-[var(--color-ink)] leading-snug tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
-                          {p.name}
+                          {productDisplayName(p, locale)}
                         </h3>
                         {p.spec && p.spec.length > 30 ? (
                           <p className="mt-2 text-[12px] text-[var(--color-muted)] leading-relaxed font-mono">

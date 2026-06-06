@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import Link from "next/link";
 import { X, Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import { formatNOK, useCart } from "@/contexts/CartContext";
@@ -57,6 +57,8 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
     itemCount === 1
       ? tr(locale, "produkt", "product")
       : tr(locale, "produkter", "products");
+
+  const checkoutDisabled = loading || itemCount === 0;
 
   return createPortal(
     <div
@@ -134,11 +136,14 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
                     onClick={() => onOpenChange(false)}
                     className="relative block aspect-square shrink-0 overflow-hidden rounded-[3px] border border-[var(--color-divider)] bg-[oklch(0.96_0.005_80)]"
                   >
-                    {line.imageSrc ? (
-                      <Image src={line.imageSrc} alt="" fill className="object-cover" sizes="80px" />
-                    ) : (
-                      <div className="absolute inset-0 bg-[oklch(0.93_0.01_85)]" />
-                    )}
+                    <StorefrontRemoteImage
+                      src={line.imageSrc}
+                      alt=""
+                      locale={locale}
+                      fill
+                      compact
+                      className="object-cover"
+                    />
                   </Link>
 
                   <div className="relative flex min-w-0 flex-col">
@@ -227,14 +232,25 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
               <ShoppingBag className="h-4 w-4" />
               {tr(locale, "Vis handlekurv", "View cart")}
             </Link>
-            <Link
-              href="/kasse"
-              onClick={() => onOpenChange(false)}
-              className="btn-primary flex w-full justify-center"
-            >
-              {tr(locale, "Gå til kassen", "Go to checkout")}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            {checkoutDisabled ? (
+              <button
+                type="button"
+                disabled
+                className="btn-primary flex w-full cursor-not-allowed justify-center disabled:opacity-60"
+              >
+                {tr(locale, "Gå til kassen", "Go to checkout")}
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <Link
+                href="/kasse"
+                onClick={() => onOpenChange(false)}
+                className="btn-primary flex w-full justify-center"
+              >
+                {tr(locale, "Gå til kassen", "Go to checkout")}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
           </div>
         </footer>
       </aside>

@@ -12,6 +12,8 @@ import { MainNav } from "@/components/site/MainNav";
 import { Footer } from "@/components/site/Footer";
 import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/site/Reveal";
+import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
+import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import {
   cartSnapshotFromProduct,
   type LocalizedBulletBundle,
@@ -22,6 +24,7 @@ import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { isMissingStorefrontImageSource } from "@/lib/storefront-image";
 import { useCart } from "@/contexts/CartContext";
 import { Check, ChevronDown, Minus, Plus, ShoppingBag, Star, ShieldCheck, Truck, Wrench } from "lucide-react";
 
@@ -41,7 +44,7 @@ export function ProductPageTemplate({
   const locale = useActiveLocale();
   const router = useRouter();
   const { addItemFromSnapshot, syncing, lastActionError, clearLastActionError } = useCart();
-  const variants = product.variants ?? [];
+  const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const [selectedVid, setSelectedVid] = useState(() => {
     const v = product.hydratedVariantId ?? product.defaultVariantId ?? variants[0]?.id ?? "";
     return v;
@@ -57,15 +60,16 @@ export function ProductPageTemplate({
   }, [variants, selectedVid]);
 
   useEffect(() => {
+    const defaultVariantId = product.variants?.[0]?.id;
     const v =
       product.hydratedVariantId ??
       product.defaultVariantId ??
-      product.variants?.[0]?.id ??
+      defaultVariantId ??
       "";
     if (v) setSelectedVid(v);
-  }, [product.slug, product.hydratedVariantId, product.defaultVariantId, product.variants?.[0]?.id]);
+  }, [product.slug, product.hydratedVariantId, product.defaultVariantId, product.variants]);
 
-  const gallery = product.galleryImageUrls?.length ? product.galleryImageUrls : [product.img];
+  const gallery = useMemo(() => product.galleryImageUrls?.length ? product.galleryImageUrls : [product.img], [product.galleryImageUrls, product.img]);
 
   useEffect(() => {
     if (!effectiveVariant?.imageSrc?.trim()) return;
@@ -119,7 +123,7 @@ export function ProductPageTemplate({
   const reviews = product.reviews ?? [];
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
@@ -146,15 +150,19 @@ export function ProductPageTemplate({
                     {product.badge}
                   </span>
                 )}
-                <Image
-                  src={mainImageSrc}
-                  alt={product.name}
-                  width={1024}
-                  height={768}
-                  className="h-full w-full object-cover transition-all duration-500"
-                  sizes="(max-width: 1024px) 100vw, 55vw"
-                  priority
-                />
+                {isMissingStorefrontImageSource(mainImageSrc) ? (
+                  <ImageUnavailablePlaceholder locale={locale} className="min-h-full" />
+                ) : (
+                  <Image
+                    src={mainImageSrc}
+                    alt={product.name}
+                    width={1024}
+                    height={768}
+                    className="h-full w-full object-cover transition-all duration-500"
+                    sizes="(max-width: 1024px) 100vw, 55vw"
+                    priority
+                  />
+                )}
               </div>
               {gallery.length > 1 ? (
                 <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
@@ -170,13 +178,17 @@ export function ProductPageTemplate({
                       }`}
                       aria-label={tr(locale, `Bilde ${i + 1}`, `Image ${i + 1}`)}
                     >
-                      <Image
-                        src={src}
-                        alt=""
-                        width={320}
-                        height={240}
-                        className="h-full w-full object-cover"
-                      />
+                      {isMissingStorefrontImageSource(src) ? (
+                        <ImageUnavailablePlaceholder locale={locale} className="min-h-full" />
+                      ) : (
+                        <Image
+                          src={src}
+                          alt=""
+                          width={320}
+                          height={240}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -419,16 +431,25 @@ export function ProductPageTemplate({
               {relatedProducts.map((p, i) => (
                 <Reveal key={p.slug} delay={i * 0.06} className="h-full min-h-0">
                   <Link href={`/produkter/${p.slug}`} className="group card-elevated flex h-full min-h-0 flex-col">
-                    <div className="aspect-[4/3] overflow-hidden bg-[oklch(0.94_0.005_80)]">
-                      <Image
-                        src={p.img}
-                        alt={p.name}
-                        loading="lazy"
-                        width={1024}
-                        height={768}
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-                      />
+                    <div className="aspect-[4/3] overflow-hidden bg-[var(--color-stone)]">
+                      {typeof p.img === "string" ? (
+                        <StorefrontRemoteImage
+                          src={p.img}
+                          alt={p.name}
+                          locale={locale}
+                          className="transition-transform duration-700 group-hover:scale-[1.05]"
+                        />
+                      ) : (
+                        <Image
+                          src={p.img}
+                          alt={p.name}
+                          loading="lazy"
+                          width={1024}
+                          height={768}
+                          sizes="(max-width: 1024px) 50vw, 25vw"
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+                        />
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="text-[14px] font-bold text-[var(--color-ink)] leading-snug">{p.name}</h3>

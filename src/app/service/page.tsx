@@ -56,7 +56,7 @@ export default async function ServicePage() {
   const locale = await getServerLocale();
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <SiteHeader locale={locale} />
       <PageHero
         label={tr(locale, "Service og support", "Service and support")}

@@ -54,7 +54,7 @@ export function AccountShell({
 
   if (initializing) {
     return (
-      <main className={`min-h-screen bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
+      <main className={` bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
         <p className="container-x py-24 text-center text-[var(--color-muted)]">
@@ -67,7 +67,7 @@ export function AccountShell({
 
   if (!customer) {
     return (
-      <main className={`min-h-screen bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
+      <main className={` bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />
         <p className="container-x py-24 text-center text-[var(--color-muted)]">
@@ -79,7 +79,7 @@ export function AccountShell({
   }
 
   return (
-    <main className={`min-h-screen bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
+    <main className={` bg-[var(--color-stone)] ${ACCOUNT_PAGE_INTERACTIVE}`}>
       <header className="sticky top-0 z-50">
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />

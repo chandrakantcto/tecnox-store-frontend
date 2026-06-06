@@ -13,6 +13,7 @@ import { shopLoginEmailPassword, shopRegisterAccount } from "@/lib/auth/shop-ses
 import { useLocale } from "@/contexts/LocaleContext";
 import { tr } from "@/lib/locale";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
+import { validatePasswordComplexity } from "@/lib/auth/validate";
 import heroImg from "@/assets/hero-combi.jpg";
 
 const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
@@ -76,6 +77,7 @@ function LoginPanel() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          maxLength={255}
           className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px]"
         />
       </label>
@@ -94,6 +96,7 @@ function LoginPanel() {
           onChange={setPassword}
           required
           autoComplete="current-password"
+          maxLength={255}
           showLabel={tr(lc, "Vis passord", "Show password")}
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
@@ -123,7 +126,8 @@ function RegisterPanel() {
   const [busy, setBusy] = useState(false);
 
   const validate = (): string | null => {
-    if (password.length < 8) return tr(lc, "Passord må være minst 8 tegn.", "Password must be at least 8 characters.");
+    const pwdErr = validatePasswordComplexity(password, lc);
+    if (pwdErr) return pwdErr;
     if (password !== confirmPassword) return tr(lc, "Passordene stemmer ikke overens.", "Passwords do not match.");
     return null;
   };
@@ -153,18 +157,19 @@ function RegisterPanel() {
   return (
     <form onSubmit={(e) => void submit(e)} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <RegisterField label={tr(lc, "Fornavn", "First name")} value={firstName} onChange={setFirstName} required />
-        <RegisterField label={tr(lc, "Etternavn", "Last name")} value={lastName} onChange={setLastName} required />
+        <RegisterField label={tr(lc, "Fornavn", "First name")} value={firstName} onChange={setFirstName} required maxLength={100} />
+        <RegisterField label={tr(lc, "Etternavn", "Last name")} value={lastName} onChange={setLastName} required maxLength={100} />
       </div>
-      <RegisterField label={tr(lc, "E-post", "Email")} type="email" value={email} onChange={setEmail} required />
-      <RegisterField label={tr(lc, "Telefon (valgfritt)", "Phone (optional)")} value={phone} onChange={setPhone} />
-      <RegisterField label={tr(lc, "Passord", "Password")} type="password" value={password} onChange={setPassword} required />
+      <RegisterField label={tr(lc, "E-post", "Email")} type="email" value={email} onChange={setEmail} required maxLength={255} />
+      <RegisterField label={tr(lc, "Telefon (valgfritt)", "Phone (optional)")} value={phone} onChange={setPhone} maxLength={20} />
+      <RegisterField label={tr(lc, "Passord", "Password")} type="password" value={password} onChange={setPassword} required maxLength={255} />
       <RegisterField
         label={tr(lc, "Gjenta passord", "Confirm password")}
         type="password"
         value={confirmPassword}
         onChange={setConfirmPassword}
         required
+        maxLength={255}
       />
       {err ? (
         <p className="rounded-[2px] border border-red-600/35 px-3 py-2 text-[13px] text-red-800">{err}</p>
@@ -182,12 +187,14 @@ function RegisterField({
   onChange,
   type = "text",
   required,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   required?: boolean;
+  maxLength?: number;
 }) {
   const { locale: lc } = useLocale();
   const baseInputClass = "mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px]";
@@ -199,6 +206,7 @@ function RegisterField({
           value={value}
           onChange={onChange}
           required={required}
+          maxLength={maxLength}
           autoComplete="new-password"
           showLabel={tr(lc, "Vis passord", "Show password")}
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
@@ -209,6 +217,7 @@ function RegisterField({
           type={type}
           value={value}
           required={required}
+          maxLength={maxLength}
           onChange={(e) => onChange(e.target.value)}
           className={baseInputClass}
         />
@@ -228,7 +237,7 @@ function AccountAuthContent({
   const isLogin = initialTab === "login";
 
   return (
-    <main className="min-h-screen bg-[var(--color-stone)]">
+    <main className=" bg-[var(--color-stone)]">
       <header className="sticky top-0 z-50">
         <TopBar />
         <MainNav megaMenuByLocale={megaMenuByLocale} />

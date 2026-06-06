@@ -61,7 +61,7 @@ function UserAccountMenu({ locale, authCustomer }: { locale: Locale; authCustome
   };
 
   return (
-    <div ref={menuRef} className="relative hidden sm:block">
+    <div ref={menuRef} className="relative hidden sm:flex items-center">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

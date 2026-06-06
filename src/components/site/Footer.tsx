@@ -6,19 +6,9 @@ import { Linkedin, Instagram, Youtube } from "lucide-react";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { ROOT_CATEGORY_LABELS } from "@/data/rootCategoryLabels";
 /** Root collection slugs — same targets as /produkter sidebar (`?cat=`). */
-const FOOTER_ROOT_CATEGORIES = [
-  { slug: "kaffe", nameNb: "kaffitraktar", nameEn: "Coffee and bar" },
-  { slug: "kjolerom", nameNb: "Kjølerom og fryserom", nameEn: "Cold rooms and freezer rooms" },
-  { slug: "kjoling", nameNb: "Kjøle- og frysutstyr", nameEn: "Cooling and freezing" },
-  { slug: "kok-stek", nameNb: "Kok og stek", nameEn: "Cook and fry" },
-  { slug: "kombi", nameNb: "Kombidampere", nameEn: "Combi ovens" },
-  { slug: "maskiner", nameNb: "Kjøkkenmaskiner", nameEn: "Kitchen machinery" },
-  { slug: "oppvask", nameNb: "Oppvaskmaskiner", nameEn: "Dishwashers" },
-  { slug: "pizza", nameNb: "Pizzautstyr", nameEn: "Pizza equipment" },
-  { slug: "rengjoring", nameNb: "Rengjøring og hygiene", nameEn: "Cleaning and hygiene" },
-  { slug: "servering", nameNb: "Serveringsutstyr", nameEn: "Serving equipment" },
-] as const;
+const FOOTER_ROOT_CATEGORIES = ROOT_CATEGORY_LABELS;
 
 function produkterCatHref(slug: string) {
   return `/produkter?cat=${encodeURIComponent(slug)}`;

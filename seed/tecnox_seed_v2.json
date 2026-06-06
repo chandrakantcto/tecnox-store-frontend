@@ -1,0 +1,1831 @@
+{
+  "schemaVersion": "1.0",
+  "source": "product_export_2026-05-12",
+  "total": 40,
+  "fieldNotes": {
+    "MATCHING": [
+      "slug",
+      "nameNb",
+      "descriptionNb",
+      "currency",
+      "filterCategoryNb",
+      "suggestedLeafCollectionIds",
+      "featuredAssetFile",
+      "imageFiles",
+      "variants.sku",
+      "variants.nameNb",
+      "variants.priceMinorOreExVat",
+      "variants.featuredAssetFile"
+    ],
+    "ADDED_EMPTY": [
+      "brand",
+      "nameEn",
+      "optionGroupCode",
+      "optionGroupNameNb",
+      "optionGroupNameEn",
+      "variants.optionCode",
+      "variants.nameEn"
+    ],
+    "EXTRA_FROM_SOURCE": [
+      "_source_model_number",
+      "_source_status",
+      "_source_stock_status",
+      "_source_type",
+      "_source_tags",
+      "_source_attributes",
+      "_source_seo_title",
+      "_source_seo_description",
+      "_source_page_url"
+    ]
+  },
+  "products": [
+    {
+      "slug": "planetarisk-mikser7-liter-hendi",
+      "nameNb": "Planetarisk mikser7 liter Hendi",
+      "nameEn": null,
+      "descriptionNb": "Modell: 221150 Universalmikser - kjøkkenmaskin, Hendi Hus i støpt aluminium Bolle i rustfritt stål 11 hastighetsinnstillinger (200 rpm) Inkludert tilbehør: Visp, padle og eltekrok i rustfritt stål Padle med silikonkant i PA (polyamid/nylon) Alt tilbehør tåler oppvaskmaskin. Kapasitet: 7 liter Mel: 0,2–1,5 kg Eggehviter: 2–20 stk. Søt kremfløte: 150–1500 ml Fløte: 0,1–2 l Mål: 263 × 470 × H 413 mm Effekt: 800 W / 230 V Vekt: 12,5 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Planetarisk mikser",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "planetarisk-mikser"
+      ],
+      "featuredAssetFile": "Planetarisk-mikser-221150.jpg",
+      "imageFiles": [
+        "Planetarisk-mikser-221150.jpg",
+        "Planetarisk-mikser-221150-Gastroline.jpg",
+        "Planetarisk-mikser-221150-Hendi.jpg",
+        "Planetarisk-mikser-221150-Preveda.jpg",
+        "Planetarisk-mikser-221150-Preveda-Gastroline.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-221150",
+          "nameNb": "Planetarisk mikser7 liter Hendi",
+          "nameEn": null,
+          "priceMinorOreExVat": 89200000,
+          "featuredAssetFile": "Planetarisk-mikser-221150.jpg"
+        }
+      ],
+      "_source_model_number": "221150",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "kjøkkenmaskin",
+        "Piskemaskin",
+        "Planetarisk mikser",
+        "Røremaskin",
+        "Universalmikser"
+      ],
+      "_source_page_url": "https://gastroline.no/product/planetarisk-mikser7-liter-hendi/"
+    },
+    {
+      "slug": "pastakoker-25-liter240496",
+      "nameNb": "Pastakoker 25 liter240496",
+      "nameEn": null,
+      "descriptionNb": "Modell: 240496 Elektrisk pastakoker, HENDI Utført i rustfritt stål AISI 304 Inkluderer 5 kurver: 1 stor kurv (170 × 263 × 306 mm) 2 mellomstore kurver (170 × 130 × 259 mm) 2 små kurver (115 × 126 × 253 mm) Justerbart temperaturområde: fra 45 °C til 110 °C Vanntank kapasitet: 25 liter Varmeelementet er plassert i bunnen av det lukkede kammeret Mål: 326 x 601 x h279 mm Effekt: 230V-1 fas / 3,5 kW Vekt: 9 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Pastakoker",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pastakoker"
+      ],
+      "featuredAssetFile": "Pasta-koker-240496.jpg",
+      "imageFiles": [
+        "Pasta-koker-240496.jpg",
+        "Pasta-koker-240496-Hendi.jpg",
+        "Pasta-koker-240496-Element.jpg",
+        "Pasta-240496.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-240496",
+          "nameNb": "Pastakoker 25 liter240496",
+          "nameEn": null,
+          "priceMinorOreExVat": 36450000,
+          "featuredAssetFile": "Pasta-koker-240496.jpg"
+        }
+      ],
+      "_source_model_number": "240496",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Modular",
+        "pastakoker"
+      ],
+      "_source_attributes": {
+        "Modell": "F6540CPE 400V | F6540CPE 230V 3F | Kurv 1/4 | kurv 2/4 | Lokk 40"
+      },
+      "_source_page_url": "https://gastroline.no/product/pastakoker-25-liter240496/"
+    },
+    {
+      "slug": "induksjonsbord6-kokesoner-400-volthendi-120x72-cm",
+      "nameNb": "Induksjonsbord6 kokesoner / 400 VoltHendi 120x72 cm",
+      "nameEn": null,
+      "descriptionNb": "Modell: 237397 Induksjonsbord med 6 kokesoner 5 mm herdet glass 11 effektnivåer 3 × 5,0 kW + 3 × 3,5 kW Passer til gryter og panner med bunndiameter opptil 260 mm Utstyrt med fettfilter som er enkelt å ta av og rengjøre Maksimalt tillatt belastning på koketoppen: 150 kg Mål: 1200 × 720 × H890 mm Effekt: 400 V / 25,5 kW / 36,8 A Vekt: 90 / 109 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Induksjonskoketopp",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "koketopp-el-og-gass",
+        "induksjonskoketopp"
+      ],
+      "featuredAssetFile": "Induksjon-237397-Gastroline.jpg",
+      "imageFiles": [
+        "Induksjon-237397-Gastroline.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-237397",
+          "nameNb": "Induksjonsbord6 kokesoner / 400 VoltHendi 120x72 cm",
+          "nameEn": null,
+          "priceMinorOreExVat": 535600000,
+          "featuredAssetFile": "Induksjon-237397-Gastroline.jpg"
+        }
+      ],
+      "_source_model_number": "237397",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Keramisk koketopp",
+        "Koketopp",
+        "Modular"
+      ],
+      "_source_attributes": {
+        "Voltstyrke": "R7040PVET 230V 3F | R7040PVET 400V"
+      },
+      "_source_seo_title": "Induksjonstopp 4 Soner Hendi 80x72 | Gastroline",
+      "_source_seo_description": "Induksjonstopp fra Hendi med 4 kokesoner og høy effekt. Perfekt for profesjonelle kjøkken med behov for rask og jevn varme.",
+      "_source_page_url": "https://gastroline.no/product/induksjonsbord6-kokesoner-400-volthendi-120x72-cm/"
+    },
+    {
+      "slug": "stavmikser221327-stav-lengde-30-cm",
+      "nameNb": "Stavmikser221327 Stav lengde 30 cm",
+      "nameEn": null,
+      "descriptionNb": "Modell: 221327 Stavmikser / Håndmikser, Hendi Stav med lengde på 30 cm Kapasitet: 80 l. Hastighet 4000 ~ 16000 RPM Mål: ⌀100x716 mm. Effekt: 350W / 230V Vekt: 3,21 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Stavmikser",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "stavmikser"
+      ],
+      "featuredAssetFile": "Stavmikser-221327-Hendi.jpg",
+      "imageFiles": [
+        "Stavmikser-221327-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-221327",
+          "nameNb": "Stavmikser221327 Stav lengde 30 cm",
+          "nameEn": null,
+          "priceMinorOreExVat": 29800000,
+          "featuredAssetFile": "Stavmikser-221327-Hendi.jpg"
+        }
+      ],
+      "_source_model_number": "221327",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "HÅNDMIKSER",
+        "STAVMIKSER"
+      ],
+      "_source_page_url": "https://gastroline.no/product/stavmikser221327-stav-lengde-30-cm/"
+    },
+    {
+      "slug": "stavmikser221198stav-lengde-25-cm",
+      "nameNb": "Stavmikser221198Stav lengde 25 cm",
+      "nameEn": null,
+      "descriptionNb": "Modell: 221198 Stavmikser / Håndmikser, Hendi Stav med lengde på 25 cm Kapasitet: 20 l. Hastighet 4000 ~ 16000 RPM Mål: ⌀100x666 mm. Effekt: 350W / 230V Vekt: 3,08 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Stavmikser",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "stavmikser"
+      ],
+      "featuredAssetFile": "Stavmikser-221198-Hendi.jpg",
+      "imageFiles": [
+        "Stavmikser-221198-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-221198",
+          "nameNb": "Stavmikser221198Stav lengde 25 cm",
+          "nameEn": null,
+          "priceMinorOreExVat": 29400000,
+          "featuredAssetFile": "Stavmikser-221198-Hendi.jpg"
+        }
+      ],
+      "_source_model_number": "221198",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "HÅNDMIKSER",
+        "STAVMIKSER"
+      ],
+      "_source_page_url": "https://gastroline.no/product/stavmikser221198stav-lengde-25-cm/"
+    },
+    {
+      "slug": "kjottmorner975305",
+      "nameNb": "KjøttmørnerHendi 975305",
+      "nameEn": null,
+      "descriptionNb": "Modell: 975305 Elektrisk kjøttmørner Hus i rustfritt stål Leveres med mørningstilbehør for biff og svin Maks kjøttporsjonsstørrelse: 160 mm bred x 30 mm tykk Produksjonskapasitet: Opptil 800 stykker per time Hastighet på mykgjøringsknivene: 75 o/min Effekt: 350 W / 230 V – 1-fas Mål (BxDxH): 514 x 224 x 430 mm Vekt: 18 kg https://www.youtube.com/watch?v=opv1rzKiztw",
+      "currency": "NOK",
+      "filterCategoryNb": "Mørnings- og strimlekuttere",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "m-rnings-og-strimlekuttere"
+      ],
+      "featuredAssetFile": "Morning-Hendi.jpg",
+      "imageFiles": [
+        "Morning-Hendi.jpg",
+        "Morning-Hendi-975305.jpg",
+        "Morning-Preveda-975305.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-975305",
+          "nameNb": "KjøttmørnerHendi 975305",
+          "nameEn": null,
+          "priceMinorOreExVat": 95800000,
+          "featuredAssetFile": "Morning-Hendi.jpg"
+        }
+      ],
+      "_source_model_number": "975305",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Grønnsakskutter",
+        "Ostekutt er"
+      ],
+      "_source_attributes": {
+        "Modell": "Drake | Kniv 8 mm | Kniv 10 mm | Kniv 15 mm | Mørning"
+      },
+      "_source_page_url": "https://gastroline.no/product/kjottmorner975305/"
+    },
+    {
+      "slug": "kraftig-gronnsakskutterostekutterinkludert-sett-med-5-kniver",
+      "nameNb": "Kraftig grønnsakskutterOstekutterInkludert sett med 5 kniver",
+      "nameEn": null,
+      "descriptionNb": "Modell: 231852 Grønnsakskuttmaskin, Hendi Stor innmatingsåpning for store grønnsaker, opptil Ø 165 mm Liten innmatingsåpning for lange grønnsaker, f.eks. gulrøtter og agurker, opptil Ø 55 mm Kutte­kammer i støpt aluminium Nedre del av huset i rustfritt stål Inkludert skivesett (5 stk): 2 stk. kutteskiver 2 / 4 mm. 3 stk. riveskiver: 3 / 4,5 / 7 mm. Mål: 574x250x(h)472 mm Effekt: 750 W / 230V / 300 rpm. Vekt: 27 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Grønnsakskutter - Ostekutter",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "gr-nnsakskutter-ostekutter",
+        "pizzautstyr",
+        "gr-nnsakskutter-ostekutter"
+      ],
+      "featuredAssetFile": "Gronnsakskutter-231852.jpg",
+      "imageFiles": [
+        "Gronnsakskutter-231852.jpg",
+        "Gronnsaks-kutter-231852.jpg",
+        "Gronnsakskutter-kniver-231852.jpg",
+        "Gronnsakskutter-preveda-231852.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-231852",
+          "nameNb": "Kraftig grønnsakskutterOstekutterInkludert sett med 5 kniver",
+          "nameEn": null,
+          "priceMinorOreExVat": 121600000,
+          "featuredAssetFile": "Gronnsakskutter-231852.jpg"
+        }
+      ],
+      "_source_model_number": "231852",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Grønnsakskutter",
+        "Ostekutt er"
+      ],
+      "_source_seo_title": "Grønnsakskutter & ostekutter | Storkjøkken maskin | Gastroline",
+      "_source_seo_description": "Grønnsakskutter, ostekutter og maskin til kutting av grønnsaker i storkjøkken. Effektiv, presis og robust løsning for profesjonell matproduksjon.",
+      "_source_page_url": "https://gastroline.no/product/kraftig-gronnsakskutterostekutterinkludert-sett-med-5-kniver/"
+    },
+    {
+      "slug": "vekt-10-kghendi580028",
+      "nameNb": "Vekt 10 KGHendi580028",
+      "nameEn": null,
+      "descriptionNb": "Modell: 580028 Vekt 10 kg Inndeling: 1 gram Vanntett hus laget av ABS og rustfritt stål Innebygd LED skjerm Avlesning i gram (g), milliliter (ml), unser (oz) eller pund (lb) Innebygd oppladbart litiumbatteri USB kabel for lading inkludert i settet Varsler om overbelastning og lavt batteri Mål: 160x210x h.19 mm.",
+      "currency": "NOK",
+      "filterCategoryNb": "Vekt - Timer - Termometer",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "vekter",
+        "kj-kkenrekvisita",
+        "vekt-timer-termometer"
+      ],
+      "featuredAssetFile": "580028-Preveda.jpg",
+      "imageFiles": [
+        "580028-Preveda.jpg",
+        "580028-Preveda-1.jpg",
+        "580028-Preveda-Gastroline.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-580028",
+          "nameNb": "Vekt 10 KGHendi580028",
+          "nameEn": null,
+          "priceMinorOreExVat": 3800000,
+          "featuredAssetFile": "580028-Preveda.jpg"
+        }
+      ],
+      "_source_model_number": "580028",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "vekt"
+      ],
+      "_source_page_url": "https://gastroline.no/product/vekt-10-kghendi580028/"
+    },
+    {
+      "slug": "vekt-5-kghendi580226",
+      "nameNb": "Vekt 5 KGHendi580226",
+      "nameEn": null,
+      "descriptionNb": "Modell: 580226 Vekt 5 kg Inndeling: 1 gram Hus laget av rustfritt stål Innebygd digital LCD-skjerm Avlesning i gram (g), unser (oz) eller pund (lb). Strøm: 1 x 3V litium batteri Varsler om overbelastning og lavt batteri Slår seg automatisk av etter en tid Mål: 169x218x h.13 mm.",
+      "currency": "NOK",
+      "filterCategoryNb": "Vekt - Timer - Termometer",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "vekter",
+        "kj-kkenrekvisita",
+        "vekt-timer-termometer"
+      ],
+      "featuredAssetFile": "580226-vekt.jpg",
+      "imageFiles": [
+        "580226-vekt.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-<span",
+          "nameNb": "Vekt 5 KGHendi580226",
+          "nameEn": null,
+          "priceMinorOreExVat": 3200000,
+          "featuredAssetFile": "580226-vekt.jpg"
+        }
+      ],
+      "_source_model_number": "<span",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "vekt"
+      ],
+      "_source_page_url": "https://gastroline.no/product/vekt-5-kghendi580226/"
+    },
+    {
+      "slug": "induksjonsfrityrkoker88-liter-2x-35-kw-215029",
+      "nameNb": "Induksjonsfrityrkoker8+8 liter / 2x 3,5 kW 215029",
+      "nameEn": null,
+      "descriptionNb": "Modell: 215029 Induksjon frityr med tappekran 2x 8 liter, Hendi Fullstendig laget i rustfritt stål Brønn uten elementer, rask og enkel rengjøring Digital nøyaktig temperaturstyring 60 °C -190 °C Slår seg automatisk av etter 3 timer Kapasitet: 2x 8 liter Mål: 577x609xh 410 mm. Effekt: 2x 3,5 kW / 230V Vekt: 23,3 kg https://www.youtube.com/watch?v=7QbrYADiVMA",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "Frityr-induksjon-dobbelt-215029.jpg",
+      "imageFiles": [
+        "Frityr-induksjon-dobbelt-215029.jpg",
+        "Frityr-induksjon-dobbelt.jpg",
+        "Frityrkoker-induksjon-dobbelt.jpg",
+        "Frityr-induksjon-215012-filter.jpg",
+        "215012-Frityrkoker.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-215029<strong>",
+          "nameNb": "Induksjonsfrityrkoker8+8 liter / 2x 3,5 kW 215029",
+          "nameEn": null,
+          "priceMinorOreExVat": 109800000,
+          "featuredAssetFile": "Frityr-induksjon-dobbelt-215029.jpg"
+        }
+      ],
+      "_source_model_number": "215029<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_seo_title": "Induksjonsfrityrkoker 8 8L 2x3,5 kW | Gastroline",
+      "_source_seo_description": "Induksjonsfrityrkoker med dobbel kapasitet 8 8 liter. Effektiv løsning for travle restauranter og storkjøkken med høyt behov.",
+      "_source_page_url": "https://gastroline.no/product/induksjonsfrityrkoker88-liter-2x-35-kw-215029/"
+    },
+    {
+      "slug": "induksjonstopp4-kokesoner-400-volthendi-80x72-cm",
+      "nameNb": "Induksjonsbord4 kokesoner / 400 VoltHendi 80x72 cm",
+      "nameEn": null,
+      "descriptionNb": "Modell: 237687 Induksjonsbord med 4 kokesoner 5 mm herdet glass 11 effektnivåer 2 × 5,0 kW + 2 × 3,5 kW Passer til gryter og panner med bunndiameter opptil 260 mm Utstyrt med fettfilter som er enkelt å ta av og rengjøre Maksimalt tillatt belastning på koketoppen: 100 kg Mål: 800 × 720 × H890 mm Effekt: 400 V / 17,0 kW / 26,0 A Vekt: 63 / 74 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Induksjonskoketopp",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "koketopp-el-og-gass",
+        "induksjonskoketopp"
+      ],
+      "featuredAssetFile": "237687-induksjon-kokebord.jpg",
+      "imageFiles": [
+        "237687-induksjon-kokebord.jpg",
+        "Induksjon-Preveda.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-237687",
+          "nameNb": "Induksjonsbord4 kokesoner / 400 VoltHendi 80x72 cm",
+          "nameEn": null,
+          "priceMinorOreExVat": 356800000,
+          "featuredAssetFile": "237687-induksjon-kokebord.jpg"
+        }
+      ],
+      "_source_model_number": "237687",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Keramisk koketopp",
+        "Koketopp",
+        "Modular"
+      ],
+      "_source_attributes": {
+        "Voltstyrke": "R7040PVET 230V 3F | R7040PVET 400V"
+      },
+      "_source_seo_title": "Induksjonstopp 4 Soner Hendi 80x72 | Gastroline",
+      "_source_seo_description": "Induksjonstopp fra Hendi med 4 kokesoner og høy effekt. Perfekt for profesjonelle kjøkken med behov for rask og jevn varme.",
+      "_source_page_url": "https://gastroline.no/product/induksjonstopp4-kokesoner-400-volthendi-80x72-cm/"
+    },
+    {
+      "slug": "gass-kokekrakk-147276-108-kw",
+      "nameNb": "Gass Kokekrakk 10,8 kW / 147276",
+      "nameEn": null,
+      "descriptionNb": "Modell: 147276 Gass Kokekrakk, Hendi Rustfritt stål ramme Piezoelektrisk tenning Mål: 58x65x h40 cm. Effekt: 10,8 kW Vekt: 17 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Koketopp - Gass koketopp",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "induksjon-wok",
+        "koketopp-el-og-gass",
+        "koketopp-gass-koketopp"
+      ],
+      "featuredAssetFile": "Gass-Kokekrakk-147276-Preveda.jpg",
+      "imageFiles": [
+        "Gass-Kokekrakk-147276-Preveda.jpg",
+        "Gass-Kokekrakk-147276.jpg",
+        "Gass-Kokekrakk-147276-Preveda-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-147276",
+          "nameNb": "Gass Kokekrakk 10,8 kW / 147276",
+          "nameEn": null,
+          "priceMinorOreExVat": 54800000,
+          "featuredAssetFile": "Gass-Kokekrakk-147276-Preveda.jpg"
+        }
+      ],
+      "_source_model_number": "147276",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "gass",
+        "gass-kokekrakk",
+        "gasskokekrakk",
+        "koke",
+        "kokebord",
+        "Kokekrakk",
+        "NGETL",
+        "RGH 50",
+        "WOK"
+      ],
+      "_source_page_url": "https://gastroline.no/product/gass-kokekrakk-147276-108-kw/"
+    },
+    {
+      "slug": "gass-kokekrakk-147801-60-kw",
+      "nameNb": "Gass Kokekrakk 6,0 kW / 147801",
+      "nameEn": null,
+      "descriptionNb": "Modell: 147801 Gass Kokekrakk, Hendi Rustfritt stål ramme Piezoelektrisk tenning Mål: 40x44x h39 cm. Effekt: 6,0 kW Vekt: 12 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Koketopp - Gass koketopp",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "induksjon-wok",
+        "koketopp-el-og-gass",
+        "koketopp-gass-koketopp"
+      ],
+      "featuredAssetFile": "Gass-Kokekrakk-147801-Preveda.jpg",
+      "imageFiles": [
+        "Gass-Kokekrakk-147801-Preveda.jpg",
+        "Gass-Kokekrakk-147801-Hendi.jpg",
+        "Gass-Kokekrakk-147801.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-147801",
+          "nameNb": "Gass Kokekrakk 6,0 kW / 147801",
+          "nameEn": null,
+          "priceMinorOreExVat": 41000000,
+          "featuredAssetFile": "Gass-Kokekrakk-147801-Preveda.jpg"
+        }
+      ],
+      "_source_model_number": "147801",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "gass",
+        "gass-kokekrakk",
+        "gasskokekrakk",
+        "koke",
+        "kokebord",
+        "Kokekrakk",
+        "NGETL",
+        "RGH 50",
+        "WOK"
+      ],
+      "_source_page_url": "https://gastroline.no/product/gass-kokekrakk-147801-60-kw/"
+    },
+    {
+      "slug": "kebabkniv-267257",
+      "nameNb": "Kebabkniv 267257",
+      "nameEn": null,
+      "descriptionNb": "Modell: 267257 Trådløs kebab kniv, Hendi Skjæredybde: 1-8 mm Bladstørrelse: Ø 100 mm Omdreininger: 2600 rpm 230V 1-Fas Vekt: 1,62 kg Anbefales ikke for intensiv bruk",
+      "currency": "NOK",
+      "filterCategoryNb": "Kebabkniv",
+      "suggestedLeafCollectionIds": [
+        "kebab",
+        "kebabkniv"
+      ],
+      "featuredAssetFile": "267257-Kebabkniv-Hendi.jpg",
+      "imageFiles": [
+        "267257-Kebabkniv-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-267257</span>",
+          "nameNb": "Kebabkniv 267257",
+          "nameEn": null,
+          "priceMinorOreExVat": 27400000,
+          "featuredAssetFile": "267257-Kebabkniv-Hendi.jpg"
+        }
+      ],
+      "_source_model_number": "267257</span>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "elektrisk Kniv",
+        "Gyros",
+        "kebab",
+        "kebabgrill",
+        "Kebabkniv",
+        "Potis"
+      ],
+      "_source_page_url": "https://gastroline.no/product/kebabkniv-267257/"
+    },
+    {
+      "slug": "pressgrillriflet-stekeflate-475x23-cm",
+      "nameNb": "PressgrillRiflet stekeflate 47,5x23 cm.Hendi 263709",
+      "nameEn": null,
+      "descriptionNb": "Modell: 263709 Pressgrill, r illet topp og bunn Stekeplate i støpejern Temperaturområde 50 - 300 °C Uttrekkbar fettoppsamlingskar i fronten Stekeflate: 475x230 mm. Mål: 570x370x H210 mm. 230V /1-fas / 3,6 kW. Vekt: 24,2 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pressgrill - Toaster - Salamander",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pressgrill-toaster-salamander"
+      ],
+      "featuredAssetFile": "Pressgrill-263709-Hendi.jpg",
+      "imageFiles": [
+        "Pressgrill-263709-Hendi.jpg",
+        "Pressgrill-263709.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-263709",
+          "nameNb": "PressgrillRiflet stekeflate 47,5x23 cm.Hendi 263709",
+          "nameEn": null,
+          "priceMinorOreExVat": 45800000,
+          "featuredAssetFile": "Pressgrill-263709-Hendi.jpg"
+        }
+      ],
+      "_source_model_number": "263709",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Kontaktgrill",
+        "Pressgrill"
+      ],
+      "_source_attributes": {
+        "Pressgrill 2004": "Rillet topp og bunn | Slett topp og bunn"
+      },
+      "_source_seo_title": "Pressgrill Riflet Stekeflate 47,5x23 cm | Gastroline",
+      "_source_seo_description": "Pressgrill med riflet stekeflate for rask og jevn grilling. Perfekt for restaurant og storkjøkken med behov for høy kapasitet.",
+      "_source_page_url": "https://gastroline.no/product/pressgrillriflet-stekeflate-475x23-cm/"
+    },
+    {
+      "slug": "pressgrillriflet-stekeflate-45x273-cm",
+      "nameNb": "PressgrillRiflet stekeflate 45x27 cm.Hendi 263624",
+      "nameEn": null,
+      "descriptionNb": "Modell: 263624 Pressgrill, r illet topp og bunn Stekeplate i støpejern Temperaturområde 50 - 300 °C Uttrekkbar fettoppsamlingskar i fronten Stekeflate: 450x270 mm. Mål: 548x415x H210 mm. 230V /1-fas / 2,7 kW. Vekt: 29,5 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pressgrill - Toaster - Salamander",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pressgrill-toaster-salamander"
+      ],
+      "featuredAssetFile": "Pressgrill-263624.jpg",
+      "imageFiles": [
+        "Pressgrill-263624.jpg",
+        "Pressgrill-263624-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-263624",
+          "nameNb": "PressgrillRiflet stekeflate 45x27 cm.Hendi 263624",
+          "nameEn": null,
+          "priceMinorOreExVat": 53600000,
+          "featuredAssetFile": "Pressgrill-263624.jpg"
+        }
+      ],
+      "_source_model_number": "263624",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Kontaktgrill",
+        "Pressgrill"
+      ],
+      "_source_attributes": {
+        "Pressgrill 2004": "Rillet topp og bunn | Slett topp og bunn"
+      },
+      "_source_seo_title": "Pressgrill Riflet 45x27 cm | Gastroline",
+      "_source_seo_description": "Stor pressgrill med riflet stekeflate 45x27 cm. Perfekt for høy kapasitet og jevn grilling i travle kjøkken.",
+      "_source_page_url": "https://gastroline.no/product/pressgrillriflet-stekeflate-45x273-cm/"
+    },
+    {
+      "slug": "pressgrillriflet-stekeflate-34x23-cm",
+      "nameNb": "PressgrillRiflet stekeflate 34x23 cm.Hendi 263655",
+      "nameEn": null,
+      "descriptionNb": "Modell: 263655 Pressgrill, r iflet topp og bunn Stekeplate i støpejern Temperaturområde 50 - 300 °C Uttrekkbar fettoppsamlingskar i fronten Stekeflate: 340x230 mm. Mål: 430x370x H210 mm. 230V /1-fas / 2,2 kW. Vekt: 18,5 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pressgrill - Toaster - Salamander",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pressgrill-toaster-salamander"
+      ],
+      "featuredAssetFile": "Pressgrill-263655-Preveda-Hendi.jpg",
+      "imageFiles": [
+        "Pressgrill-263655-Preveda-Hendi.jpg",
+        "Pressgrill-263655.jpg",
+        "Pressgrill-263655-Preveda.jpg",
+        "Pressgrill-263655-Preveda-Gastroline.jpg",
+        "Pressgrill-263655-Preveda-Hendi-skuff.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-263655",
+          "nameNb": "PressgrillRiflet stekeflate 34x23 cm.Hendi 263655",
+          "nameEn": null,
+          "priceMinorOreExVat": 29800000,
+          "featuredAssetFile": "Pressgrill-263655-Preveda-Hendi.jpg"
+        }
+      ],
+      "_source_model_number": "263655",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Kontaktgrill",
+        "Pressgrill"
+      ],
+      "_source_attributes": {
+        "Pressgrill 2004": "Rillet topp og bunn | Slett topp og bunn"
+      },
+      "_source_seo_title": "Pressgrill Riflet 34x23 cm | Gastroline",
+      "_source_seo_description": "Pressgrill med riflet stekeflate 34x23 cm for perfekt grillresultat. Ideell for profesjonelle kjøkken og rask matlaging.",
+      "_source_page_url": "https://gastroline.no/product/pressgrillriflet-stekeflate-34x23-cm/"
+    },
+    {
+      "slug": "pressgrillriflet-stekeflate-22x23-cm",
+      "nameNb": "PressgrillRiflet stekeflate 22x23 cm.Hendi 263501",
+      "nameEn": null,
+      "descriptionNb": "Modell: 263501 Pressgrill, r illet topp og bunn Stekeplate i støpejern Temperaturområde 50 - 300 °C Uttrekkbar fettoppsamlingskar i fronten Stekeflate: 220x230 mm. Mål: 310x370x H210 mm. 230V /1-fas / 1,8 kW. Vekt: 13,4 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pressgrill - Toaster - Salamander",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pressgrill-toaster-salamander"
+      ],
+      "featuredAssetFile": "Pressgrill-263501-Preveda-Gastroline.jpg",
+      "imageFiles": [
+        "Pressgrill-263501-Preveda-Gastroline.jpg",
+        "Pressgrill-263501-Preveda.jpg",
+        "Pressgrill-263501-Preveda-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-263501",
+          "nameNb": "PressgrillRiflet stekeflate 22x23 cm.Hendi 263501",
+          "nameEn": null,
+          "priceMinorOreExVat": 27200000,
+          "featuredAssetFile": "Pressgrill-263501-Preveda-Gastroline.jpg"
+        }
+      ],
+      "_source_model_number": "263501",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Kontaktgrill",
+        "Pressgrill"
+      ],
+      "_source_attributes": {
+        "Pressgrill 2004": "Rillet topp og bunn | Slett topp og bunn"
+      },
+      "_source_seo_title": "Pressgrill Riflet 22x23 cm | Gastroline",
+      "_source_seo_description": "Kompakt pressgrill med riflet stekeflate 22x23 cm. Perfekt for panini og grillmat. Ideell for små kjøkken og caféer.",
+      "_source_page_url": "https://gastroline.no/product/pressgrillriflet-stekeflate-22x23-cm/"
+    },
+    {
+      "slug": "frityrkoker-digital-88-liter-2x-35-kw-207376",
+      "nameNb": "Frityrkoker Digital 8+8 liter / 2x 3,5 kW 207376",
+      "nameEn": null,
+      "descriptionNb": "Modell: 207376 Frityr 8+8 liter, digital styring med tappekran, Hendi Digital nøyaktig termostat, samt digital timer/tidsur Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 8+8 liter olje Mål: 605x515xh 345 mm. Effekt: 2x 3,5 kW / 230V Vekt: 16,69 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "207376-Frityrkoker-88-l.-digital-Preveda.jpg",
+      "imageFiles": [
+        "207376-Frityrkoker-88-l.-digital-Preveda.jpg",
+        "207376-Frityrkoker-88-l.-digital-Hendi.jpg",
+        "207376-Frityrkoker-88-l.-digital-Hendi-Preveda.jpg",
+        "207376-Frityrkoker-88-l.-digital.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-207376<strong>",
+          "nameNb": "Frityrkoker Digital 8+8 liter / 2x 3,5 kW 207376",
+          "nameEn": null,
+          "priceMinorOreExVat": 79000000,
+          "featuredAssetFile": "207376-Frityrkoker-88-l.-digital-Preveda.jpg"
+        }
+      ],
+      "_source_model_number": "207376<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_seo_title": "Digital Frityrkoker 8 8L 2x3,5 kW | Gastroline",
+      "_source_seo_description": "Digital frityrkoker med dobbel kapasitet 8 8 liter og presis temperaturkontroll. Perfekt for profesjonelle kjøkken og restaurant.",
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-digital-88-liter-2x-35-kw-207376/"
+    },
+    {
+      "slug": "frityrkoker-digital-8-liter-35-kw-207369",
+      "nameNb": "Frityrkoker Digital 8 liter / 3,5 kW 207369",
+      "nameEn": null,
+      "descriptionNb": "Modell: 207369 Frityr 8 liter, digital styring med tappekran, Hendi Digital nøyaktig termostat, samt digital timer/tidsur Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 8 liter olje Mål: 300x515xh 345 mm. Effekt: 3,5 kW / 230V Vekt: 9,05 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "207369-Frityrkoker-8-l.-digital.jpg",
+      "imageFiles": [
+        "207369-Frityrkoker-8-l.-digital.jpg",
+        "207369-Frityrkoker-8-l.-digital-Preveda-Hendi.jpg",
+        "207369-Frityrkoker-8-l.-digital-Preveda.jpg",
+        "207369-Frityrkoker-8-l.-digital-Preveda-Hendi-deler.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-207369<strong>",
+          "nameNb": "Frityrkoker Digital 8 liter / 3,5 kW 207369",
+          "nameEn": null,
+          "priceMinorOreExVat": 39000000,
+          "featuredAssetFile": "207369-Frityrkoker-8-l.-digital.jpg"
+        }
+      ],
+      "_source_model_number": "207369<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-digital-8-liter-35-kw-207369/"
+    },
+    {
+      "slug": "frityrkoker-med-tappekran-88-liter-2x-35-kw-209301",
+      "nameNb": "Frityrkoker med tappekran 8+8 liter / 2x 3,5 kW 209301",
+      "nameEn": null,
+      "descriptionNb": "Modell: 209301 Frityr med tappekran 8+8 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 8+8 liter olje Mål: 605x515xh 350 mm. Effekt: 3,5 kW / 230V Vekt: 16,48 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "209301-Frityrkoker-88-l.-med-tappekran-Preveda.jpg",
+      "imageFiles": [
+        "209301-Frityrkoker-88-l.-med-tappekran-Preveda.jpg",
+        "209301-Frityrkoker-88-l.-med-tappekran-Preveda-1.jpg",
+        "209301-Frityrkoker-88-l.-med-tappekran-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-209301<strong>",
+          "nameNb": "Frityrkoker med tappekran 8+8 liter / 2x 3,5 kW 209301",
+          "nameEn": null,
+          "priceMinorOreExVat": 66800000,
+          "featuredAssetFile": "209301-Frityrkoker-88-l.-med-tappekran-Preveda.jpg"
+        }
+      ],
+      "_source_model_number": "209301<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_seo_title": "Frityrkoker 8 8L m/Tappekran | Gastroline",
+      "_source_seo_description": "Frityrkoker med dobbel tank 8 8 liter og tappekran. Enkel rengjøring og høy kapasitet for profesjonelle kjøkken.",
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-med-tappekran-88-liter-2x-35-kw-209301/"
+    },
+    {
+      "slug": "smultringfrityr-35-kw-205914",
+      "nameNb": "Smultringfrityr / 3,5 kW 205914",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205914 Frityr for smultringer , Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Avtakbart element Tappekran i fronten Temperatur tilsetning 50 °C / 190 °C Kapasitet: 12 liter olje Kurv mål: 354x383 mm. Mål: 630x860xh 360 mm. Effekt: 3,5 kW / 230 Vekt: 17 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "Smultringfrityr-205914.jpg",
+      "imageFiles": [
+        "Smultringfrityr-205914.jpg",
+        "Smultringfrityr-205914-Gastroline-Hendi.jpg",
+        "Smultringfrityr-205914-Gastroline.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205914<strong>",
+          "nameNb": "Smultringfrityr / 3,5 kW 205914",
+          "nameEn": null,
+          "priceMinorOreExVat": 68000000,
+          "featuredAssetFile": "Smultringfrityr-205914.jpg"
+        }
+      ],
+      "_source_model_number": "205914<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/smultringfrityr-35-kw-205914/"
+    },
+    {
+      "slug": "beltetoaster-hendi261309",
+      "nameNb": "Beltetoaster Hendi261309",
+      "nameEn": null,
+      "descriptionNb": "Modell: 261309 Hamburgerbrød varmer , Hendi 2 separate varmeelementer Leveres med brett foran og bak Justerbar ristetid opptil 3 minutter Mål (BDH): 418x368x387 mm. 230V /1-fas / 2240W. Vekt: 15,5 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Pressgrill - Toaster - Salamander",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pressgrill-toaster-salamander"
+      ],
+      "featuredAssetFile": "Toaster-261309-Gastroline.jpg",
+      "imageFiles": [
+        "Toaster-261309-Gastroline.jpg",
+        "Toaster-261309-Hendi-Gastroline-1.jpg",
+        "Toaster-261309-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-261309<strong>",
+          "nameNb": "Beltetoaster Hendi261309",
+          "nameEn": null,
+          "priceMinorOreExVat": 68500000,
+          "featuredAssetFile": "Toaster-261309-Gastroline.jpg"
+        }
+      ],
+      "_source_model_number": "261309<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Kontaktgrill",
+        "Pressgrill"
+      ],
+      "_source_attributes": {
+        "Modell": "GR 4.2 RR: Rillet topp og bunn | GR 4.2 RL: Rillet topp / slett bunn | GR 4.2 LL: Slett topp og bunn"
+      },
+      "_source_page_url": "https://gastroline.no/product/beltetoaster-hendi261309/"
+    },
+    {
+      "slug": "beltetoaster-hendi261200",
+      "nameNb": "Beltetoaster Hendi261200",
+      "nameEn": null,
+      "descriptionNb": "Modell: 261200 Hamburgerbrød varmer , Hendi 2 separate varmeelementer Justerbar transportbåndets hastighet Leveres med brett foran og bak Mål (BDH): 288x418x387 mm. 230V /1-fas / 1340W. https://www.youtube.com/watch?v=ZKyhrsyrYoM",
+      "currency": "NOK",
+      "filterCategoryNb": "Pressgrill - Toaster - Salamander",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "pressgrill-toaster-salamander"
+      ],
+      "featuredAssetFile": "Toaster-261200-hendi.jpg",
+      "imageFiles": [
+        "Toaster-261200-hendi.jpg",
+        "Toaster-261200.jpg",
+        "Toaster-261200-Gastroline.jpg",
+        "Toaster-261200-Hendi-Gastroline.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-261200<strong>",
+          "nameNb": "Beltetoaster Hendi261200",
+          "nameEn": null,
+          "priceMinorOreExVat": 60000000,
+          "featuredAssetFile": "Toaster-261200-hendi.jpg"
+        }
+      ],
+      "_source_model_number": "261200<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Kontaktgrill",
+        "Pressgrill"
+      ],
+      "_source_attributes": {
+        "Modell": "GR 4.2 RR: Rillet topp og bunn | GR 4.2 RL: Rillet topp / slett bunn | GR 4.2 LL: Slett topp og bunn"
+      },
+      "_source_page_url": "https://gastroline.no/product/beltetoaster-hendi261200/"
+    },
+    {
+      "slug": "glasskanne-18-l445907",
+      "nameNb": "Glasskanne 1,8 L445907",
+      "nameEn": null,
+      "descriptionNb": "Modell: 445907 Kaffekolbe, Hendi Kapasitet: 1,8 liter Mål: ⌀185x(h)170mm",
+      "currency": "NOK",
+      "filterCategoryNb": "Kaffetrakter, vannkoker",
+      "suggestedLeafCollectionIds": [
+        "kaffe-og-bar",
+        "kaffetrakter-vannkoker"
+      ],
+      "featuredAssetFile": "kaffekanne-445907.jpg",
+      "imageFiles": [
+        "kaffekanne-445907.jpg",
+        "kaffekanne-445907-Hendi.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-445907",
+          "nameNb": "Glasskanne 1,8 L445907",
+          "nameEn": null,
+          "priceMinorOreExVat": 2600000,
+          "featuredAssetFile": "kaffekanne-445907.jpg"
+        }
+      ],
+      "_source_model_number": "445907",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Dunkeboks",
+        "Espressomaskin",
+        "Kaffekvern",
+        "Kaffekverner",
+        "Kaffemaskin",
+        "melkeskummer",
+        "Storkjøkkenutstyr",
+        "Tamper"
+      ],
+      "_source_page_url": "https://gastroline.no/product/glasskanne-18-l445907/"
+    },
+    {
+      "slug": "vekt-15-kg",
+      "nameNb": "Vekt 15 KGHendi580233",
+      "nameEn": null,
+      "descriptionNb": "Modell: 580233 Vekt 15 kg Inndeling: 1 gram Brett i rustfritt stål Stor digital display Drives av 3 stk. AAA batteri Gir beskjed ved lavt batterinivå og ved for mye vekt Slår seg automatisk av etter en tid Veieflate: 210x140 mm. Mål: 266x269x h.34 mm. https://www.youtube.com/watch?v=1OOVArVgAwA",
+      "currency": "NOK",
+      "filterCategoryNb": "Vekt - Timer - Termometer",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "vekter",
+        "kj-kkenrekvisita",
+        "vekt-timer-termometer"
+      ],
+      "featuredAssetFile": "Vekt-580233.jpg",
+      "imageFiles": [
+        "Vekt-580233.jpg",
+        "Vekt-580233-Hendi.jpg",
+        "Vekt-580233-Preveda.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-580233</span>",
+          "nameNb": "Vekt 15 KGHendi580233",
+          "nameEn": null,
+          "priceMinorOreExVat": 6600000,
+          "featuredAssetFile": "Vekt-580233.jpg"
+        }
+      ],
+      "_source_model_number": "580233</span>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "vekt"
+      ],
+      "_source_page_url": "https://gastroline.no/product/vekt-15-kg/"
+    },
+    {
+      "slug": "kaffefiltero-11-cm",
+      "nameNb": "Kaffefilter HendiSett med 1000 filtre",
+      "nameEn": null,
+      "descriptionNb": "Modell: 208656 Engangsfilter, Hendi Bunn Ø 133 mm. / Topp 245 mm. K artong med 1000 st.",
+      "currency": "NOK",
+      "filterCategoryNb": "Kaffetrakter, vannkoker",
+      "suggestedLeafCollectionIds": [
+        "kaffe-og-bar",
+        "kaffetrakter-vannkoker"
+      ],
+      "featuredAssetFile": "208656-kaffefilter.jpg",
+      "imageFiles": [
+        "208656-kaffefilter.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-208656",
+          "nameNb": "Kaffefilter HendiSett med 1000 filtre",
+          "nameEn": null,
+          "priceMinorOreExVat": 6400000,
+          "featuredAssetFile": "208656-kaffefilter.jpg"
+        }
+      ],
+      "_source_model_number": "208656",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Dunkeboks",
+        "Espressomaskin",
+        "Kaffekvern",
+        "Kaffekverner",
+        "Kaffemaskin",
+        "melkeskummer",
+        "Storkjøkkenutstyr",
+        "Tamper"
+      ],
+      "_source_page_url": "https://gastroline.no/product/kaffefiltero-11-cm/"
+    },
+    {
+      "slug": "frityrkoker-8-8-liter-2x-35-kw-205839",
+      "nameNb": "Frityrkoker 8+ 8 liter / 2x 3,5 kW 205839",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205839 Frityr 2x 8 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 2x 8 liter olje Kurv mål: 240x190x h 140 mm. Mål: 550x430xh 345 mm. Effekt: 2x 3,5 kW / 230V Vekt: 11,28 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "205853-Frityrkoker-2x6-l-Gastroline-2.jpg",
+      "imageFiles": [
+        "205853-Frityrkoker-2x6-l-Gastroline-2.jpg",
+        "205853-Frityrkoker-2x6-l-Gastroline.jpg",
+        "Frityrkoker-dobbelt-olje-Hendi.jpg",
+        "Frityrkoker-dobbelt-kurv.jpg",
+        "Frityrkoker-dobbelt-Gastroline.jpg",
+        "Frityrkoker-dobbelt-Gastroline-Hendi.jpg",
+        "Frityrkoker-deler-1.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205839<strong>",
+          "nameNb": "Frityrkoker 8+ 8 liter / 2x 3,5 kW 205839",
+          "nameEn": null,
+          "priceMinorOreExVat": 36800000,
+          "featuredAssetFile": "205853-Frityrkoker-2x6-l-Gastroline-2.jpg"
+        }
+      ],
+      "_source_model_number": "205839<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-8-8-liter-2x-35-kw-205839/"
+    },
+    {
+      "slug": "frityrkoker-66-liter-2x33-kw-205853",
+      "nameNb": "Frityrkoker 6+6 liter / 2x3,3 kW 205853",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205853 Frityr 2x 6 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 2x 6 liter olje Kurv mål: 240x185x h 100 mm. Mål: 550x430xh 290 mm. Effekt: 2x 3,3 kW / 230V Vekt: 9,83 kg.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "205853-Frityrkoker-2x6-l-Gastroline-2.jpg",
+      "imageFiles": [
+        "205853-Frityrkoker-2x6-l-Gastroline-2.jpg",
+        "205853-Frityrkoker-2x6-l-Gastroline.jpg",
+        "Frityrkoker-dobbelt-olje-Hendi.jpg",
+        "Frityrkoker-dobbelt-kurv.jpg",
+        "Frityrkoker-dobbelt-Gastroline.jpg",
+        "Frityrkoker-dobbelt-Gastroline-Hendi.jpg",
+        "Frityrkoker-deler-1.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205853<strong>",
+          "nameNb": "Frityrkoker 6+6 liter / 2x3,3 kW 205853",
+          "nameEn": null,
+          "priceMinorOreExVat": 34800000,
+          "featuredAssetFile": "205853-Frityrkoker-2x6-l-Gastroline-2.jpg"
+        }
+      ],
+      "_source_model_number": "205853<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-66-liter-2x33-kw-205853/"
+    },
+    {
+      "slug": "frityrkoker-44-liter-2x-30-kw-205846",
+      "nameNb": "Frityrkoker 4+4 liter / 2x 3,0 kW 205846",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205846 Frityr 2x4 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 4+4 liter olje Kurv mål: 210x140x h 120 mm. Mål: 470x380xh 330 mm. Effekt: 2x 3,0 kW / 230V Vekt: 8,66 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "205846-Frityrkoker-2x-4-l.-Gastroline.jpg",
+      "imageFiles": [
+        "205846-Frityrkoker-2x-4-l.-Gastroline.jpg",
+        "205846-Frityrkoker-2x-4-l.-Gastroline-2.jpg",
+        "Frityrkoker-kurv-2.jpg",
+        "Frityrkoker-dobbelt-Gastroline-Hendi.jpg",
+        "Frityrkoker-dobbelt-Gastroline.jpg",
+        "Frityrkoker-dobbelt-kurv.jpg",
+        "Frityrkoker-dobbelt-olje-Hendi.jpg",
+        "Frityrkoker-deler-1.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205846<strong>",
+          "nameNb": "Frityrkoker 4+4 liter / 2x 3,0 kW 205846",
+          "nameEn": null,
+          "priceMinorOreExVat": 31000000,
+          "featuredAssetFile": "205846-Frityrkoker-2x-4-l.-Gastroline.jpg"
+        }
+      ],
+      "_source_model_number": "205846<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-44-liter-2x-30-kw-205846/"
+    },
+    {
+      "slug": "frityrkoker-8-liter-35-kw-205822",
+      "nameNb": "Frityrkoker 8 liter / 3,5 kW 205822",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205822 Frityr 8 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 8 liter olje Kurv mål: 240x190x h 140 mm. Mål: 265x430xh 345 mm. Effekt: 3,5 kW / 230V Vekt: 6 kg. Kompakt frityrkoker med jamn varme og trygg drift Hendi frityrkoker 205822 er ein effektiv og plassbesparande frityr utvikla for profesjonelle kjøkken. Med 8 liter kapasitet og kraftig varmeelement gir han rask oppvarming og stabile steikeresultat. Perfekt for mindre til mellomstore serveringsstader med behov for påliteleg frityr i dagleg drift. Jamnt og stabilt temperaturområde for konsekvent steikeresultat Fullt utført i rustfritt stål for lang levetid og enkelt reinhald Sikkerheitstermostat gir trygg bruk og stabil drift Kompakt benkmodell som sparar verdifull arbeidsplass Effektiv varmeeffekt som gir rask oppvarming og god kapasitet Frityrkokaren eignar seg godt for restaurantar, gatekjøkken, kafear, kantiner og foodtrucks som treng ei driftssikker frityrløysing. Solid konstruksjon og profesjonell kvalitet gjer denne frityrkokaren godt eigna for dagleg bruk over tid. Eit trygt og funksjonelt val for effektiv frityrsteiking i profesjonelle kjøkken.",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "205822-Frityrkoker-8-l.-Gastroline-2.jpg",
+      "imageFiles": [
+        "205822-Frityrkoker-8-l.-Gastroline-2.jpg",
+        "205822-Frityrkoker-8-l.-Gastroline.jpg",
+        "Frityr-koker-olje-beholder.jpg",
+        "Frityr-olje.jpg",
+        "Frityrkoker-kurv.jpg",
+        "Frityrkoker-deler.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205822",
+          "nameNb": "Frityrkoker 8 liter / 3,5 kW 205822",
+          "nameEn": null,
+          "priceMinorOreExVat": 20500000,
+          "featuredAssetFile": "205822-Frityrkoker-8-l.-Gastroline-2.jpg"
+        }
+      ],
+      "_source_model_number": "205822",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_seo_title": "Frityrkoker i kasserolle - 8 liter / 3,5 kW | Gastro Line",
+      "_source_seo_description": "Kjøp frityrkoker i kasserolle fra Gastro Line. 8 liter kapasitet, laget i rustfritt stål med sikkerhetstermostat. Ideell for mindre bruk eller hjemmebruk.",
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-8-liter-35-kw-205822/"
+    },
+    {
+      "slug": "frityrkoker-6-liter-33-kw-205815",
+      "nameNb": "Frityrkoker 6 liter / 3,3 kW 205815",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205815 Frityr 6 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 6 liter olje Kurv mål: 240x185x h 100 mm. Mål: 265x430xh 290 mm. Effekt: 3,3 kW / 230V Vekt: 5,23 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "205815-Frityrkoker-6-l.-Gastroline-2.jpg",
+      "imageFiles": [
+        "205815-Frityrkoker-6-l.-Gastroline-2.jpg",
+        "205815-Frityrkoker-6-l.-Gastroline.jpg",
+        "Frityr-koker-olje-beholder.jpg",
+        "Frityr-olje.jpg",
+        "Frityrkoker-kurv.jpg",
+        "Frityrkoker-deler.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205815<strong>",
+          "nameNb": "Frityrkoker 6 liter / 3,3 kW 205815",
+          "nameEn": null,
+          "priceMinorOreExVat": 16800000,
+          "featuredAssetFile": "205815-Frityrkoker-6-l.-Gastroline-2.jpg"
+        }
+      ],
+      "_source_model_number": "205815<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-6-liter-33-kw-205815/"
+    },
+    {
+      "slug": "frityrkoker-4-liter-33-kw-205808",
+      "nameNb": "Frityrkoker 4 liter / 3,0 kW 205808",
+      "nameEn": null,
+      "descriptionNb": "Modell: 205808 Frityr 4 liter, Hendi Fullstendig laget i rustfritt stål Sikkerhetstermostat Kapasitet: 4 liter olje Kurv mål: 210x140x h 120 mm. Mål: 217x380xh 300 mm. Effekt: 3,0 kW / 230V Vekt: 4,64 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "205808-frityr-4-liter-hendi-Gastroline-2.jpg",
+      "imageFiles": [
+        "205808-frityr-4-liter-hendi-Gastroline-2.jpg",
+        "205808-frityr-4-liter-hendi-Gastroline.jpg",
+        "Frityr-koker-olje-beholder.jpg",
+        "Frityr-olje.jpg",
+        "Frityrkoker-kurv.jpg",
+        "Frityrkoker-deler.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-205808",
+          "nameNb": "Frityrkoker 4 liter / 3,0 kW 205808",
+          "nameEn": null,
+          "priceMinorOreExVat": 16000000,
+          "featuredAssetFile": "205808-frityr-4-liter-hendi-Gastroline-2.jpg"
+        }
+      ],
+      "_source_model_number": "205808",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/frityrkoker-4-liter-33-kw-205808/"
+    },
+    {
+      "slug": "induksjonsfrityrkoker8-liter-33-kw-215012",
+      "nameNb": "Induksjonsfrityrkoker8 liter / 3,5 kW 215012",
+      "nameEn": null,
+      "descriptionNb": "Modell: 215012 Induksjon frityr med tappekran 8 liter, Hendi Fullstendig laget i rustfritt stål Brønn uten elementer, rask og enkel rengjøring Digital nøyaktig temperaturstyring 60 °C -190 °C Slår seg automatisk av etter 3 timer Kapasitet: 8 liter Mål: 290x485xh 405 mm. Effekt: 3,5 kW / 230V Vekt: 12,7 kg https://www.youtube.com/watch?v=7QbrYADiVMA",
+      "currency": "NOK",
+      "filterCategoryNb": "Frityrkoker 1FAS - 230V",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "frityrkokere",
+        "frityrkoker-1fas-230v"
+      ],
+      "featuredAssetFile": "Frityr-induksjon-215012.jpg",
+      "imageFiles": [
+        "Frityr-induksjon-215012.jpg",
+        "Frityr-induksjon-215012-Gastroline.jpg",
+        "Frityr-induksjon-215012-Gastroline-2.jpg",
+        "Frityr-induksjon-215012-filter.jpg",
+        "Frityr-induksjon-215012-kurv.jpg",
+        "215012-Frityrkoker.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-215012<strong>",
+          "nameNb": "Induksjonsfrityrkoker8 liter / 3,5 kW 215012",
+          "nameEn": null,
+          "priceMinorOreExVat": 54800000,
+          "featuredAssetFile": "Frityr-induksjon-215012.jpg"
+        }
+      ],
+      "_source_model_number": "215012<strong>",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Amitek",
+        "Forved",
+        "frityr",
+        "Frityrkoker"
+      ],
+      "_source_seo_title": "Induksjonsfrityrkoker 8 liter 3,5 kW | Gastroline",
+      "_source_seo_description": "Induksjonsfrityrkoker 8 liter med 3,5 kW gir rask oppvarming og presis temperaturkontroll. Perfekt for restaurant og storkjøkken.",
+      "_source_page_url": "https://gastroline.no/product/induksjonsfrityrkoker8-liter-33-kw-215012/"
+    },
+    {
+      "slug": "vekt-0-5-kg",
+      "nameNb": "Vekt 3 KGHendi580011",
+      "nameEn": null,
+      "descriptionNb": "Modell: 580011 Vekt 3 kg Inndeling: Opptil 200 g. / nøyaktighet 0,1 g, 200-1000 g. / nøyaktighet 0,5 g, O ver 1000 g / nøyaktighet 1 g. Hus laget av ABS og rustfritt stål Innebygd LED-skjerm Avlesning i gram (g), milliliter (ml), unser (oz) eller pund (lb). Drives av 3 stk. AAA batteri Varsler om overbelastning og lavt batteri Slår seg automatisk av etter en tid Mål: 169x218x h.13 mm.",
+      "currency": "NOK",
+      "filterCategoryNb": "Vekt - Timer - Termometer",
+      "suggestedLeafCollectionIds": [
+        "bearbeiding-kj-kkenmaskiner",
+        "vekter",
+        "kj-kkenrekvisita",
+        "vekt-timer-termometer"
+      ],
+      "featuredAssetFile": "Vekt-580011.jpg",
+      "imageFiles": [
+        "Vekt-580011.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-<span",
+          "nameNb": "Vekt 3 KGHendi580011",
+          "nameEn": null,
+          "priceMinorOreExVat": 3400000,
+          "featuredAssetFile": "Vekt-580011.jpg"
+        }
+      ],
+      "_source_model_number": "<span",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "vekt"
+      ],
+      "_source_page_url": "https://gastroline.no/product/vekt-0-5-kg/"
+    },
+    {
+      "slug": "polsekoker-240502",
+      "nameNb": "Pølsekoker 9 literHendi",
+      "nameEn": null,
+      "descriptionNb": "Modell: 240502 Pølsevarmer, Hendi Hengslet rustfritt Lokk Falsk bunn ( perforert bunnrist ) Kapasitet: 9 liter , 1/2 GN Temp. område: 30 - 85 °C Mål: 330 x 280 x 250 mm Effekt: 1000W / 230V Vekt: 6,3 kg https://www.youtube.com/watch?v=CpQs2iAkWmc",
+      "currency": "NOK",
+      "filterCategoryNb": "Pølse - Vaffel - Crepe",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "p-lse-vaffel-crepe"
+      ],
+      "featuredAssetFile": "Pølsevarme-240502-gastroline-med-rist.jpg",
+      "imageFiles": [
+        "Pølsevarme-240502-gastroline-med-rist.jpg",
+        "Pølsevarme-240502-gastroline.jpg",
+        "Pølsevarme-240502-gastroline-åpen.jpg",
+        "Pølsevarme-240502-gastroline-med-pølse.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-240502",
+          "nameNb": "Pølsekoker 9 literHendi",
+          "nameEn": null,
+          "priceMinorOreExVat": 17800000,
+          "featuredAssetFile": "Pølsevarme-240502-gastroline-med-rist.jpg"
+        }
+      ],
+      "_source_model_number": "240502",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Vaffeljern",
+        "Vaffelsteker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/polsekoker-240502/"
+    },
+    {
+      "slug": "polsegrill7-teflonbelagte-ruller",
+      "nameNb": "Pølsegrill14 ruller268674",
+      "nameEn": null,
+      "descriptionNb": "Modell: 268674 Roterende pølsegrill, Hendi Rustfritt konstruksjon Avtakbar dryppskål som er lett å rengjøre Temperaturkontroll opptil 230 °C. 2 uavhengig justerbare varmesoner Kapasitet: 14 ruller Rull lengde: 63 cm Mål: 732x590x(h)168 mm Effekt: 2000W / 230V Vekt: 16 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pølse - Vaffel - Crepe",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "p-lse-vaffel-crepe"
+      ],
+      "featuredAssetFile": "Polsegrill-268674.jpg",
+      "imageFiles": [
+        "Polsegrill-268674.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-268674",
+          "nameNb": "Pølsegrill14 ruller268674",
+          "nameEn": null,
+          "priceMinorOreExVat": 99800000,
+          "featuredAssetFile": "Polsegrill-268674.jpg"
+        }
+      ],
+      "_source_model_number": "268674",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Vaffeljern",
+        "Vaffelsteker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/polsegrill7-teflonbelagte-ruller/"
+    },
+    {
+      "slug": "polsegrill7-ruller",
+      "nameNb": "Pølsegrill11 ruller268650",
+      "nameEn": null,
+      "descriptionNb": "Modell: 268650 Roterende pølsegrill, Hendi Utstyrt med lokk i herdet glass som reduserer varmetap Kabinett og ruller i rustfritt stål Rask oppvarming og effektiv varmegjenvinning Avtakbar dryppskuff som gjør rengjøringen rask og enkel Justerbar temperaturkontroll opptil 230 °C Kapasitet: 11 ruller Rullelengde: 45 cm. Mål: 566x527x(h)259 mm Effekt: 980W / 230V Vekt: 18 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pølse - Vaffel - Crepe",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "p-lse-vaffel-crepe"
+      ],
+      "featuredAssetFile": "Polsegrill-268650.jpg",
+      "imageFiles": [
+        "Polsegrill-268650.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-268650",
+          "nameNb": "Pølsegrill11 ruller268650",
+          "nameEn": null,
+          "priceMinorOreExVat": 56600000,
+          "featuredAssetFile": "Polsegrill-268650.jpg"
+        }
+      ],
+      "_source_model_number": "268650",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Vaffeljern",
+        "Vaffelsteker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/polsegrill7-ruller/"
+    },
+    {
+      "slug": "polsegrill5-teflonbelagte-ruller",
+      "nameNb": "Pølsegrill9 ruller268643",
+      "nameEn": null,
+      "descriptionNb": "Modell: 268643 Roterende pølsegrill, Hendi Utstyrt med lokk i herdet glass som reduserer varmetap Kabinett og ruller i rustfritt stål Rask oppvarming og effektiv varmegjenvinning Avtakbar dryppskuff som gjør rengjøringen rask og enkel Justerbar temperaturkontroll opptil 230 °C Kapasitet: 9 ruller Rullelengde: 45 cm. Mål: 566x450x(H)259 mm Effekt: 790W / 230V Vekt: 14 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pølse - Vaffel - Crepe",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "p-lse-vaffel-crepe"
+      ],
+      "featuredAssetFile": "Polsegrill-268636.jpg",
+      "imageFiles": [
+        "Polsegrill-268636.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-268643",
+          "nameNb": "Pølsegrill9 ruller268643",
+          "nameEn": null,
+          "priceMinorOreExVat": 42200000,
+          "featuredAssetFile": "Polsegrill-268636.jpg"
+        }
+      ],
+      "_source_model_number": "268643",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Vaffeljern",
+        "Vaffelsteker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/polsegrill5-teflonbelagte-ruller/"
+    },
+    {
+      "slug": "polsegrill-5-ruller",
+      "nameNb": "Pølsegrill7 ruller268636",
+      "nameEn": null,
+      "descriptionNb": "Modell: 268636 Roterende pølsegrill, Hendi Utstyrt med lokk i herdet glass som reduserer varmetap Kabinett og ruller i rustfritt stål Rask oppvarming og effektiv varmegjenvinning Avtakbar dryppskuff som gjør rengjøringen rask og enkel Justerbar temperaturkontroll opptil 230 °C Kapasitet: 7 ruller Rullelengde: 45 cm. Mål: 566x375x(H)259 mm Effekt: 620W / 230V Vekt: 10 kg",
+      "currency": "NOK",
+      "filterCategoryNb": "Pølse - Vaffel - Crepe",
+      "suggestedLeafCollectionIds": [
+        "kok-og-stek",
+        "p-lse-vaffel-crepe"
+      ],
+      "featuredAssetFile": "Polsegrill-268636.jpg",
+      "imageFiles": [
+        "Polsegrill-268636.jpg"
+      ],
+      "brand": null,
+      "optionGroupCode": null,
+      "optionGroupNameNb": null,
+      "optionGroupNameEn": null,
+      "variants": [
+        {
+          "optionCode": null,
+          "sku": "TECNOX-<span",
+          "nameNb": "Pølsegrill7 ruller268636",
+          "nameEn": null,
+          "priceMinorOreExVat": 39600000,
+          "featuredAssetFile": "Polsegrill-268636.jpg"
+        }
+      ],
+      "_source_model_number": "<span",
+      "_source_status": "publish",
+      "_source_stock_status": "instock",
+      "_source_type": "simple",
+      "_source_tags": [
+        "Vaffeljern",
+        "Vaffelsteker"
+      ],
+      "_source_page_url": "https://gastroline.no/product/polsegrill-5-ruller/"
+    }
+  ]
+}
