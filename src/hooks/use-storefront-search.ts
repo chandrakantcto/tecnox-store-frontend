@@ -10,6 +10,8 @@ import {
   type SearchHitRaw,
 } from "@/lib/vendure/normalize";
 import type { Locale } from "@/lib/locale";
+import { tr } from "@/lib/locale";
+import { resolveProductDisplayNames } from "@/data/productLabels";
 
 export type CategorySearchHit = {
   slug: string;
@@ -63,11 +65,6 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
     return () => window.clearTimeout(id);
   }, [value, delayMs]);
   return debounced;
-}
-
-function exVatMinorFromInclusiveMinor(minorInclusive: number | null): number | null {
-  if (minorInclusive === null || !Number.isFinite(minorInclusive)) return null;
-  return Math.round(minorInclusive / 1.25);
 }
 
 export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
@@ -144,11 +141,20 @@ export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
     setError(null);
   };
 
-  /** Price label for dropdown rows (excl. VAT, consistent with catalog cards). */
+  /** Price label for dropdown rows (incl. VAT, consistent with catalog cards). */
   const formatHitPrice = (hit: SearchHitRaw) => {
     const inc = priceMinorFromHit(hit.priceWithTax);
-    const ex = exVatMinorFromInclusiveMinor(inc);
-    return formatNOKExclVatFromMinor(lc, ex);
+    return formatNOKExclVatFromMinor(lc, inc);
+  };
+
+  const formatHitName = (hit: SearchHitRaw) => {
+    const resolved = resolveProductDisplayNames(
+      hit.slug,
+      hit.productName,
+      hit.productName,
+      hit.productName,
+    );
+    return tr(locale, resolved.nb, resolved.en);
   };
 
   return {
@@ -161,6 +167,7 @@ export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
     error,
     clearQuery,
     formatHitPrice,
+    formatHitName,
   };
 }
 

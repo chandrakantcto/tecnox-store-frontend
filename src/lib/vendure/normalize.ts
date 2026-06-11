@@ -212,13 +212,26 @@ export function priceMinorFromHit(priceWithTax: unknown): number | null {
   return null;
 }
 
-export function formatNOKExclVatFromMinor(locale: string, minor: number | null): string {
-  if (minor === null || !Number.isFinite(minor)) return "—";
+function formatNokAmount(locale: string, minor: number): string {
   const nok = minor / 100;
   const nf = Intl.NumberFormat(locale === "en" ? "en-GB" : "nb-NO", {
     maximumFractionDigits: 0,
   });
-  const amount = nf.format(nok).replace(/\u00a0/g, " ");
-  if (locale === "en") return `From NOK ${amount},- excl. VAT`;
-  return `Fra kr ${amount},- eks. MVA`;
+  return nf.format(nok).replace(/\u00a0/g, " ");
+}
+
+/** Full price line (label + amount + VAT note) — PDP, cart, search. */
+export function formatNOKExclVatFromMinor(locale: string, minor: number | null): string {
+  if (minor === null || !Number.isFinite(minor)) return "—";
+  const amount = formatNokAmount(locale, minor);
+  if (locale === "en") return `From NOK ${amount},- incl. VAT`;
+  return `Fra kr ${amount},- inkl. MVA`;
+}
+
+/** Amount + VAT note only — product cards that already show a separate “From” label. */
+export function formatNOKExclVatCardAmount(locale: string, minor: number | null): string {
+  if (minor === null || !Number.isFinite(minor)) return "—";
+  const amount = formatNokAmount(locale, minor);
+  if (locale === "en") return `NOK ${amount},- incl. VAT`;
+  return `kr ${amount},- inkl. MVA`;
 }

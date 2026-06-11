@@ -9,9 +9,11 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { ProductsSectionPayload, CatalogProductCard } from "@/lib/vendure/catalog-types";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
+import { formatNOKExclVatCardAmount } from "@/lib/vendure/normalize";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
 import { BsArrowUpRightCircleFill } from "react-icons/bs";
 import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
 import { isMissingStorefrontImage } from "@/lib/storefront-image";
@@ -23,10 +25,43 @@ type ProductsProps = {
   catalog: ProductsSectionPayload;
   /** Server-parsed query (?cat=) for /produkter */
   initialCatSlug?: string | null;
+  /** Server-parsed query (?q=) for /produkter keyword search */
+  initialSearchQuery?: string | null;
 };
 
 function productDisplayName(product: CatalogProductCard, locale: Locale): string {
   return tr(locale, product.nameNb ?? product.name, product.nameEn ?? product.name);
+}
+
+function stripHtmlMarkup(html: string): string {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function productSpecSnippet(product: CatalogProductCard, locale: Locale): string {
+  const raw = tr(
+    locale,
+    product.descriptionNb?.trim() || product.description?.trim() || product.spec,
+    product.descriptionEn?.trim() || product.description?.trim() || product.spec,
+  );
+  return stripHtmlMarkup(raw);
+}
+
+function productPriceDisplay(product: CatalogProductCard, locale: Locale): string {
+  const minor = product.priceNumeric > 0 ? product.priceNumeric : null;
+  return formatNOKExclVatCardAmount(locale, minor);
+}
+
+function subcategoryDisplayName(
+  sc: { slug: string; name: string; nameNb?: string; nameEn?: string },
+  locale: Locale,
+): string {
+  const { nb, en } = resolveCollectionDisplayNames(
+    sc.slug,
+    sc.nameNb ?? sc.name,
+    sc.nameEn ?? sc.name,
+    sc.name,
+  );
+  return tr(locale, nb, en);
 }
 
 function productImage(product: CatalogProductCard, locale: Locale) {
@@ -77,6 +112,15 @@ function indexForSlug(pairs: { slug: string | null }[], slug: string | null): nu
   return idx >= 0 ? idx : 0;
 }
 
+function indexForSidebarHighlight(
+  pairs: { slug: string | null }[],
+  urlSlug: string | null,
+  sidebarRootSlug?: string | null,
+): number {
+  const highlight = sidebarRootSlug ?? urlSlug;
+  return indexForSlug(pairs, highlight);
+}
+
 const HOMEPAGE_INITIAL_ROWS = 3;
 
 function useHomeGridColumns(enabled: boolean) {
@@ -103,8 +147,10 @@ export function Products({
   locale: _locale,
   catalog,
   initialCatSlug = null,
+  initialSearchQuery = null,
 }: ProductsProps) {
   const locale = useActiveLocale();
+  const searchQuery = catalog.searchQuery ?? initialSearchQuery;
   const router = useRouter();
   const pathname = usePathname() ?? "/";
   const isHomePreview = !withCategorySidebar;
@@ -136,7 +182,13 @@ export function Products({
   const [activeSlug, setActiveSlug] = useState<string | null>(() =>
     syncSlugAllowed(initialCatSlug, catalog.filterSlugs),
   );
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [activeTabIndex, setActiveTabIndex] = useState(() =>
+    indexForSidebarHighlight(
+      pairs,
+      syncSlugAllowed(initialCatSlug, catalog.filterSlugs),
+      catalog.sidebarRootSlug,
+    ),
+  );
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const tabScrollRef = useRef<HTMLDivElement>(null);
   const [tabScrollHints, setTabScrollHints] = useState({ left: false, right: false, overflow: false });
@@ -155,17 +207,16 @@ export function Products({
   useEffect(() => {
     const slug = syncSlugAllowed(initialCatSlug, catalog.filterSlugs);
     setActiveSlug(slug);
-    setActiveTabIndex(indexForSlug(pairs, slug));
-  }, [initialCatSlug, catalog.filterSlugs, pairs]);
+    setActiveTabIndex(indexForSidebarHighlight(pairs, slug, catalog.sidebarRootSlug));
+  }, [initialCatSlug, catalog.filterSlugs, catalog.sidebarRootSlug, pairs]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const fromUrl = new URLSearchParams(window.location.search).get("cat");
-    if (!fromUrl) return;
-    const slug = syncSlugAllowed(fromUrl, catalog.filterSlugs);
+    const slug = fromUrl ? syncSlugAllowed(fromUrl, catalog.filterSlugs) : null;
     setActiveSlug(slug);
-    setActiveTabIndex(indexForSlug(pairs, slug));
-  }, [catalog.filterSlugs, pairs]);
+    setActiveTabIndex(indexForSidebarHighlight(pairs, slug, catalog.sidebarRootSlug));
+  }, [catalog.filterSlugs, catalog.sidebarRootSlug, pairs]);
 
   useEffect(() => {
     setPreviewRows(HOMEPAGE_INITIAL_ROWS);
@@ -248,7 +299,7 @@ export function Products({
       }}
       className={cn(
         withCategorySidebar
-          ? "w-full text-left px-3 py-2.5 rounded-[3px] text-[13px] font-medium transition-colors border border-transparent"
+          ? "w-full text-left px-3 py-2.5 rounded-[3px] cursor-pointer text-[13px] font-medium transition-colors border border-transparent"
           : "nav-link shrink-0 whitespace-nowrap px-4 py-2.5 text-[14px] font-medium cursor-pointer",
         !withCategorySidebar && !isActive && "text-[var(--color-muted)]",
         isActive &&
@@ -379,13 +430,14 @@ export function Products({
                     <Reveal key={sc.slug} delay={Math.min(i * 0.05, 0.3)}>
                       <Link
                         href={`/produkter?cat=${encodeURIComponent(sc.slug)}`}
+                        onClick={() => router.refresh()}
                         className="group flex flex-col bg-white border border-[var(--color-divider)] rounded-[3px] overflow-hidden hover:border-[var(--color-copper)] hover:shadow-sm transition-all h-full"
                       >
                         <div className="aspect-[4/3] bg-[oklch(0.96_0.005_80)] relative">
                           {sc.remoteImageSrc ? (
                             <Image
                               src={sc.remoteImageSrc}
-                              alt={sc.name}
+                              alt={subcategoryDisplayName(sc, locale)}
                               fill
                               sizes="(max-width: 768px) 50vw, 25vw"
                               className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -398,7 +450,7 @@ export function Products({
                         </div>
                         <div className="p-3 flex items-center justify-between">
                           <span className="text-[13px] font-bold text-[var(--color-ink)] group-hover:text-[var(--color-copper)] transition-colors truncate pr-2">
-                            {sc.name}
+                            {subcategoryDisplayName(sc, locale)}
                           </span>
                           <span className="text-[11px] text-[var(--color-muted)] tabular-nums bg-[oklch(0.96_0.005_80)] px-1.5 py-0.5 rounded-[2px]">
                             {sc.count}
@@ -411,13 +463,34 @@ export function Products({
               </div>
             )}
 
+            {searchQuery ? (
+              <Reveal>
+                <p className="mb-6 text-[15px] text-[var(--color-ink)]">
+                  {tr(locale, "Søkeresultater for", "Results for")}{" "}
+                  <span className="font-semibold text-[var(--color-copper)]">&laquo;{searchQuery}&raquo;</span>
+                  {visible.length > 0 ? (
+                    <span className="text-[var(--color-muted)]">
+                      {" "}
+                      ({visible.length} {tr(locale, "treff", "matches")})
+                    </span>
+                  ) : null}
+                </p>
+              </Reveal>
+            ) : null}
+
             {visible.length === 0 ? (
               <p className="text-[15px] text-[var(--color-muted)]">
-                {tr(
-                  locale,
-                  "Ingen produkter å vise.",
-                  "No products to show.",
-                )}
+                {searchQuery
+                  ? tr(
+                      locale,
+                      `Ingen produkter funnet for «${searchQuery}».`,
+                      `No products found for «${searchQuery}».`,
+                    )
+                  : tr(
+                      locale,
+                      "Ingen produkter å vise.",
+                      "No products to show.",
+                    )}
               </p>
             ) : (
               <>
@@ -427,7 +500,9 @@ export function Products({
                   withCategorySidebar ? "lg:grid-cols-3 xl:grid-cols-4" : "lg:grid-cols-4",
                 )}
               >
-                {gridProducts.map((p, i) => (
+                {gridProducts.map((p, i) => {
+                  const specSnippet = productSpecSnippet(p, locale);
+                  return (
                   <Reveal key={p.slug} delay={Math.min(i * 0.05, 0.3)}>
                     <Link
                       href={`/produkter/${p.slug}`}
@@ -453,9 +528,9 @@ export function Products({
                         <h3 className="mt-1.5 text-[15px] font-bold text-[var(--color-ink)] leading-snug tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
                           {productDisplayName(p, locale)}
                         </h3>
-                        {p.spec && p.spec.length > 30 ? (
+                        {specSnippet.length > 30 ? (
                           <p className="mt-2 text-[12px] text-[var(--color-muted)] leading-relaxed font-mono">
-                            {p.spec.slice(0, 30) + "..."}
+                            {specSnippet.slice(0, 30) + "..."}
                           </p>
                         ) : null}
                         <div className="mt-auto pt-4 flex items-end justify-between gap-2 border-t border-[var(--color-divider)]">
@@ -464,7 +539,7 @@ export function Products({
                               {tr(locale, "Fra", "From")}
                             </p>
                             <p className="text-[12px] font-bold text-[var(--color-copper)] tracking-[-0.01em] leading-tight">
-                              {p.price}
+                              {productPriceDisplay(p, locale)}
                             </p>
                           </div>
                           <span className="text-[5px] font-medium text-[var(--color-ink)] inline-flex items-center gap-1 group-hover:text-[var(--color-copper)] transition-colors">
@@ -474,7 +549,8 @@ export function Products({
                       </div>
                     </Link>
                   </Reveal>
-                ))}
+                  );
+                })}
               </div>
               {isHomePreview ? (
                 <div className="mt-8 flex flex-wrap items-center justify-between gap-4">

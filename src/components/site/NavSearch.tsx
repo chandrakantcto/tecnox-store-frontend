@@ -23,6 +23,10 @@ function productHref(slug: string) {
   return `/produkter/${encodeURIComponent(slug)}`;
 }
 
+function productSearchResultsHref(term: string) {
+  return `/produkter?q=${encodeURIComponent(term.trim())}`;
+}
+
 type SuggestionRowsProps = {
   locale: Locale;
   search: StorefrontSearchApi;
@@ -41,7 +45,7 @@ function SuggestionRows({
   setActiveIndex,
   panelVariant = "desktop",
 }: SuggestionRowsProps) {
-  const { query, categoryHits, productHits, loading, error, debouncedTerm, formatHitPrice } = search;
+  const { query, categoryHits, productHits, loading, error, debouncedTerm, formatHitPrice, formatHitName } = search;
 
   const q = query.trim();
   const showPanel = q.length >= 1 || loading;
@@ -152,7 +156,7 @@ function SuggestionRows({
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium">{row.productName}</span>
+                      <span className="block truncate font-medium">{formatHitName(row)}</span>
                       <span className="mt-0.5 block text-[11px] font-mono text-[var(--color-copper)] tabular-nums">
                         {formatHitPrice(row)}
                       </span>
@@ -192,6 +196,13 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
     setActiveIndex(-1);
     search.clearQuery();
   }, [search]);
+
+  const submitSearch = useCallback(() => {
+    const term = search.query.trim();
+    if (term.length < 1) return;
+    router.push(productSearchResultsHref(term));
+    closeAll();
+  }, [search, router, closeAll]);
 
   useEffect(() => {
     if (!barOpen) return;
@@ -249,9 +260,15 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
       setActiveIndex((i) => (i <= 0 ? -1 : i - 1));
       return;
     }
-    if (e.key === "Enter" && activeIndex >= 0 && totalRows > 0) {
+    if (e.key === "Enter") {
       e.preventDefault();
-      navigateActive();
+      if (activeIndex >= 0 && totalRows > 0) {
+        navigateActive();
+        return;
+      }
+      if (search.query.trim().length >= 1) {
+        submitSearch();
+      }
     }
   };
  
@@ -273,8 +290,15 @@ export function NavSearchDesktop({ locale, search }: { locale: Locale; search: S
             <label className="sr-only" htmlFor={listId}>
               {tr(locale, "Søk i produkter og kategorier", "Search products and categories")}
             </label>
-            <div className="relative z-[2] flex h-9 w-full items-center gap-2 rounded-[2px] border border-[var(--color-divider)] bg-white px-3 shadow-sm">
-              <Search className="h-4 w-4 shrink-0 text-[var(--color-muted)]" aria-hidden />
+            <div className="relative z-[2] flex h-9 w-full items-center gap-2 rounded-[2px] cursor-pointer border border-[var(--color-divider)] bg-white px-3 shadow-sm">
+              <button
+                type="button"
+                onClick={submitSearch}
+                aria-label={tr(locale, "Søk", "Search")}
+                className="shrink-0 text-[var(--color-muted)] transition-colors cursor-pointer hover:text-[var(--color-ink)]"
+              >
+                <Search className="h-4 w-4" aria-hidden />
+              </button>
               <input
                 ref={inputRef}
                 id={listId}
@@ -368,6 +392,13 @@ export function NavSearchMobile({
     onResultPick?.();
   }, [search, onResultPick]);
 
+  const submitSearch = useCallback(() => {
+    const term = search.query.trim();
+    if (term.length < 1) return;
+    router.push(productSearchResultsHref(term));
+    closePick();
+  }, [search, router, closePick]);
+
   useEffect(() => {
     setActiveIndex(-1);
   }, [search.query, search.categoryHits, search.productHits]);
@@ -412,9 +443,15 @@ export function NavSearchMobile({
       setActiveIndex((i) => (i <= 0 ? -1 : i - 1));
       return;
     }
-    if (e.key === "Enter" && activeIndex >= 0 && totalRows > 0) {
+    if (e.key === "Enter") {
       e.preventDefault();
-      navigateActive();
+      if (activeIndex >= 0 && totalRows > 0) {
+        navigateActive();
+        return;
+      }
+      if (search.query.trim().length >= 1) {
+        submitSearch();
+      }
     }
   };
 
@@ -424,7 +461,14 @@ export function NavSearchMobile({
         {tr(locale, "Søk", "Search")}
       </label>
       <div className="flex h-10 w-full items-center gap-2 rounded-[2px] border border-[var(--color-divider)] bg-white px-3">
-        <Search className="h-4 w-4 shrink-0 text-[var(--color-muted)]" aria-hidden />
+        <button
+          type="button"
+          onClick={submitSearch}
+          aria-label={tr(locale, "Søk", "Search")}
+          className="shrink-0 text-[var(--color-muted)] transition-colors cursor-pointer hover:text-[var(--color-ink)]"
+        >
+          <Search className="h-4 w-4" aria-hidden />
+        </button>
         <input
           id={listId}
           type="search"

@@ -65,11 +65,15 @@ export type ProductsSectionPayload = {
   filterSlugs: (string | null)[];
   products: CatalogProductCard[];
   subcategories?: HomepageCategoryTile[];
+  /** Root collection slug for sidebar highlight when `?cat=` is a nested collection */
+  sidebarRootSlug?: string | null;
   /** When set (e.g. /produkter), sidebar counts reflect full catalogue; `products` may be filtered server-side */
   filterSidebarCounts?: {
     all: number;
     bySlug: Record<string, number>;
   };
+  /** When set, `products` are filtered by this search term (e.g. `/produkter?q=`) */
+  searchQuery?: string | null;
   error?: string | null;
 };
 

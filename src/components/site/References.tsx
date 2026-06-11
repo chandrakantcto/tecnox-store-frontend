@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Reveal } from "./Reveal";
 import refRestaurant from "@/assets/ref-restaurant.jpg";
@@ -5,6 +7,7 @@ import refHotell from "@/assets/ref-hotell.jpg";
 import refKantine from "@/assets/ref-kantine.jpg";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 
 const REFS = [
   {
@@ -36,7 +39,8 @@ const REFS = [
   },
 ];
 
-export function References({ locale = "nb" }: { locale?: Locale }) {
+export function References({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   return (
     <section className="bg-[var(--color-stone)] section-pad">
       <div className="container-x">

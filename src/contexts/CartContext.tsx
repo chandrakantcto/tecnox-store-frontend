@@ -3,7 +3,7 @@
 import type { CartProductSnapshot } from "@/lib/catalog/storefront-product";
 import {
   cartLinesFromActiveOrder,
-  orderSubtotalExTaxKr,
+  orderSubtotalWithTaxKr,
   orderTotalQuantity,
   type VendureCartLine,
 } from "@/lib/vendure/cart-from-active-order";
@@ -95,7 +95,7 @@ export function CartProvider({
 
   const lines = useMemo(() => cartLinesFromActiveOrder(order), [order]);
   const itemCount = useMemo(() => orderTotalQuantity(order), [order]);
-  const subtotal = useMemo(() => orderSubtotalExTaxKr(order), [order]);
+  const subtotal = useMemo(() => orderSubtotalWithTaxKr(order), [order]);
 
   const refresh = useCallback(async () => {
     const res = await shopGraphql<ActiveOrderQueryResult>(GQL_ACTIVE_ORDER, undefined, locale);

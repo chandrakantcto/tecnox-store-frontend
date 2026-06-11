@@ -11,7 +11,8 @@
     "featuredAssetFile": "prod-combi.jpg",
     "nameNb": "Kombidamper iCombi Pro 10-1/1",
     "nameEn": "Combi Oven iCombi Pro 10-1/1",
-    "descriptionNb": "Markedets mest intelligente kombidamper. Kjenner igjen produktet, justerer kokemiljøet og leverer perfekt resultat — gang etter gang. Bygget for europeisk profesjonell drift."
+    "descriptionNb": "Markedets mest intelligente kombidamper. Kjenner igjen produktet, justerer kokemiljøet og leverer perfekt resultat — gang etter gang. Bygget for europeisk profesjonell drift.",
+    "descriptionEn": "The market's most intelligent combi oven. Recognises the product, adjusts the cooking climate and delivers perfect results — time after time. Built for European professional operations."
   },
   {
     "slug": "underbenkskjoler-gn-2-1",
@@ -24,7 +25,8 @@
     "featuredAssetFile": "prod-underbenk.jpg",
     "nameNb": "Underbenkskjøler GN 2/1",
     "nameEn": "Undercounter Refrigerator GN 2/1",
-    "descriptionNb": "Robust dansk konstruksjon i rustfritt stål, dimensjonert for daglig bruk i krevende miljø. Stille drift og klassens laveste energiforbruk."
+    "descriptionNb": "Robust dansk konstruksjon i rustfritt stål, dimensjonert for daglig bruk i krevende miljø. Stille drift og klassens laveste energiforbruk.",
+    "descriptionEn": "Robust Danish stainless-steel construction, sized for daily use in demanding environments. Quiet operation and the lowest energy consumption in its class."
   },
   {
     "slug": "hetteoppvasker-ae-50",
@@ -38,7 +40,8 @@
     "featuredAssetFile": "prod-hetteoppvask.jpg",
     "nameNb": "Hetteoppvasker AE-50",
     "nameEn": "Hood Dishwasher AE-50",
-    "descriptionNb": "Hettemaskinen som fjerner flaskehalsen i oppvaskstasjonen. Smart vannstyring og innebygd avløpspumpe gir konsistent vaskeresultat ved høy belastning."
+    "descriptionNb": "Hettemaskinen som fjerner flaskehalsen i oppvaskstasjonen. Smart vannstyring og innebygd avløpspumpe gir konsistent vaskeresultat ved høy belastning.",
+    "descriptionEn": "The hood dishwasher that removes the bottleneck in your wash station. Smart water management and a built-in drain pump deliver consistent wash results under heavy load."
   },
   {
     "slug": "pizzaovn-modular-pyralis-9",
@@ -51,7 +54,8 @@
     "featuredAssetFile": "prod-pizzaovn.jpg",
     "nameNb": "Pizzaovn Modular Pyralis 9",
     "nameEn": "Pizza Oven Modular Pyralis 9",
-    "descriptionNb": "Italiensk håndverk for autentisk napoletansk pizza. Cordieritsten og separat sone-styring gir nøyaktig kontroll på over- og undervarme."
+    "descriptionNb": "Italiensk håndverk for autentisk napoletansk pizza. Cordieritsten og separat sone-styring gir nøyaktig kontroll på over- og undervarme.",
+    "descriptionEn": "Italian craftsmanship for authentic Neapolitan pizza. Cordierite stone and separate zone control give precise top and bottom heat."
   },
   {
     "slug": "induksjonstopp-4-soner",
@@ -64,7 +68,8 @@
     "featuredAssetFile": "prod-induksjon.jpg",
     "nameNb": "Induksjonstopp 4-soner",
     "nameEn": "Induction Hob 4 Zones",
-    "descriptionNb": "Profesjonell induksjon med ekstrem responstid og 90 % virkningsgrad. Lukket glassflate gir hurtig rengjøring og redusert kjøkkentemperatur."
+    "descriptionNb": "Profesjonell induksjon med ekstrem responstid og 90 % virkningsgrad. Lukket glassflate gir hurtig rengjøring og redusert kjøkkentemperatur.",
+    "descriptionEn": "Professional induction with extreme response time and 90% efficiency. Sealed glass surface enables fast cleaning and lower kitchen temperatures."
   },
   {
     "slug": "frittstaende-fryseskap",
@@ -77,7 +82,8 @@
     "featuredAssetFile": "prod-fryseskap.jpg",
     "nameNb": "Frittstående fryseskap",
     "nameEn": "Free-standing Freezer Cabinet",
-    "descriptionNb": "Stort fryseskap med klassens laveste energiforbruk og solid konstruksjon for hardbruk. Naturlig kuldemedium og fremtidssikker styring."
+    "descriptionNb": "Stort fryseskap med klassens laveste energiforbruk og solid konstruksjon for hardbruk. Naturlig kuldemedium og fremtidssikker styring.",
+    "descriptionEn": "Large freezer cabinet with the lowest energy consumption in its class and heavy-duty construction. Natural refrigerant and future-ready controls."
   },
   {
     "slug": "konvektomat-convovent-mini",
@@ -91,7 +97,8 @@
     "featuredAssetFile": "prod-konvektomat.jpg",
     "nameNb": "Konvektomat ConvoVent Mini",
     "nameEn": "Convection Oven ConvoVent Mini",
-    "descriptionNb": "Kompakt tysk kvalitet for caféer, bakerier og mindre kjøkken. Direkte dampgenerator og enkel touchstyring — uten kompromiss på resultat."
+    "descriptionNb": "Kompakt tysk kvalitet for caféer, bakerier og mindre kjøkken. Direkte dampgenerator og enkel touchstyring — uten kompromiss på resultat.",
+    "descriptionEn": "Compact German quality for cafés, bakeries and smaller kitchens. Direct steam generator and simple touch controls — without compromising results."
   },
   {
     "slug": "demo-arbeidsbord-prof-lengder",
@@ -102,6 +109,7 @@
     "nameNb": "Profesjonelt arbeidsbord — modulerbar lengde",
     "nameEn": "Professional work table — modular lengths",
     "descriptionNb": "Demonstrasjonsprodukt med tre varianter (lengder) på samme produktside. Velg ønsket modul på produktkortet. Rustfritt toppplate og industriunderstell — monterbar med justerbare ben.",
+    "descriptionEn": "Demo product with three length variants on one product page. Choose the module on the product card. Stainless worktop and industrial frame — adjustable legs for installation.",
     "storefrontReviewsJson": "[{\"author\":\"Kari Lunde\",\"rating\":5,\"title\":\"Klart til drift\",\"body\":\"Bestilte 150 cm-varianten til vårt storkjøkken. Stabil konstruksjon og enkel hygienisk overflate. God oppfølging fra Tecnox.\",\"dateIso\":\"2025-10-18\"},{\"author\":\"Mohamed A.\",\"rating\":4,\"title\":\"Solid arbeidsflate\",\"body\":\"180 cm passer perfekt mellom kjølebord og kokeøy. Ønsket meg hurtigkoplinger for vegg — ellers fem stjerner.\",\"dateIso\":\"2025-11-02\"},{\"author\":\"Restaurant Bryggen\",\"rating\":5,\"title\":\"Ink. montering\",\"body\":\"Vi tok 120 cm-varianten på et trangt kjøkkenspor. Montering gjort samme uke og alt stemte mot tegning.\",\"dateIso\":\"2026-01-08\"}]",
     "storefrontServiceBulletsJson": "{\"nb\":[\"Levering over hele landet på avtalt dato\",\"Teknisk opplæring og serviceavtaler\",\"Garantiprogram på kommersielle installasjoner\"],\"en\":[\"Nationwide delivery on agreed schedule\",\"Technical training & service programmes\",\"Commercial installation warranty\"]}"
     ,
@@ -164,7 +172,8 @@
     "featuredAssetFile": "prod-stekebord.jpg",
     "nameNb": "Stekebord 800 mm",
     "nameEn": "Griddle Plate 800 mm",
-    "descriptionNb": "Italiensk håndverk i rustfritt stål. Tykk stekeplate for jevn varmefordeling og lang levetid — laget for kontinuerlig drift."
+    "descriptionNb": "Italiensk håndverk i rustfritt stål. Tykk stekeplate for jevn varmefordeling og lang levetid — laget for kontinuerlig drift.",
+    "descriptionEn": "Italian stainless-steel craftsmanship. Thick griddle plate for even heat distribution and long service life — built for continuous operation."
   },
   {
     "slug": "demo-var-induksjon-prof",
@@ -176,6 +185,7 @@
     "nameNb": "Profesjonell induksjonstopp (demo-varianter)",
     "nameEn": "Professional induction hob (demo variants)",
     "descriptionNb": "Demonstrasjonsprodukt for variantvelger: samme listing, fem varianter med ulik sonetelling og ytelse.",
+    "descriptionEn": "Demo product for variant selector: one listing, five variants with different zone counts and performance.",
     "optionGroupCode": "demo-ind-prof-zones",
     "optionGroupNameNb": "Konfigurasjon",
     "optionGroupNameEn": "Configuration",
@@ -197,6 +207,7 @@
     "nameNb": "Underbenkskjøler — volumserie (demo)",
     "nameEn": "Undercounter fridge — capacity series (demo)",
     "descriptionNb": "Variantprodukt: velg nettovolum til kjøkkens BIM og energibudsjett. Alle varianter deler samme SKU-familie og merkelappfelt.",
+    "descriptionEn": "Variant product: choose net capacity for kitchen BIM and energy budget. All variants share the same SKU family and label fields.",
     "optionGroupCode": "demo-ufridge-volume-l",
     "optionGroupNameNb": "Nettovolum",
     "optionGroupNameEn": "Net capacity",
@@ -218,6 +229,7 @@
     "nameNb": "Kombidamper iCombi — GN-format (demo)",
     "nameEn": "Combi oven iCombi — GN layout (demo)",
     "descriptionNb": "Fem populære GN-konfigurasjoner på én PDP for testing av bilder, prisdelta og lagertilpasning.",
+    "descriptionEn": "Five popular GN configurations on one PDP for testing images, price deltas and stock adaptation.",
     "optionGroupCode": "demo-combi-gn-layout",
     "optionGroupNameNb": "Kapasitet (GN)",
     "optionGroupNameEn": "Capacity (GN)",
@@ -239,6 +251,7 @@
     "nameNb": "Elektrisk pizza steindeck (demo Ø)",
     "nameEn": "Electric pizza stone deck (demo Ø)",
     "descriptionNb": "Velg bredde eller steintykkelse; nyttig for å verifisere variantliste og min/max pris på produktsiden.",
+    "descriptionEn": "Choose width or stone thickness; useful for verifying variant lists and min/max price on the product page.",
     "optionGroupCode": "demo-pizza-deck-mm",
     "optionGroupNameNb": "Bakeflate",
     "optionGroupNameEn": "Bake surface",
@@ -260,6 +273,7 @@
     "nameNb": "Tunnelfront oppvask (demo kurvserie)",
     "nameEn": "Tunnel front dishwasher (demo rack series)",
     "descriptionNb": "Fem maskiner definert rundt kurvdimensjon og pumpepakke — klassisk eksempel på tekniske varianter i katalog.",
+    "descriptionEn": "Five machines defined around rack dimensions and pump package — a classic example of technical variants in the catalogue.",
     "optionGroupCode": "demo-fw-rack-mm",
     "optionGroupNameNb": "Kurvmål og pumpe",
     "optionGroupNameEn": "Rack size & pumps",
@@ -272,6 +286,13 @@
     ]
   },
   {
+    "slug": "bluedrum",
+    "nameNb": "BlueDrum",
+    "nameEn": "BlueDrum",
+    "descriptionNb": "Velg kategorier og underkategorier, og lagre med Opprett eller Oppdater. Valgte elementer vises i disse kolleksjonene i nettbutikken.",
+    "descriptionEn": "Select categories and subcategories, then save with Create or Update. Checked items appear in those collections on the storefront."
+  },
+  {
     "slug": "demo-espresso-gruppe-antall",
     "brand": "La Cimbali",
     "filterCategoryNb": "Kaffe",
@@ -281,6 +302,7 @@
     "nameNb": "Tradisjonell espressomaskin (demo grupper)",
     "nameEn": "Traditional espresso machine (demo groups)",
     "descriptionNb": "Konfigurasjoner fra 2 til 4 grupper for UI-tester på prisstriper og bildeswitch per variant.",
+    "descriptionEn": "Configurations from 2 to 4 groups for UI tests on price bands and image switching per variant.",
     "optionGroupCode": "demo-espresso-groups-count",
     "optionGroupNameNb": "Antall grupper",
     "optionGroupNameEn": "Number of groups",

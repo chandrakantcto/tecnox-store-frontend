@@ -192,7 +192,7 @@ export function HandlekurvView({
 
                       <div className="col-span-2 text-right sm:col-span-1">
                         <p className="text-[12px] text-[var(--color-muted)]">
-                          kr {formatNOK(Math.round(line.unitPriceKr))} {tr(locale, "eks. MVA", "excl. VAT")}
+                          kr {formatNOK(Math.round(line.unitPriceKr))} {tr(locale, "inkl. MVA", "incl. VAT")}
                         </p>
                         <p className="mt-1 text-[18px] font-bold tracking-[-0.015em] text-[var(--color-copper)]">
                           kr {formatNOK(Math.round(line.lineTotalKr))}
@@ -244,14 +244,14 @@ export function HandlekurvView({
                       <dd>{itemCount}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum (eks. MVA)", "Subtotal (excl. VAT)")}</dt>
+                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum (inkl. MVA)", "Subtotal (incl. VAT)")}</dt>
                       <dd className="font-mono">kr {formatNOK(Math.round(subtotal))}</dd>
                     </div>
                   </dl>
 
                   <div className="mt-6 flex items-baseline justify-between border-t border-[var(--color-dark-border)] pt-5">
                     <span className="text-[12px] uppercase tracking-[0.14em] text-[var(--color-dark-muted)]">
-                      {tr(locale, "Total eks. MVA", "Total excl. VAT")}
+                      {tr(locale, "Total inkl. MVA", "Total incl. VAT")}
                     </span>
                     <span className="text-[24px] font-bold tracking-[-0.02em] text-[var(--color-copper)]">
                       kr {formatNOK(Math.round(subtotal))}

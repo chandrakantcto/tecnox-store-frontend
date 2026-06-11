@@ -15,8 +15,11 @@ export const GQL_ACTIVE_ORDER = /* GraphQL */ `
         id
         quantity
         linePrice
+        linePriceWithTax
         discountedLinePrice
+        discountedLinePriceWithTax
         discountedUnitPrice
+        discountedUnitPriceWithTax
         productVariant {
           id
           sku

@@ -210,13 +210,13 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
         <footer className="shrink-0 border-t border-[var(--color-divider)] bg-[var(--color-stone)] px-5 py-5">
           <dl className="space-y-2 text-[12px] uppercase tracking-[0.08em] text-[var(--color-muted)]">
             <div className="flex justify-between gap-4">
-              <dt>{tr(locale, "Delsum (eks. MVA)", "Subtotal (excl. VAT)")}</dt>
+              <dt>{tr(locale, "Delsum (inkl. MVA)", "Subtotal (incl. VAT)")}</dt>
               <dd className="font-mono text-[14px] font-semibold normal-case tracking-normal text-[var(--color-ink)]">
                 kr {formatNOK(Math.round(subtotal))}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt>{tr(locale, "Total (eks. MVA)", "Total (excl. VAT)")}</dt>
+              <dt>{tr(locale, "Total (inkl. MVA)", "Total (incl. VAT)")}</dt>
               <dd className="font-mono text-[14px] font-bold normal-case tracking-normal text-[var(--color-ink)]">
                 kr {formatNOK(Math.round(subtotal))}
               </dd>

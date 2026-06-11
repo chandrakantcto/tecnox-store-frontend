@@ -11,13 +11,18 @@ import { staticSrc } from "@/lib/static-asset";
 import type { CatalogProductCard } from "@/lib/vendure/catalog-types";
 import {
   applyLocaleToSearchHit,
-  buildLocalizedCategoryNameMap,
   buildLocalizedCategoryNameMapsBoth,
   fetchNavRoots,
   getGlobalProductSearchHitsDual,
   pickLocalizedText,
   searchHitToCatalogCard,
 } from "@/lib/vendure/catalog-data";
+import {
+  optionGroupLabelsForProductSlug,
+  resolveProductDescriptions,
+  resolveProductDisplayNames,
+  variantLabelsForSku,
+} from "@/data/productLabels";
 import {
   absoluteAssetUrl,
   dedupeNavRootsBySlug,
@@ -210,13 +215,19 @@ function catalogCardToProductStub(card: CatalogProductCard): Product {
   return {
     slug: card.slug,
     name: card.name,
+    nameNb: card.nameNb,
+    nameEn: card.nameEn,
     brand: card.brand,
     spec: card.spec,
     price: card.price,
     priceNumeric: card.priceNumeric,
     category: card.category,
+    categoryNb: card.categoryNb,
+    categoryEn: card.categoryEn,
     img: typeof card.img === "string" ? card.img : staticSrc(card.img),
     description: card.description ?? "",
+    descriptionNb: card.descriptionNb,
+    descriptionEn: card.descriptionEn,
     highlights: [],
     specs: [],
     ...(badgeOk ? { badge: badgeOk } : {}),
@@ -343,12 +354,6 @@ export const getStorefrontProductDetail = cache(
       };
       for (const r of roots) attachNav(r, r.slug);
 
-      const slugToCategoryName = buildLocalizedCategoryNameMap(
-        dedupeNavRootsBySlug(roots),
-        locale,
-        navNb.roots,
-        navEn.roots,
-      );
       const { nb: slugToCategoryNameNb, en: slugToCategoryNameEn } = buildLocalizedCategoryNameMapsBoth(
         dedupeNavRootsBySlug(roots),
         navNb.roots,
@@ -373,29 +378,58 @@ export const getStorefrontProductDetail = cache(
       const productSlug = typeof p.slug === "string" ? p.slug : slug;
       const namePrimary = typeof p.name === "string" ? p.name : "";
       const nameAlternate = typeof pAlt?.name === "string" ? pAlt.name : "";
-      let name = pickLocalizedText(namePrimary, nameAlternate, locale);
       const descriptionPrimary = typeof p.description === "string" ? p.description : "";
       const descriptionAlternate = typeof pAlt?.description === "string" ? pAlt.description : "";
-      let descriptionHtml = pickLocalizedText(descriptionPrimary, descriptionAlternate, locale);
 
       const nbBySlug = new Map(dualSearch.nb.map((h) => [h.slug, h]));
       const enBySlug = new Map(dualSearch.en.map((h) => [h.slug, h]));
-      const searchOverlay = applyLocaleToSearchHit(
+      const searchBase: SearchHitRaw = {
+        slug: productSlug,
+        sku: "",
+        productId: "",
+        productName: namePrimary || nameAlternate,
+        description: descriptionPrimary || descriptionAlternate,
+      };
+      const nbOverlay = applyLocaleToSearchHit(
         {
-          slug: productSlug,
-          sku: "",
-          productId: "",
-          productName: name,
-          description: descriptionHtml,
+          ...searchBase,
+          productName: pickLocalizedText(namePrimary, nameAlternate, "nb"),
+          description: pickLocalizedText(descriptionPrimary, descriptionAlternate, "nb"),
         },
-        locale,
+        "nb",
         nbBySlug,
         enBySlug,
       );
-      if (searchOverlay.productName?.trim()) name = searchOverlay.productName.trim();
-      if (searchOverlay.description != null && String(searchOverlay.description).trim()) {
-        descriptionHtml = String(searchOverlay.description);
-      }
+      const enOverlay = applyLocaleToSearchHit(
+        {
+          ...searchBase,
+          productName: pickLocalizedText(namePrimary, nameAlternate, "en"),
+          description: pickLocalizedText(descriptionPrimary, descriptionAlternate, "en"),
+        },
+        "en",
+        nbBySlug,
+        enBySlug,
+      );
+      const nameResolved = resolveProductDisplayNames(
+        productSlug,
+        nbOverlay.productName?.trim() || pickLocalizedText(namePrimary, nameAlternate, "nb"),
+        enOverlay.productName?.trim() || pickLocalizedText(namePrimary, nameAlternate, "en"),
+        namePrimary || nameAlternate,
+      );
+      const nameNb = nameResolved.nb;
+      const nameEn = nameResolved.en;
+      const descResolved = resolveProductDescriptions(
+        productSlug,
+        String(nbOverlay.description ?? "").trim() ||
+          pickLocalizedText(descriptionPrimary, descriptionAlternate, "nb"),
+        String(enOverlay.description ?? "").trim() ||
+          pickLocalizedText(descriptionPrimary, descriptionAlternate, "en"),
+        descriptionPrimary || descriptionAlternate,
+      );
+      const descriptionHtmlNb = descResolved.nb;
+      const descriptionHtmlEn = descResolved.en;
+      const name = locale === "en" ? nameEn : nameNb;
+      const descriptionHtml = locale === "en" ? descriptionHtmlEn : descriptionHtmlNb;
 
       const collections = Array.isArray(p.collections)
         ? (p.collections.filter((x) => x && typeof x === "object") as Record<string, unknown>[])
@@ -408,8 +442,11 @@ export const getStorefrontProductDetail = cache(
       ).filter(Boolean);
 
       const rootSlug = rootSlugForProductCollections(collIds, idToRoot);
-      const categoryLabel =
-        (rootSlug && slugToCategoryName.get(rootSlug)) ?? slugToCategoryName.values().next().value ?? "—";
+      const categoryNb =
+        (rootSlug && slugToCategoryNameNb.get(rootSlug)) ?? slugToCategoryNameNb.values().next().value ?? "—";
+      const categoryEn =
+        (rootSlug && slugToCategoryNameEn.get(rootSlug)) ?? slugToCategoryNameEn.values().next().value ?? categoryNb;
+      const categoryLabel = locale === "en" ? categoryEn : categoryNb;
 
       const pdpCf =
         !pdpExtrasRes.error &&
@@ -497,6 +534,8 @@ export const getStorefrontProductDetail = cache(
       const storefrontVariants: StorefrontVariantDetail[] = [];
       const variantPreviewRels: string[] = [];
 
+      const seedOptionGroup = optionGroupLabelsForProductSlug(productSlug);
+
       for (const vr of variantRowsRaw) {
         const id = typeof vr.id === "string" || typeof vr.id === "number" ? String(vr.id) : "";
         const sku = typeof vr.sku === "string" ? vr.sku : "";
@@ -527,6 +566,7 @@ export const getStorefrontProductDetail = cache(
             opt.group && typeof opt.group === "object" ? (opt.group as Record<string, unknown>) : null;
           const optId = typeof opt.id === "string" || typeof opt.id === "number" ? String(opt.id) : "";
           const optNameRaw = typeof opt.name === "string" ? opt.name : "";
+          const optNameAlt = altOptionNames.get(optId) ?? "";
           const groupId =
             typeof opt.groupId === "string"
               ? opt.groupId
@@ -534,33 +574,54 @@ export const getStorefrontProductDetail = cache(
                 ? gn.id
                 : "";
           const groupNameRaw = gn && typeof gn.name === "string" ? gn.name : "";
+          const groupNameAlt = altGroupNames.get(groupId) ?? "";
+          const seedVariant = variantLabelsForSku(sku);
+          const optNameNb = seedVariant?.nameNb || pickLocalizedText(optNameRaw, optNameAlt, "nb");
+          const optNameEn = seedVariant?.nameEn || pickLocalizedText(optNameRaw, optNameAlt, "en");
+          const groupNameNb =
+            seedOptionGroup?.nameNb || pickLocalizedText(groupNameRaw, groupNameAlt, "nb");
+          const groupNameEn =
+            seedOptionGroup?.nameEn || pickLocalizedText(groupNameRaw, groupNameAlt, "en");
           return {
             id: optId,
             code: typeof opt.code === "string" ? opt.code : "",
-            name: pickLocalizedText(optNameRaw, altOptionNames.get(optId) ?? "", locale),
+            name: pickLocalizedText(optNameRaw, optNameAlt, locale),
+            nameNb: optNameNb,
+            nameEn: optNameEn,
             groupId,
             groupCode: gn && typeof gn.code === "string" ? gn.code : "",
-            groupName: pickLocalizedText(groupNameRaw, altGroupNames.get(groupId) ?? "", locale),
+            groupName: pickLocalizedText(groupNameRaw, groupNameAlt, locale),
+            groupNameNb,
+            groupNameEn,
           };
         });
 
         const inc = minorUnitsFromMoney(vr.priceWithTax);
-        const minorEx = exVatMinorFromInclusiveMinor(inc);
 
         const imgCandidate =
           (variantRelPreview.trim() && (absoluteAssetUrl(variantRelPreview.trim()) ?? null)) ??
           (productFeaturedRel.trim() && (absoluteAssetUrl(productFeaturedRel.trim()) ?? null)) ??
           null;
 
+        const variantNameRaw = typeof vr.name === "string" ? vr.name : sku;
+        const variantNameAlt = altVariantNames.get(id) ?? "";
+        const seedVariantLabels = variantLabelsForSku(sku);
+        const variantNameNb =
+          seedVariantLabels?.nameNb || pickLocalizedText(variantNameRaw, variantNameAlt, "nb");
+        const variantNameEn =
+          seedVariantLabels?.nameEn || pickLocalizedText(variantNameRaw, variantNameAlt, "en");
+
         storefrontVariants.push({
           id,
           sku,
-          name: pickLocalizedText(typeof vr.name === "string" ? vr.name : sku, altVariantNames.get(id) ?? "", locale),
+          name: pickLocalizedText(variantNameRaw, variantNameAlt, locale),
+          nameNb: variantNameNb,
+          nameEn: variantNameEn,
           stockLevel:
             typeof vr.stockLevel === "string" ? vr.stockLevel : String(vr.stockLevel ?? "—"),
           options,
-          priceLabelExVat: formatNOKExclVatFromMinor(locale, minorEx),
-          priceNumericExVat: typeof minorEx === "number" ? minorEx : 0,
+          priceLabelExVat: formatNOKExclVatFromMinor(locale, inc),
+          priceNumericExVat: typeof inc === "number" ? inc : 0,
           imageSrc: imgCandidate,
           specs: specsRowsFromFacetValues(merged, sku),
         });
@@ -591,14 +652,24 @@ export const getStorefrontProductDetail = cache(
       const productRecord: Product = {
         slug: productSlug,
         name,
+        nameNb,
+        nameEn,
         brand,
         category: typeof categoryLabel === "string" ? categoryLabel : "—",
+        categoryNb,
+        categoryEn,
         spec: oneLineSpecFromDescription(descriptionHtml),
         price: chosen.priceLabelExVat,
         priceNumeric: chosen.priceNumericExVat,
         description: stripHtmlMarkup(descriptionHtml) || descriptionHtml,
+        descriptionNb: stripHtmlMarkup(descriptionHtmlNb) || descriptionHtmlNb,
+        descriptionEn: stripHtmlMarkup(descriptionHtmlEn) || descriptionHtmlEn,
         descriptionHtml,
+        descriptionHtmlNb,
+        descriptionHtmlEn,
         highlights: bulletsFromRichDescription(descriptionHtml),
+        highlightsNb: bulletsFromRichDescription(descriptionHtmlNb),
+        highlightsEn: bulletsFromRichDescription(descriptionHtmlEn),
         specs,
         img: heroImg,
         variants: storefrontVariants,
