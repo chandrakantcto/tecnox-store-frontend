@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Reveal } from "./Reveal";
-import type { ProductsSectionPayload, CatalogProductCard } from "@/lib/vendure/catalog-types";
+import type { ProductsSectionPayload, CatalogProductCard, SidebarTreeNode } from "@/lib/vendure/catalog-types";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
 import { formatNOKExclVatCardAmount } from "@/lib/vendure/normalize";
 import { useActiveLocale } from "@/hooks/use-active-locale";
@@ -167,16 +167,28 @@ export function Products({
 
   const countForFilter = useCallback(
     (slug: string | null) => {
-      const sc = catalog.filterSidebarCounts;
-      if (sc) {
-        if (slug === null) return sc.all;
-        return sc.bySlug[slug] ?? 0;
+      if (catalog.sidebarTree) {
+        if (slug === null) {
+          return catalog.sidebarTree.reduce((acc, node) => acc + node.count, 0);
+        }
+        const findNode = (nodes: SidebarTreeNode[], s: string): SidebarTreeNode | null => {
+          for (const n of nodes) {
+            if (n.slug === s) return n;
+            if (n.children) {
+              const found = findNode(n.children, s);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+        const node = findNode(catalog.sidebarTree, slug);
+        if (node) return node.count;
       }
       const list = catalog.products ?? [];
       if (slug === null) return list.length;
       return list.filter((p) => p.categorySlug === slug).length;
     },
-    [catalog.filterSidebarCounts, catalog.products],
+    [catalog.sidebarTree, catalog.products],
   );
 
   const [activeSlug, setActiveSlug] = useState<string | null>(() =>
@@ -204,11 +216,35 @@ export function Products({
     });
   }, []);
 
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
   useEffect(() => {
     const slug = syncSlugAllowed(initialCatSlug, catalog.filterSlugs);
     setActiveSlug(slug);
     setActiveTabIndex(indexForSidebarHighlight(pairs, slug, catalog.sidebarRootSlug));
-  }, [initialCatSlug, catalog.filterSlugs, catalog.sidebarRootSlug, pairs]);
+    
+    // Auto-expand active parent
+    if (slug && catalog.sidebarTree) {
+      const findPath = (nodes: SidebarTreeNode[], target: string, path: string[] = []): string[] | null => {
+        for (const n of nodes) {
+          if (n.slug === target) return path;
+          if (n.children && n.children.length > 0) {
+            const found = findPath(n.children, target, [...path, n.id]);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      const path = findPath(catalog.sidebarTree, slug);
+      if (path) {
+        setExpandedCategories(prev => {
+          const newExpanded = new Set(prev);
+          path.forEach(id => newExpanded.add(id));
+          return Array.from(newExpanded);
+        });
+      }
+    }
+  }, [initialCatSlug, catalog.filterSlugs, catalog.sidebarRootSlug, pairs, catalog.sidebarTree]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -298,33 +334,128 @@ export function Products({
         if (withCategorySidebar) setCategoryMenuOpen(false);
       }}
       className={cn(
-        withCategorySidebar
-          ? "w-full text-left px-3 py-2.5 rounded-[3px] cursor-pointer text-[13px] font-medium transition-colors border border-transparent"
-          : "nav-link shrink-0 whitespace-nowrap px-4 py-2.5 text-[14px] font-medium cursor-pointer",
-        !withCategorySidebar && !isActive && "text-[var(--color-muted)]",
-        isActive &&
-          withCategorySidebar &&
-          "bg-white text-[var(--color-ink)] shadow-sm border-y border-r border-[var(--color-divider)] border-l-[3px] border-l-[var(--color-copper)]",
-        !isActive &&
-          withCategorySidebar &&
-          "text-[var(--color-muted)] hover:bg-white/70 hover:text-[var(--color-ink)]",
+        "nav-link shrink-0 whitespace-nowrap px-4 py-2.5 text-[14px] font-medium cursor-pointer",
+        !isActive && "text-[var(--color-muted)]",
       )}
-      data-active={!withCategorySidebar && isActive ? "true" : undefined}
+      data-active={isActive ? "true" : undefined}
     >
       {label}
-      {withCategorySidebar && slug !== null && (
-        <span className="ml-2 tabular-nums text-[11px] text-[var(--color-muted)] font-normal">
-          ({countForFilter(slug)})
-        </span>
-      )}
-      {withCategorySidebar && slug === null && (
-        <span className="ml-2 tabular-nums text-[11px] text-[var(--color-muted)] font-normal">
-          ({countForFilter(null)})
-        </span>
-      )}
     </button>
     );
   });
+
+  const toggleCategory = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpandedCategories((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const renderSidebarTree = (nodes: SidebarTreeNode[], depth = 0) => {
+    return nodes.map((node) => {
+      const isExpanded = expandedCategories.includes(node.id);
+      const isSubActive = activeSlug === node.slug;
+      
+      if (depth === 0) {
+        const isActiveRoot = activeSlug === node.slug || (catalog.sidebarRootSlug === node.slug && activeSlug !== null);
+        return (
+          <div key={node.id} className="group border-b border-gray-50 last:border-0">
+            <div
+              className={cn(
+                "flex items-center justify-between px-3 py-2.5 hover:bg-white/70 transition-colors cursor-pointer",
+                isActiveRoot ? "bg-white text-[var(--color-ink)] shadow-sm border-l-[3px] border-l-[var(--color-copper)]" : "text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+              )}
+              onClick={() => {
+                const idx = indexForSlug(pairs, node.slug);
+                navigateTab(node.slug, idx);
+                if (window.innerWidth < 1024) setCategoryMenuOpen(false);
+              }}
+            >
+              <span className="text-[13px] font-medium flex-1 min-w-0 truncate">
+                {locale === "en" ? node.nameEn || node.name : node.nameNb || node.name}
+                <span className="ml-2 tabular-nums text-[11px] text-[var(--color-muted)] font-normal">
+                  ({node.count})
+                </span>
+              </span>
+
+              {node.children && node.children.length > 0 && (
+                <div
+                  className="p-1 cursor-pointer"
+                  onClick={(e) => toggleCategory(e, node.id)}
+                >
+                  <ChevronDown
+                    className={cn(
+                      "h-3.5 w-3.5 transition-transform",
+                      isActiveRoot ? "text-[var(--color-copper)]" : "text-[var(--color-muted)]",
+                      !isExpanded && "-rotate-90"
+                    )}
+                    strokeWidth={2}
+                  />
+                </div>
+              )}
+            </div>
+
+            {isExpanded && node.children && node.children.length > 0 && (
+              <div className="bg-white/30 py-1">
+                {renderSidebarTree(node.children, depth + 1)}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      return (
+        <div key={node.id}>
+          <div
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 text-[12px] font-medium transition-colors cursor-pointer relative",
+              isSubActive ? "text-[var(--color-copper)] bg-white/50" : "text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+            )}
+            style={{ paddingLeft: `${12 + depth * 16}px` }}
+            onClick={() => {
+              const idx = indexForSlug(pairs, node.slug);
+              navigateTab(node.slug, idx);
+              if (window.innerWidth < 1024) setCategoryMenuOpen(false);
+            }}
+          >
+            <span
+              className={cn(
+                "w-1.5 h-1.5 rounded-full flex-shrink-0",
+                isSubActive ? "bg-[var(--color-copper)]" : "bg-[var(--color-divider)]"
+              )}
+            />
+            <span className="flex-1 truncate">
+              {locale === "en" ? node.nameEn || node.name : node.nameNb || node.name}
+            </span>
+            <span className="tabular-nums text-[10px] text-[var(--color-muted)] font-normal bg-white/50 px-1.5 py-0.5 rounded-[2px]">
+              {node.count}
+            </span>
+
+            {node.children && node.children.length > 0 && (
+              <div
+                className="p-1 cursor-pointer absolute right-2"
+                onClick={(e) => toggleCategory(e, node.id)}
+              >
+                <ChevronDown
+                  className={cn(
+                    "h-3 w-3 transition-transform text-[var(--color-muted)]",
+                    !isExpanded && "-rotate-90"
+                  )}
+                  strokeWidth={2}
+                />
+              </div>
+            )}
+          </div>
+          {isExpanded && node.children && node.children.length > 0 && (
+            <div className="bg-white/10 border-l border-[var(--color-divider)] ml-4">
+              {renderSidebarTree(node.children, depth + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
 
   return (
     <section className="bg-[var(--color-stone)] section-pad pt-16 lg:pt-20">
@@ -378,7 +509,27 @@ export function Products({
                     "lg:block",
                   )}
                 >
-                  {filterButtons}
+                  <div className="group border-b border-gray-50 last:border-0">
+                    <button
+                      type="button"
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/70 transition-colors cursor-pointer text-left",
+                        activeSlug === null ? "bg-white text-[var(--color-ink)] shadow-sm border-l-[3px] border-l-[var(--color-copper)]" : "text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+                      )}
+                      onClick={() => {
+                        navigateTab(null, 0);
+                        if (window.innerWidth < 1024) setCategoryMenuOpen(false);
+                      }}
+                    >
+                      <span className="text-[13px] font-medium flex-1 min-w-0 truncate">
+                        {locale === "en" ? "All" : "Alle"}
+                        <span className="ml-2 tabular-nums text-[11px] text-[var(--color-muted)] font-normal">
+                          ({countForFilter(null)})
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  {catalog.sidebarTree ? renderSidebarTree(catalog.sidebarTree) : filterButtons}
                 </div>
               </nav>
             </aside>

@@ -4,6 +4,16 @@ import type { StaticImageData } from "next/image";
 
 export type MegaMenuLocales = Record<Locale, MegaMain[]>;
 
+export type SidebarTreeNode = {
+  id: string;
+  slug: string;
+  name: string;
+  nameNb?: string;
+  nameEn?: string;
+  count: number;
+  children: SidebarTreeNode[];
+};
+
 export type HomepageCategoryTile = {
   slug: string;
   name: string;
@@ -65,6 +75,7 @@ export type ProductsSectionPayload = {
   filterSlugs: (string | null)[];
   products: CatalogProductCard[];
   subcategories?: HomepageCategoryTile[];
+  sidebarTree?: SidebarTreeNode[];
   /** Root collection slug for sidebar highlight when `?cat=` is a nested collection */
   sidebarRootSlug?: string | null;
   /** When set (e.g. /produkter), sidebar counts reflect full catalogue; `products` may be filtered server-side */

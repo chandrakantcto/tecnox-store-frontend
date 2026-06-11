@@ -9,6 +9,7 @@ import type {
   ProductsListingCatalogPayload,
   ProductsListingPageCopy,
   ProductsSectionPayload,
+  SidebarTreeNode,
 } from "@/lib/vendure/catalog-types";
 import { GQL_NAV_COLLECTIONS, GQL_NAV_COLLECTIONS_KATEGORIER, GQL_SEARCH_PRODUCTS, VENDURE_SHOP_LIST_MAX_TAKE } from "@/lib/vendure/queries";
 import { vendureShopQuery } from "@/lib/vendure/shop-fetch";
@@ -177,26 +178,22 @@ function parseCategoriesSectionCopy(activeChannel: unknown, requestLocale: strin
 
 const COLLECTION_COUNT_PAGE = VENDURE_SHOP_LIST_MAX_TAKE;
 
-async function accumulateDirectVariantCounts(locale: string, firstBranch: unknown): Promise<Map<string, number>> {
-  const merged = new Map<string, number>();
-  const first = validateFlattenedCollectionCounts(firstBranch);
-  first.map.forEach((v, k) => merged.set(k, v));
-
-  let fetched = merged.size;
-  const totalItems = first.totalItems;
-
-  while (totalItems > 0 && fetched < totalItems) {
-    const { data } = await vendureShopQuery<{
-      storefrontCollectionCounts?: unknown;
-    }>(GQL_COLLECTION_COUNTS_PAGE, { take: COLLECTION_COUNT_PAGE, skip: fetched }, locale);
-
-    const chunk = validateFlattenedCollectionCounts(data?.storefrontCollectionCounts);
-    if (chunk.map.size === 0) break;
-    chunk.map.forEach((v, k) => merged.set(k, v));
-    fetched += chunk.map.size;
-    if (chunk.map.size < COLLECTION_COUNT_PAGE) break;
+async function accumulateDirectVariantCounts(locale: string, firstBranch: unknown): Promise<Map<string, Set<string>>> {
+  const merged = new Map<string, Set<string>>();
+  // We compute the true product counts from the global search index instead of variant counts
+  const dualSearch = await getGlobalProductSearchHitsDual();
+  const baseHits = locale === "en" ? dualSearch.en : dualSearch.nb;
+  
+  for (const hit of baseHits) {
+    if (hit.collectionIds) {
+      const uniqueIds = new Set(hit.collectionIds);
+      for (const id of uniqueIds) {
+        if (!merged.has(id)) merged.set(id, new Set());
+        merged.get(id)!.add(hit.productId);
+      }
+    }
   }
-
+  
   return merged;
 }
 
@@ -501,19 +498,29 @@ export const getMegaMenuBothLocales = cache(async (): Promise<{ data: MegaMenuLo
   };
 });
 
-function sidebarProductCountsByRoot(
-  hits: SearchHitRaw[],
-  displayRoots: VCollectionNav[],
-  idToRoot: Map<string, string>,
-): { all: number; bySlug: Record<string, number> } {
-  const bySlug = Object.fromEntries(displayRoots.map((r) => [r.slug, 0])) as Record<string, number>;
-  for (const hit of hits) {
-    const rs = rootSlugFromCollectionIds(hit, idToRoot);
-    if (rs !== null && Object.prototype.hasOwnProperty.call(bySlug, rs)) {
-      bySlug[rs] += 1;
-    }
-  }
-  return { all: hits.length, bySlug };
+function buildSidebarTree(
+  nodes: VCollectionNav[],
+  locale: Locale,
+  nbNames: Map<string, string>,
+  enNames: Map<string, string>,
+  directVariantCounts: DirectVariantCounts,
+): SidebarTreeNode[] {
+  return nodes.map((node) => {
+    const storeNb = nbNames.get(node.slug) || node.name;
+    const storeEn = enNames.get(node.slug) || storeNb;
+    const { nb, en } = resolveCollectionDisplayNames(node.slug, storeNb, storeEn, node.name);
+    const name = locale === "en" ? en : nb;
+    
+    return {
+      id: node.id,
+      slug: node.slug,
+      name,
+      nameNb: nb,
+      nameEn: en,
+      count: rollupVariantTotalsFromCounts(node, directVariantCounts),
+      children: node.children ? buildSidebarTree(node.children, locale, nbNames, enNames, directVariantCounts) : [],
+    };
+  });
 }
 
 async function accumulateSearch(locale: string, baseInput: Record<string, unknown>): Promise<{
@@ -869,12 +876,10 @@ export const getProductsListingCatalog = cache(
 
       const sidebarHitsSource = globalDualSearch ?? dualSearch;
       const sidebarBaseHits = locale === "en" ? sidebarHitsSource.en : sidebarHitsSource.nb;
-      const sidebarNbBySlug = searchHitsBySlug(sidebarHitsSource.nb);
-      const sidebarEnBySlug = searchHitsBySlug(sidebarHitsSource.en);
-      const sidebarLocalizedHits = sidebarBaseHits.map((h) =>
-        applyLocaleToSearchHit(h, locale, sidebarNbBySlug, sidebarEnBySlug),
-      );
-      const sidebarCounts = sidebarProductCountsByRoot(sidebarLocalizedHits, displayRoots, idToRoot);
+      
+      const nbNamesFlattened = buildFlattenedTranslations(navNb.roots);
+      const enNamesFlattened = buildFlattenedTranslations(navEn.roots);
+      const sidebarTree = buildSidebarTree(displayRoots, locale, nbNamesFlattened, enNamesFlattened, nav.directVariantCounts);
 
       const allowedCollectionIds = activeNode ? new Set(extractAllDescendantIds(activeNode)) : null;
 
@@ -915,7 +920,7 @@ export const getProductsListingCatalog = cache(
           products,
           subcategories,
           sidebarRootSlug,
-          filterSidebarCounts: sidebarCounts,
+          sidebarTree,
           searchQuery,
           error: dualSearch.error ?? nav.error ?? null,
         },
