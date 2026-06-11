@@ -8,7 +8,7 @@ export type VendureCartLine = {
   productName: string;
   brand: string;
   spec: string;
-  /** Major currency units (NOK kr) excluding tax — matches PDP “eks. MVA”. */
+  /** Major currency units (NOK kr) including tax — matches PDP “inkl. MVA”. */
   unitPriceKr: number;
   lineTotalKr: number;
   imageSrc: string;
@@ -63,8 +63,15 @@ export function cartLinesFromActiveOrder(
       preview ? absoluteAssetUrl(preview) ?? "" : "";
 
     const lineTotalKr =
-      krFromMinor(line.discountedLinePrice ?? line.linePrice);
-    let unitPriceKr = krFromMinor(line.discountedUnitPrice);
+      krFromMinor(
+        line.discountedLinePriceWithTax ??
+          line.discountedLinePrice ??
+          line.linePriceWithTax ??
+          line.linePrice,
+      );
+    let unitPriceKr = krFromMinor(
+      line.discountedUnitPriceWithTax ?? line.discountedUnitPrice,
+    );
     if (!unitPriceKr && qty > 0) {
       unitPriceKr = lineTotalKr / qty;
     }
@@ -92,6 +99,13 @@ export function cartLinesFromActiveOrder(
 export function orderSubtotalExTaxKr(order: unknown): number {
   if (!order || typeof order !== "object") return 0;
   return krFromMinor((order as Record<string, unknown>).subTotal);
+}
+
+export function orderSubtotalWithTaxKr(order: unknown): number {
+  if (!order || typeof order !== "object") return 0;
+  const withTax = krFromMinor((order as Record<string, unknown>).subTotalWithTax);
+  if (withTax > 0) return withTax;
+  return orderSubtotalExTaxKr(order);
 }
 
 export function orderTotalQuantity(order: unknown): number {

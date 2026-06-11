@@ -7,8 +7,15 @@ import { Footer } from "@/components/site/Footer";
 import { MainNav } from "@/components/site/MainNav";
 import { PageHero } from "@/components/site/PageHero";
 import { TopBar } from "@/components/site/TopBar";
+import { AuthValidationAlert } from "@/components/account/AuthValidationAlert";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
+import {
+  emailNotRegisteredMessage,
+  invalidEmailFormatMessage,
+  passwordsDoNotMatchMessage,
+} from "@/lib/auth/auth-messages";
+import { isValidEmail } from "@/lib/auth/email-validation";
 import { shopLoginEmailPassword, shopRegisterAccount } from "@/lib/auth/shop-session-auth";
 import { useLocale } from "@/contexts/LocaleContext";
 import { tr } from "@/lib/locale";
@@ -57,8 +64,38 @@ function LoginPanel() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
+
+    if (!isValidEmail(email)) {
+      setErr(invalidEmailFormatMessage(lc));
+      return;
+    }
+
     setBusy(true);
-    const r = await shopLoginEmailPassword(email, password, lc);
+    let emailRegistered: boolean | null = null;
+    try {
+      const checkRes = await fetch("/api/auth/check-customer-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const checkData = (await checkRes.json()) as {
+        registered?: boolean;
+        lookupAvailable?: boolean;
+        error?: string;
+      };
+      if (checkData.lookupAvailable) {
+        emailRegistered = checkData.registered === true;
+        if (!checkData.registered) {
+          setBusy(false);
+          setErr(emailNotRegisteredMessage(lc));
+          return;
+        }
+      }
+    } catch {
+      emailRegistered = null;
+    }
+
+    const r = await shopLoginEmailPassword(email, password, lc, { emailRegistered });
     setBusy(false);
     if (!r.ok) {
       setErr(r.error);
@@ -69,7 +106,13 @@ function LoginPanel() {
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="space-y-5">
+    <>
+      {err ? (
+        <div className="mb-4">
+          <AuthValidationAlert>{err}</AuthValidationAlert>
+        </div>
+      ) : null}
+      <form onSubmit={(e) => void submit(e)} className="space-y-5">
       <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
         {tr(lc, "E-post", "Email")}
         <input
@@ -102,13 +145,11 @@ function LoginPanel() {
           className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
         />
       </div>
-      {err ? (
-        <p className="rounded-[2px] border border-red-600/35 bg-white px-3 py-2 text-[13px] text-red-800">{err}</p>
-      ) : null}
       <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
         {busy ? tr(lc, "Logger inn …", "Signing in …") : tr(lc, "Logg inn", "Sign in")}
       </button>
     </form>
+    </>
   );
 }
 
@@ -126,9 +167,10 @@ function RegisterPanel() {
   const [busy, setBusy] = useState(false);
 
   const validate = (): string | null => {
+    if (!isValidEmail(email)) return invalidEmailFormatMessage(lc);
     const pwdErr = validatePasswordComplexity(password, lc);
     if (pwdErr) return pwdErr;
-    if (password !== confirmPassword) return tr(lc, "Passordene stemmer ikke overens.", "Passwords do not match.");
+    if (password !== confirmPassword) return passwordsDoNotMatchMessage(lc);
     return null;
   };
 
@@ -145,17 +187,35 @@ function RegisterPanel() {
       { email, password, firstName, lastName, phoneNumber: phone || undefined },
       lc,
     );
-    setBusy(false);
     if (!r.ok) {
+      setBusy(false);
       setErr(r.error);
       return;
     }
+
+    try {
+      await fetch("/api/auth/send-registration-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, email, password, locale: lc }),
+      });
+    } catch {
+      // Registration succeeded; email failure should not block account access.
+    }
+
+    setBusy(false);
     await refresh();
-    router.replace("/konto");
+    router.replace("/");
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="space-y-4">
+    <>
+      {err ? (
+        <div className="mb-4">
+          <AuthValidationAlert>{err}</AuthValidationAlert>
+        </div>
+      ) : null}
+      <form onSubmit={(e) => void submit(e)} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <RegisterField label={tr(lc, "Fornavn", "First name")} value={firstName} onChange={setFirstName} required maxLength={100} />
         <RegisterField label={tr(lc, "Etternavn", "Last name")} value={lastName} onChange={setLastName} required maxLength={100} />
@@ -171,13 +231,11 @@ function RegisterPanel() {
         required
         maxLength={255}
       />
-      {err ? (
-        <p className="rounded-[2px] border border-red-600/35 px-3 py-2 text-[13px] text-red-800">{err}</p>
-      ) : null}
       <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
         {busy ? tr(lc, "Oppretter …", "Creating …") : tr(lc, "Registrer", "Register")}
       </button>
     </form>
+    </>
   );
 }
 

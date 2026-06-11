@@ -16,6 +16,12 @@ import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailableP
 import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import {
   cartSnapshotFromProduct,
+  productLocalizedCategory,
+  productLocalizedDescriptionHtml,
+  productLocalizedHighlights,
+  productLocalizedName,
+  productLocalizedPlainDescription,
+  productLocalizedPriceLabel,
   type LocalizedBulletBundle,
   type Product,
   type StorefrontVariantDetail,
@@ -79,19 +85,24 @@ export function ProductPageTemplate({
 
   const mainImageSrc = gallery[Math.min(activeImg, gallery.length - 1)] ?? product.img;
 
-  const displayPrice =
-    effectiveVariant?.priceLabelExVat ??
-    variants.find((x) => x.id === selectedVid)?.priceLabelExVat ??
-    product.price;
+  const localizedOptionName = (o: StorefrontVariantDetail["options"][number]) =>
+    tr(locale, o.nameNb ?? o.name, o.nameEn ?? o.name);
 
   const specLineBelowTitle =
     effectiveVariant?.sku
       ? `SKU · ${effectiveVariant.sku}`
       : effectiveVariant?.options?.length
-        ? effectiveVariant.options.map((o) => o.name).join(" · ")
+        ? effectiveVariant.options.map((o) => localizedOptionName(o)).join(" · ")
         : product.spec;
 
   const specsForTable = effectiveVariant?.specs?.length ? effectiveVariant.specs : product.specs;
+
+  const displayName = productLocalizedName(product, locale);
+  const displayCategory = productLocalizedCategory(product, locale);
+  const displayHighlights = productLocalizedHighlights(product, locale);
+  const displayDescriptionHtml = productLocalizedDescriptionHtml(product, locale);
+  const displayDescriptionPlain = productLocalizedPlainDescription(product, locale);
+  const displayPrice = productLocalizedPriceLabel(product, locale, effectiveVariant);
 
   const pickVariant = (id: string) => {
     setSelectedVid(id);
@@ -101,12 +112,18 @@ export function ProductPageTemplate({
   };
 
   const variantLabelOption = (v: StorefrontVariantDetail) =>
-    v.options?.length ? v.options.map((o) => o.name).join(" · ") || v.name : v.name || v.sku;
+    v.options?.length
+      ? v.options.map((o) => localizedOptionName(o)).join(" · ") ||
+        tr(locale, v.nameNb ?? v.name, v.nameEn ?? v.name)
+      : tr(locale, v.nameNb ?? v.name, v.nameEn ?? v.name) || v.sku;
 
   const handleAdd = async () => {
     clearLastActionError();
     setCartMessage(null);
-    const snap = cartSnapshotFromProduct(product, effectiveVariant);
+    const snap = cartSnapshotFromProduct(
+      { ...product, name: displayName, price: displayPrice },
+      effectiveVariant,
+    );
     const res = await addItemFromSnapshot(snap, qty);
     if (!res.ok) {
       setCartMessage(res.message);
@@ -130,11 +147,11 @@ export function ProductPageTemplate({
       </header>
 
       <PageHero
-        label={product.category}
-        title={product.name}
+        label={displayCategory}
+        title={displayName}
         crumbs={[
           { label: tr(locale, "Produkter", "Products"), to: "/produkter" },
-          { label: product.name },
+          { label: displayName },
         ]}
         bgImage={mainImageSrc}
         locale={locale}
@@ -155,7 +172,7 @@ export function ProductPageTemplate({
                 ) : (
                   <Image
                     src={mainImageSrc}
-                    alt={product.name}
+                    alt={displayName}
                     width={1024}
                     height={768}
                     className="h-full w-full object-cover transition-all duration-500"
@@ -200,7 +217,7 @@ export function ProductPageTemplate({
             <div className="lg:sticky lg:top-28">
               <p className="text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] font-semibold">{product.brand}</p>
               <h1 className="mt-3 text-[26px] lg:text-[32px] font-bold text-[var(--color-ink)] tracking-[-0.025em] leading-[1.1]">
-                {product.name}
+                {displayName}
               </h1>
               <p className="mt-3 font-mono text-[13px] text-[var(--color-muted)]">{specLineBelowTitle}</p>
 
@@ -224,7 +241,7 @@ export function ProductPageTemplate({
                     >
                       {variants.map((v) => (
                         <option key={v.id} value={v.id}>
-                          {variantLabelOption(v)} — {v.priceLabelExVat}
+                          {variantLabelOption(v)} — {productLocalizedPriceLabel(product, locale, v)}
                         </option>
                       ))}
                     </select>
@@ -238,13 +255,13 @@ export function ProductPageTemplate({
                 {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated in quote")}
               </p>
 
-              {product.descriptionHtml?.trim() ? (
+              {displayDescriptionHtml.trim() ? (
                 <div
                   className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
-                  dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+                  dangerouslySetInnerHTML={{ __html: displayDescriptionHtml }}
                 />
               ) : (
-                <p className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85">{product.description}</p>
+                <p className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85">{displayDescriptionPlain}</p>
               )}
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -319,7 +336,7 @@ export function ProductPageTemplate({
           </Reveal>
           <Reveal delay={0.1}>
             <ul className="space-y-4">
-              {product.highlights.map((h, i) => (
+              {displayHighlights.map((h, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-1 h-5 w-5 shrink-0 rounded-full bg-[var(--color-copper)] text-white inline-flex items-center justify-center">
                     <Check className="h-3 w-3" strokeWidth={3} />
@@ -411,7 +428,7 @@ export function ProductPageTemplate({
         </section>
       ) : null}
 
-      <ProductQuoteSection productSlug={product.slug} productName={product.name} locale={locale} quoteLines={quoteAsideLines} />
+      <ProductQuoteSection productSlug={product.slug} productName={displayName} locale={locale} quoteLines={quoteAsideLines} />
 
       {relatedProducts.length > 0 && (
         <section className="bg-[var(--color-stone)] py-16 lg:py-24">
@@ -428,21 +445,24 @@ export function ProductPageTemplate({
               </div>
             </Reveal>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-fr items-stretch gap-4 lg:gap-6">
-              {relatedProducts.map((p, i) => (
+              {relatedProducts.map((p, i) => {
+                const relatedName = productLocalizedName(p, locale);
+                const relatedPrice = productLocalizedPriceLabel(p, locale);
+                return (
                 <Reveal key={p.slug} delay={i * 0.06} className="h-full min-h-0">
                   <Link href={`/produkter/${p.slug}`} className="group card-elevated flex h-full min-h-0 flex-col">
                     <div className="aspect-[4/3] overflow-hidden bg-[var(--color-stone)]">
                       {typeof p.img === "string" ? (
                         <StorefrontRemoteImage
                           src={p.img}
-                          alt={p.name}
+                          alt={relatedName}
                           locale={locale}
                           className="transition-transform duration-700 group-hover:scale-[1.05]"
                         />
                       ) : (
                         <Image
                           src={p.img}
-                          alt={p.name}
+                          alt={relatedName}
                           loading="lazy"
                           width={1024}
                           height={768}
@@ -452,13 +472,14 @@ export function ProductPageTemplate({
                       )}
                     </div>
                     <div className="p-4">
-                      <h3 className="text-[14px] font-bold text-[var(--color-ink)] leading-snug">{p.name}</h3>
+                      <h3 className="text-[14px] font-bold text-[var(--color-ink)] leading-snug">{relatedName}</h3>
                       <p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] font-medium">{p.brand}</p>
-                      <p className="mt-2 text-[13px] font-bold text-[var(--color-copper)]">{p.price}</p>
+                      <p className="mt-2 text-[13px] font-bold text-[var(--color-copper)]">{relatedPrice}</p>
                     </div>
                   </Link>
                 </Reveal>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>

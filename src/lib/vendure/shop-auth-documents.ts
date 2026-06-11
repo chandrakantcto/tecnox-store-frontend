@@ -84,6 +84,12 @@ export const GQL_REGISTER_ISOLATED_CUSTOMER = /* GraphQL */ `
   }
 `;
 
+export const GQL_FORCE_PASSWORD_RESET = /* GraphQL */ `
+  mutation ForcePasswordReset($emailAddress: String!, $newPassword: String!, $secret: String!) {
+    forcePasswordReset(emailAddress: $emailAddress, newPassword: $newPassword, secret: $secret)
+  }
+`;
+
 export const GQL_LOGOUT = /* GraphQL */ `
   mutation ShopLogout {
     logout {

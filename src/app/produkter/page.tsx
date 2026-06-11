@@ -48,15 +48,21 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type PageProps = { searchParams?: Promise<{ cat?: string }> };
+type PageProps = { searchParams?: Promise<{ cat?: string; q?: string }> };
 
 export default async function ProdukterPage(props: PageProps) {
   const locale = await getServerLocale();
   const sp = (await props.searchParams) ?? {};
   const rawCat = typeof sp.cat === "string" ? sp.cat.trim() : "";
-  const cat = rawCat.length > 0 ? rawCat : null;
-  const { listing: lp, catalog, validatedCatSlug } = await getProductsListingCatalog(locale, cat);
-  if (cat !== null && validatedCatSlug !== cat) {
+  const rawQ = typeof sp.q === "string" ? sp.q.trim() : "";
+  const searchQuery = rawQ.length > 0 ? rawQ : null;
+  const cat = searchQuery ? null : rawCat.length > 0 ? rawCat : null;
+  const { listing: lp, catalog, validatedCatSlug } = await getProductsListingCatalog(
+    locale,
+    cat,
+    searchQuery,
+  );
+  if (!searchQuery && cat !== null && validatedCatSlug !== cat) {
     redirect(validatedCatSlug ? `/produkter?cat=${encodeURIComponent(validatedCatSlug)}` : "/produkter");
   }
 
@@ -84,7 +90,14 @@ export default async function ProdukterPage(props: PageProps) {
         bgImage={heroBg}
         locale={locale}
       />
-      <Products key={locale} withCategorySidebar locale={locale} catalog={catalog} initialCatSlug={validatedCatSlug} />
+      <Products
+        key={`${locale}-${validatedCatSlug ?? "all"}-${searchQuery ?? ""}`}
+        withCategorySidebar
+        locale={locale}
+        catalog={catalog}
+        initialCatSlug={validatedCatSlug}
+        initialSearchQuery={searchQuery}
+      />
       <Brands locale={locale} />
       <Newsletter locale={locale} />
       <Footer locale={locale} />

@@ -30,6 +30,10 @@ function catHref(collectionSlug: string) {
   return `/produkter?cat=${encodeURIComponent(collectionSlug)}`;
 }
 
+function refreshProdukterListing(pathname: string | null, router: ReturnType<typeof useRouter>) {
+  if (pathname === "/produkter") router.refresh();
+}
+
 function pickFirstSubWithChildren(mainCollectionId: string, megaMenuTree: MegaMain[]) {
   const main = megaMenuTree.find((m) => m.collectionId === mainCollectionId);
   return main?.subs.find((s) => s.children && s.children.length > 0)?.collectionId ?? null;
@@ -274,7 +278,10 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                           <Link
                             href={catHref(sub.id)}
                             onMouseEnter={() => setMegaSubId(sub.collectionId)}
-                            onClick={closeMega}
+                            onClick={() => {
+                              closeMega();
+                              refreshProdukterListing(pathname, router);
+                            }}
                             className={`flex items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
                               megaSubId === sub.collectionId
                                 ? "border-[var(--color-copper)] bg-[var(--color-stone)]/35 text-[var(--color-copper)] font-medium"
@@ -299,7 +306,10 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                           <li key={leaf.collectionId}>
                             <Link
                               href={catHref(leaf.id)}
-                              onClick={closeMega}
+                              onClick={() => {
+                                closeMega();
+                                refreshProdukterListing(pathname, router);
+                              }}
                               className="block px-4 py-2.5 text-[13px] text-[var(--color-ink)] border-l-[3px] border-transparent hover:border-[var(--color-copper)] hover:bg-[var(--color-stone)]/35 hover:text-[var(--color-copper)] transition-colors"
                             >
                               {leaf.label}
@@ -480,7 +490,10 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                                       <li key={leaf.collectionId}>
                                                         <Link
                                                           href={catHref(leaf.id)}
-                                                          onClick={() => setOpen(false)}
+                                                          onClick={() => {
+                                                            setOpen(false);
+                                                            refreshProdukterListing(pathname, router);
+                                                          }}
                                                           className="block rounded-[3px] px-3 py-2 text-[12.5px] text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
                                                         >
                                                           {leaf.label}
@@ -493,7 +506,10 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                             ) : (
                                               <Link
                                                 href={catHref(sub.id)}
-                                                onClick={() => setOpen(false)}
+                                                onClick={() => {
+                                                  setOpen(false);
+                                                  refreshProdukterListing(pathname, router);
+                                                }}
                                                 className="block rounded-[3px] px-3 py-2 text-[13px] text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
                                               >
                                                 {sub.label}

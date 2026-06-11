@@ -1,8 +1,11 @@
+"use client";
+
 import { Phone, Mail, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 
 const ITEMS = [
   {
@@ -34,7 +37,8 @@ type ServiceProps = {
   locale?: Locale;
 };
 
-export function Service({ hideReadMore = false, locale = "nb" }: ServiceProps) {
+export function Service({ hideReadMore = false, locale: _locale }: ServiceProps) {
+  const locale = useActiveLocale();
   return (
     <section className="grid lg:grid-cols-[1.1fr_1fr] bg-white border-y border-[var(--color-divider)]">
       {/* Left */}

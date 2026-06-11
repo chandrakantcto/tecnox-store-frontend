@@ -26,8 +26,10 @@ import {
 } from "@/lib/vendure/normalize";
 import { rollupVariantTotalsFromCounts, type DirectVariantCounts } from "@/lib/vendure/collection-variant-counts";
 import { GQL_COLLECTION_COUNTS_PAGE } from "@/lib/vendure/collection-counts-query";
-import { navCollectionsToMegaMains } from "@/lib/vendure/nav-tree";
+import { navCollectionsToMegaMainsForLocale } from "@/lib/vendure/nav-tree";
 import { rootCategoryLabelsForSlug } from "@/data/rootCategoryLabels";
+import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
+import { resolveProductDescriptions, resolveProductDisplayNames } from "@/data/productLabels";
 
 const EMPTY_CATEGORIES_COPY: CategoriesSectionCopy = {
   eyebrow: null,
@@ -238,7 +240,7 @@ function specFromHit(hit: SearchHitRaw): string {
   return d.length > 88 ? `${d.slice(0, 85)}…` : d;
 }
 
-/** Map search price (with tax minor) → display string for ex VAT NOK minor (seed used ex VAT øre). */
+/** Map search price (with tax minor) → display string for incl. VAT NOK minor. */
 function exVatMinorFromInclusive(minorInclusive: number | null): number | null {
   if (minorInclusive === null) return null;
   return Math.round(minorInclusive / 1.25);
@@ -312,28 +314,40 @@ function hitToCard(
     )}`;
 
   const minorInc = priceMinorFromHit(hit.priceWithTax);
-  const minorEx = exVatMinorFromInclusive(minorInc);
 
-  const descriptionNb = nbHit?.description?.trim() ?? hit.description?.trim() ?? "";
-  const descriptionEn = enHit?.description?.trim() ?? nbHit?.description?.trim() ?? hit.description?.trim() ?? "";
+  const descriptionNbRaw = nbHit?.description?.trim() ?? hit.description?.trim() ?? "";
+  const descriptionEnRaw =
+    enHit?.description?.trim() ?? nbHit?.description?.trim() ?? hit.description?.trim() ?? "";
+  const nameResolved = resolveProductDisplayNames(
+    hit.slug,
+    nbHit?.productName ?? hit.productName,
+    enHit?.productName ?? nbHit?.productName ?? hit.productName,
+    hit.productName,
+  );
+  const descResolved = resolveProductDescriptions(
+    hit.slug,
+    descriptionNbRaw,
+    descriptionEnRaw,
+    descriptionNbRaw || descriptionEnRaw,
+  );
 
   return {
     slug: hit.slug,
     name: localizedHit.productName,
-    nameNb: nbHit?.productName ?? hit.productName,
-    nameEn: enHit?.productName ?? nbHit?.productName ?? hit.productName,
+    nameNb: nameResolved.nb,
+    nameEn: nameResolved.en,
     brand: inferBrandFromSku(hit.sku),
     spec: specFromHit(localizedHit),
-    price: formatNOKExclVatFromMinor(locale, minorEx),
-    priceNumeric: typeof minorEx === "number" ? minorEx : 0,
+    price: formatNOKExclVatFromMinor(locale, minorInc),
+    priceNumeric: typeof minorInc === "number" ? minorInc : 0,
     category: locale === "en" ? categoryEn : categoryNb,
     categoryNb,
     categoryEn,
     categorySlug: rootSlug,
     img: imgUrl,
     description: localizedHit.description?.trim() ?? "",
-    descriptionNb,
-    descriptionEn,
+    descriptionNb: descResolved.nb,
+    descriptionEn: descResolved.en,
   };
 }
 
@@ -473,11 +487,12 @@ async function searchGrouped(locale: string, input: Record<string, unknown>) {
 export const getMegaMenuBothLocales = cache(async (): Promise<{ data: MegaMenuLocales; error?: string | null }> => {
   const [nbRaw, enRaw] = await Promise.all([fetchNavRoots("nb"), fetchNavRoots("en")]);
   const err = nbRaw.error ?? enRaw.error;
-  const nbMega = nbRaw.roots.length
-    ? navCollectionsToMegaMains(dedupeNavRootsBySlug(nbRaw.roots), nbRaw.directVariantCounts)
+  const structure = nbRaw.roots.length ? dedupeNavRootsBySlug(nbRaw.roots) : [];
+  const nbMega = structure.length
+    ? navCollectionsToMegaMainsForLocale(structure, nbRaw.directVariantCounts, nbRaw.roots, enRaw.roots, "nb")
     : [];
-  const enMega = enRaw.roots.length
-    ? navCollectionsToMegaMains(dedupeNavRootsBySlug(enRaw.roots), enRaw.directVariantCounts)
+  const enMega = structure.length
+    ? navCollectionsToMegaMainsForLocale(structure, nbRaw.directVariantCounts, nbRaw.roots, enRaw.roots, "en")
     : [];
 
   return {
@@ -664,8 +679,9 @@ function localizedCategoryTilesAnyDepth(
   const enNames = buildFlattenedTranslations(enRoots);
   
   return displayNodes.map((r) => {
-    const nb = nbNames.get(r.slug) || r.name;
-    const en = enNames.get(r.slug) || nb;
+    const storeNb = nbNames.get(r.slug) || r.name;
+    const storeEn = enNames.get(r.slug) || storeNb;
+    const { nb, en } = resolveCollectionDisplayNames(r.slug, storeNb, storeEn, r.name);
     const name = locale === "en" ? en : nb;
     
     return {
@@ -792,8 +808,13 @@ export const getHomepageCatalogPayload = cache(
 );
 
 export const getProductsListingCatalog = cache(
-  async (locale: Locale, requestedCatSlug: string | null): Promise<ProductsListingCatalogPayload> => {
+  async (
+    locale: Locale,
+    requestedCatSlug: string | null,
+    requestedSearchTerm?: string | null,
+  ): Promise<ProductsListingCatalogPayload> => {
     const lc = locale === "en" ? "en" : "nb";
+    const searchQuery = requestedSearchTerm?.trim() || null;
     const emptySection = (err?: string | null): ProductsSectionPayload => ({
       filters: locale === "en" ? ["All"] : ["Alle"],
       filterSlugs: [null],
@@ -802,11 +823,23 @@ export const getProductsListingCatalog = cache(
     });
 
     try {
-      const [nav, navNb, navEn, dualSearch] = await Promise.all([
+      const termSearchPromise = searchQuery
+        ? Promise.all([
+            accumulateSearch("nb", { term: searchQuery }),
+            accumulateSearch("en", { term: searchQuery }),
+          ]).then(([nbRes, enRes]) => ({
+            nb: nbRes.hits,
+            en: enRes.hits,
+            error: nbRes.error ?? enRes.error ?? null,
+          }))
+        : null;
+
+      const [nav, navNb, navEn, dualSearch, globalDualSearch] = await Promise.all([
         fetchNavRoots(lc),
         fetchNavRoots("nb"),
         fetchNavRoots("en"),
-        getGlobalProductSearchHitsDual(),
+        termSearchPromise ?? getGlobalProductSearchHitsDual(),
+        searchQuery ? getGlobalProductSearchHitsDual() : Promise.resolve(null),
       ]);
       if (!nav.roots.length) {
         const { error: megaErr } = await getMegaMenuBothLocales();
@@ -817,7 +850,7 @@ export const getProductsListingCatalog = cache(
         };
       }
 
-      const cat = requestedCatSlug?.trim();
+      const cat = searchQuery ? null : requestedCatSlug?.trim() || null;
       const activeNode = cat ? findNavNodeBySlug(nav.roots, cat) : null;
       const validatedCatSlug = activeNode ? activeNode.slug : null;
 
@@ -834,7 +867,14 @@ export const getProductsListingCatalog = cache(
       const enBySlug = searchHitsBySlug(dualSearch.en);
       const localizedHits = baseHits.map((h) => applyLocaleToSearchHit(h, locale, nbBySlug, enBySlug));
 
-      const sidebarCounts = sidebarProductCountsByRoot(localizedHits, displayRoots, idToRoot);
+      const sidebarHitsSource = globalDualSearch ?? dualSearch;
+      const sidebarBaseHits = locale === "en" ? sidebarHitsSource.en : sidebarHitsSource.nb;
+      const sidebarNbBySlug = searchHitsBySlug(sidebarHitsSource.nb);
+      const sidebarEnBySlug = searchHitsBySlug(sidebarHitsSource.en);
+      const sidebarLocalizedHits = sidebarBaseHits.map((h) =>
+        applyLocaleToSearchHit(h, locale, sidebarNbBySlug, sidebarEnBySlug),
+      );
+      const sidebarCounts = sidebarProductCountsByRoot(sidebarLocalizedHits, displayRoots, idToRoot);
 
       const allowedCollectionIds = activeNode ? new Set(extractAllDescendantIds(activeNode)) : null;
 
@@ -862,6 +902,8 @@ export const getProductsListingCatalog = cache(
         subcategories = localizedCategoryTilesAnyDepth(nav.roots, locale, navNb.roots, navEn.roots, nav.directVariantCounts);
       }
 
+      const sidebarRootSlug = activeNode ? (idToRoot.get(activeNode.id) ?? null) : null;
+
       return {
         listing: nav.productsListingPage,
         validatedCatSlug,
@@ -872,7 +914,9 @@ export const getProductsListingCatalog = cache(
           filterSlugs: [null as string | null, ...displayRoots.map((r) => r.slug)],
           products,
           subcategories,
+          sidebarRootSlug,
           filterSidebarCounts: sidebarCounts,
+          searchQuery,
           error: dualSearch.error ?? nav.error ?? null,
         },
       };

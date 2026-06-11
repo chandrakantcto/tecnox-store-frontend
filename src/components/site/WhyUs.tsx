@@ -1,7 +1,10 @@
+"use client";
+
 import { Compass, Truck, Wrench } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 
 const ITEMS = [
   {
@@ -27,7 +30,8 @@ const ITEMS = [
   },
 ];
 
-export function WhyUs({ locale = "nb" }: { locale?: Locale }) {
+export function WhyUs({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   return (
     <section className="bg-white border-y border-[var(--color-divider)] py-14 lg:py-20">
       <div className="container-x">

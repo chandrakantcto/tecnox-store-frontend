@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 
 const PERKS = [
   {
@@ -52,7 +55,8 @@ const OPENINGS = [
   },
 ];
 
-export function Careers({ locale = "nb" }: { locale?: Locale }) {
+export function Careers({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   return (
     <section className="bg-[var(--color-stone)] section-pad">
       <div className="container-x">

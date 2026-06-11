@@ -11,7 +11,7 @@ export function TopBar({
 }) {
   const locale = useActiveLocale();
   const delivery = tr(locale, "Levering til hele Norge", "Delivery across Norway");
-  const prices = tr(locale, "Alle priser eks. MVA", "All prices excl. VAT");
+  const prices = tr(locale, "Alle priser inkl. MVA", "All prices incl. VAT");
   const callUs = tr(locale, "Ring oss:", "Call us:");
 
   return (

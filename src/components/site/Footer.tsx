@@ -169,8 +169,8 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
           <p className="text-[14px] text-[#c4bbbd]">
             {tr(
               locale,
-              "© 2026 TECNOX AS  ·  Org.nr. 000 000 000  ·  Alle priser eks. MVA",
-              "© 2026 TECNOX AS  ·  Org.no. 000 000 000  ·  All prices excl. VAT",
+              "© 2026 TECNOX AS  ·  Org.nr. 000 000 000  ·  Alle priser inkl. MVA",
+              "© 2026 TECNOX AS  ·  Org.no. 000 000 000  ·  All prices incl. VAT",
             )}
           </p>
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">

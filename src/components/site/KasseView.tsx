@@ -487,8 +487,8 @@ export function KasseView({
                       <span>
                         {tr(
                           locale,
-                          "Jeg godkjenner at opplysningene brukes til å behandle og fakturere denne ordren gjennom TECNOX / Vendure.",
-                          "I agree my details may be used to process and fulfil this order through Tecnox / Vendure.",
+                          "Jeg godkjenner at opplysningene brukes til å behandle og fakturere denne ordren gjennom TECNOX .",
+                          "I agree my details may be used to process and fulfil this order through Tecnox .",
                         )}
                       </span>
                     </label>
@@ -552,7 +552,7 @@ export function KasseView({
                       <dd>{itemCount}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum eks. MVA", "Total ex VAT")}</dt>
+                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum inkl. MVA", "Total incl. VAT")}</dt>
                       <dd className="font-mono">kr {formatNOK(Math.round(subtotal))}</dd>
                     </div>
                   </dl>

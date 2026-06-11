@@ -1,8 +1,11 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { Reveal } from "./Reveal";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 
 type Brand = {
   name: string;
@@ -11,7 +14,8 @@ type Brand = {
 };
 
 
-export function Brands({ locale = "nb" }: { locale?: Locale }) {
+export function Brands({ locale: _locale }: { locale?: Locale }) {
+  const locale = useActiveLocale();
   return (
     <section className="bg-white py-14 lg:py-16 border-b border-[var(--color-divider)]">
       <div className="container-x">
