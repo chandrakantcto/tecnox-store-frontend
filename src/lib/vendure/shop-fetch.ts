@@ -26,7 +26,9 @@ export async function vendureShopQuery<T>(
     };
   }
   try {
-    const res = await fetch(cfg.shopApiUrl, {
+    const isMutation = query.trim().startsWith("mutation");
+    
+    const fetchOptions: RequestInit = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,8 +36,10 @@ export async function vendureShopQuery<T>(
         "vendure-language-code": vendureLanguageCode(locale),
       },
       body: JSON.stringify({ query, variables }),
-      cache: "no-store",
-    });
+      ...(isMutation ? { cache: "no-store" } : { next: { revalidate: 60 } })
+    };
+
+    const res = await fetch(cfg.shopApiUrl, fetchOptions);
 
     const json = (await res.json()) as GraphQlResponse<T>;
     if (!res.ok) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
 import { isMissingStorefrontImage } from "@/lib/storefront-image";
 import type { Locale } from "@/lib/locale";
@@ -30,6 +31,8 @@ export function StorefrontRemoteImage({
   loading = "lazy",
   fill = false,
   compact = false,
+  priority,
+  sizes,
 }: StorefrontRemoteImageProps) {
   const [failed, setFailed] = useState(false);
   const missing = isMissingStorefrontImage(src) || failed;
@@ -45,13 +48,12 @@ export function StorefrontRemoteImage({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src={src!}
       alt={alt}
-      loading={loading}
-      width={fill ? undefined : width}
-      height={fill ? undefined : height}
+      priority={priority}
+      sizes={sizes}
+      {...(fill ? { fill: true } : { width, height })}
       onError={() => setFailed(true)}
       className={cn(
         fill ? "absolute inset-0 h-full w-full object-cover" : "h-full w-full object-cover",
