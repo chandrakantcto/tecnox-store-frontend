@@ -7,25 +7,45 @@ import { Footer } from "@/components/site/Footer";
 import { MainNav } from "@/components/site/MainNav";
 import { PageHero } from "@/components/site/PageHero";
 import { TopBar } from "@/components/site/TopBar";
-import { AuthValidationAlert } from "@/components/account/AuthValidationAlert";
+import { AuthFieldGroup } from "@/components/account/AuthFieldGroup";
+import { PasswordRequirementsHint } from "@/components/account/PasswordRequirementsHint";
+import { TermsAcceptanceCheckbox } from "@/components/account/TermsAcceptanceCheckbox";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
 import {
+  emailAlreadyRegisteredMessage,
   emailNotRegisteredMessage,
+  incorrectPasswordMessage,
   invalidEmailFormatMessage,
-  passwordsDoNotMatchMessage,
+  invalidPhoneNumberMessage,
+  loginFailedMessage,
+  requiredEmailMessage,
+  requiredFirstNameMessage,
+  requiredLastNameMessage,
+  requiredPasswordMessage,
+  termsNotAcceptedMessage,
 } from "@/lib/auth/auth-messages";
-import { isValidEmail } from "@/lib/auth/email-validation";
+import {
+  isBlankInput,
+  isValidEmail,
+  isValidPhoneDigits,
+  normalizeAuthEmail,
+} from "@/lib/auth/email-validation";
 import { shopLoginEmailPassword, shopRegisterAccount } from "@/lib/auth/shop-session-auth";
 import { useLocale } from "@/contexts/LocaleContext";
 import { tr } from "@/lib/locale";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
+import { firstFieldError } from "@/lib/auth/field-errors";
 import { validatePasswordComplexity } from "@/lib/auth/validate";
 import heroImg from "@/assets/hero-combi.jpg";
+import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
 
 const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
 
 export type AuthTab = "login" | "register";
+
+type LoginFieldKey = "email" | "password";
+type RegisterFieldKey = "firstName" | "lastName" | "email" | "phone" | "password" | "terms";
 
 function AuthTabs({ active }: { active: AuthTab }) {
   const { locale: lc } = useLocale();
@@ -58,15 +78,52 @@ function LoginPanel() {
   const { refresh } = useShopAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<LoginFieldKey, string>>>({});
   const [busy, setBusy] = useState(false);
+
+  const clearFieldError = (field: LoginFieldKey) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const mapLoginApiError = (error: string): Partial<Record<LoginFieldKey, string>> => {
+    if (error === emailNotRegisteredMessage(lc) || error === invalidEmailFormatMessage(lc)) {
+      return { email: error };
+    }
+    if (error === incorrectPasswordMessage(lc) || error === loginFailedMessage(lc)) {
+      return { password: error };
+    }
+    return { password: error };
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErr(null);
+    setFieldErrors({});
 
-    if (!isValidEmail(email)) {
-      setErr(invalidEmailFormatMessage(lc));
+    const trimmedEmail = email.trim();
+    setEmail(trimmedEmail);
+
+    const errors = firstFieldError<LoginFieldKey>([
+      {
+        field: "email",
+        message: isBlankInput(trimmedEmail)
+          ? requiredEmailMessage(lc)
+          : !isValidEmail(trimmedEmail)
+            ? invalidEmailFormatMessage(lc)
+            : null,
+      },
+      {
+        field: "password",
+        message: isBlankInput(password) ? requiredPasswordMessage(lc) : null,
+      },
+    ]);
+
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -76,7 +133,7 @@ function LoginPanel() {
       const checkRes = await fetch("/api/auth/check-customer-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: trimmedEmail }),
       });
       const checkData = (await checkRes.json()) as {
         registered?: boolean;
@@ -87,7 +144,7 @@ function LoginPanel() {
         emailRegistered = checkData.registered === true;
         if (!checkData.registered) {
           setBusy(false);
-          setErr(emailNotRegisteredMessage(lc));
+          setFieldErrors({ email: emailNotRegisteredMessage(lc) });
           return;
         }
       }
@@ -95,10 +152,10 @@ function LoginPanel() {
       emailRegistered = null;
     }
 
-    const r = await shopLoginEmailPassword(email, password, lc, { emailRegistered });
+    const r = await shopLoginEmailPassword(trimmedEmail, password, lc, { emailRegistered });
     setBusy(false);
     if (!r.ok) {
-      setErr(r.error);
+      setFieldErrors(mapLoginApiError(r.error));
       return;
     }
     await refresh();
@@ -106,37 +163,39 @@ function LoginPanel() {
   };
 
   return (
-    <>
-      {err ? (
-        <div className="mb-4">
-          <AuthValidationAlert>{err}</AuthValidationAlert>
-        </div>
-      ) : null}
-      <form onSubmit={(e) => void submit(e)} className="space-y-5">
-      <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
-        {tr(lc, "E-post", "Email")}
+    <form onSubmit={(e) => void submit(e)} className="space-y-5">
+      <AuthFieldGroup
+        label={tr(lc, "E-post", "Email")}
+        error={fieldErrors.email}
+      >
         <input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            clearFieldError("email");
+          }}
+          onBlur={() => setEmail((v) => v.trim())}
           required
           maxLength={255}
           className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px]"
         />
-      </label>
-      <div>
-        <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
-          <span>{tr(lc, "Passord", "Password")}</span>
-          <Link
-            href="/forgot-password"
-            className="text-[14px] normal-case tracking-normal text-[var(--color-copper)] hover:underline"
-          >
-            {tr(lc, "Glemt passord?", "Forgot password?")}
-          </Link>
-        </div>
+      </AuthFieldGroup>
+      <AuthFieldGroup
+        label={
+          <div className="flex items-center justify-between text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
+            <span>{tr(lc, "Passord", "Password")}</span>
+          
+          </div>
+        }
+        error={fieldErrors.password}
+      >
         <PasswordWithToggle
           value={password}
-          onChange={setPassword}
+          onChange={(v) => {
+            setPassword(v);
+            clearFieldError("password");
+          }}
           required
           autoComplete="current-password"
           maxLength={255}
@@ -144,12 +203,20 @@ function LoginPanel() {
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
         />
-      </div>
-      <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
+        
+      </AuthFieldGroup>
+      <div className="text-right">
+      <Link
+              href="/forgot-password"
+              className="text-[14px] normal-case tracking-normal text-[var(--color-copper)] hover:underline"
+            >
+              {tr(lc, "Glemt passord?", "Forgot password?")}
+            </Link>
+        </div>
+      <button type="submit" disabled={busy} className="btn-primary cursor-pointer w-full disabled:opacity-60">
         {busy ? tr(lc, "Logger inn …", "Signing in …") : tr(lc, "Logg inn", "Sign in")}
       </button>
     </form>
-    </>
   );
 }
 
@@ -162,34 +229,105 @@ function RegisterPanel() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<RegisterFieldKey, string>>>({});
   const [busy, setBusy] = useState(false);
 
-  const validate = (): string | null => {
-    if (!isValidEmail(email)) return invalidEmailFormatMessage(lc);
-    const pwdErr = validatePasswordComplexity(password, lc);
-    if (pwdErr) return pwdErr;
-    if (password !== confirmPassword) return passwordsDoNotMatchMessage(lc);
-    return null;
+  const clearFieldError = (field: RegisterFieldKey) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const collectFieldErrors = (): Partial<Record<RegisterFieldKey, string>> => {
+    const trimmedFirst = firstName.trim();
+    const trimmedLast = lastName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+    const pwdErr = isBlankInput(password) ? null : validatePasswordComplexity(password, lc);
+
+    return firstFieldError<RegisterFieldKey>([
+      { field: "firstName", message: isBlankInput(trimmedFirst) ? requiredFirstNameMessage(lc) : null },
+      { field: "lastName", message: isBlankInput(trimmedLast) ? requiredLastNameMessage(lc) : null },
+      {
+        field: "email",
+        message: isBlankInput(trimmedEmail)
+          ? requiredEmailMessage(lc)
+          : !isValidEmail(trimmedEmail)
+            ? invalidEmailFormatMessage(lc)
+            : null,
+      },
+      { field: "phone", message: !isValidPhoneDigits(trimmedPhone) ? invalidPhoneNumberMessage(lc) : null },
+      {
+        field: "password",
+        message: isBlankInput(password) ? requiredPasswordMessage(lc) : pwdErr,
+      },
+      { field: "terms", message: !termsAccepted ? termsNotAcceptedMessage(lc) : null },
+    ]);
+  };
+
+  const mapRegisterApiError = (error: string): Partial<Record<RegisterFieldKey, string>> => {
+    if (error === emailAlreadyRegisteredMessage(lc)) return { email: error };
+    return { email: error };
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErr(null);
-    const ve = validate();
-    if (ve) {
-      setErr(ve);
+    setFieldErrors({});
+
+    const trimmedFirst = firstName.trim();
+    const trimmedLast = lastName.trim();
+    const trimmedEmail = normalizeAuthEmail(email);
+    const trimmedPhone = phone.trim();
+
+    setFirstName(trimmedFirst);
+    setLastName(trimmedLast);
+    setEmail(trimmedEmail);
+    setPhone(trimmedPhone);
+
+    const errors = collectFieldErrors();
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
       return;
     }
+
     setBusy(true);
+
+    try {
+      const checkRes = await fetch("/api/auth/check-customer-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmedEmail }),
+      });
+      const checkData = (await checkRes.json()) as {
+        registered?: boolean;
+        lookupAvailable?: boolean;
+      };
+      if (checkData.lookupAvailable && checkData.registered) {
+        setBusy(false);
+        setFieldErrors({ email: emailAlreadyRegisteredMessage(lc) });
+        return;
+      }
+    } catch {
+      // Proceed when lookup is unavailable; Vendure may still reject duplicates.
+    }
+
     const r = await shopRegisterAccount(
-      { email, password, firstName, lastName, phoneNumber: phone || undefined },
+      {
+        email: trimmedEmail,
+        password,
+        firstName: trimmedFirst,
+        lastName: trimmedLast,
+        phoneNumber: trimmedPhone || undefined,
+      },
       lc,
     );
     if (!r.ok) {
       setBusy(false);
-      setErr(r.error);
+      setFieldErrors(mapRegisterApiError(r.error));
       return;
     }
 
@@ -197,7 +335,12 @@ function RegisterPanel() {
       await fetch("/api/auth/send-registration-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, password, locale: lc }),
+        body: JSON.stringify({
+          firstName: trimmedFirst,
+          lastName: trimmedLast,
+          email: trimmedEmail,
+          locale: lc,
+        }),
       });
     } catch {
       // Registration succeeded; email failure should not block account access.
@@ -209,33 +352,89 @@ function RegisterPanel() {
   };
 
   return (
-    <>
-      {err ? (
-        <div className="mb-4">
-          <AuthValidationAlert>{err}</AuthValidationAlert>
-        </div>
-      ) : null}
-      <form onSubmit={(e) => void submit(e)} className="space-y-4">
+    <form onSubmit={(e) => void submit(e)} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <RegisterField label={tr(lc, "Fornavn", "First name")} value={firstName} onChange={setFirstName} required maxLength={100} />
-        <RegisterField label={tr(lc, "Etternavn", "Last name")} value={lastName} onChange={setLastName} required maxLength={100} />
+        <RegisterField
+          label={tr(lc, "Fornavn", "First name")}
+          value={firstName}
+          error={fieldErrors.firstName}
+          onChange={(v) => {
+            setFirstName(v);
+            clearFieldError("firstName");
+          }}
+          onBlurTrim
+          required
+          maxLength={100}
+        />
+        <RegisterField
+          label={tr(lc, "Etternavn", "Last name")}
+          value={lastName}
+          error={fieldErrors.lastName}
+          onChange={(v) => {
+            setLastName(v);
+            clearFieldError("lastName");
+          }}
+          onBlurTrim
+          required
+          maxLength={100}
+        />
       </div>
-      <RegisterField label={tr(lc, "E-post", "Email")} type="email" value={email} onChange={setEmail} required maxLength={255} />
-      <RegisterField label={tr(lc, "Telefon (valgfritt)", "Phone (optional)")} value={phone} onChange={setPhone} maxLength={20} />
-      <RegisterField label={tr(lc, "Passord", "Password")} type="password" value={password} onChange={setPassword} required maxLength={255} />
       <RegisterField
-        label={tr(lc, "Gjenta passord", "Confirm password")}
-        type="password"
-        value={confirmPassword}
-        onChange={setConfirmPassword}
+        label={tr(lc, "E-post", "Email")}
+        type="email"
+        value={email}
+        error={fieldErrors.email}
+        onChange={(v) => {
+          setEmail(v);
+          clearFieldError("email");
+        }}
+        onBlurTrim
         required
         maxLength={255}
       />
-      <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
+      <AuthFieldGroup
+        label={tr(lc, "Telefon (valgfritt)", "Phone (optional)")}
+        error={fieldErrors.phone}
+        labelClassName="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1"
+      >
+        <PhoneInputWithCountry
+          value={phone}
+          onChange={(v) => {
+            setPhone(v);
+            clearFieldError("phone");
+          }}
+          hasError={Boolean(fieldErrors.phone)}
+          className="mt-2"
+        />
+      </AuthFieldGroup>
+      <div>
+        <RegisterField
+          label={tr(lc, "Passord", "Password")}
+          type="password"
+          value={password}
+          error={fieldErrors.password}
+          onChange={(v) => {
+            setPassword(v);
+            clearFieldError("password");
+          }}
+          required
+          maxLength={255}
+        />
+        <PasswordRequirementsHint />
+      </div>
+      <AuthFieldGroup error={fieldErrors.terms}>
+        <TermsAcceptanceCheckbox
+          checked={termsAccepted}
+          onChange={(v) => {
+            setTermsAccepted(v);
+            clearFieldError("terms");
+          }}
+        />
+      </AuthFieldGroup>
+      <button type="submit" disabled={busy} className="btn-primary cursor-pointer w-full disabled:opacity-60">
         {busy ? tr(lc, "Oppretter …", "Creating …") : tr(lc, "Registrer", "Register")}
       </button>
     </form>
-    </>
   );
 }
 
@@ -243,22 +442,27 @@ function RegisterField({
   label,
   value,
   onChange,
+  error,
   type = "text",
   required,
   maxLength,
+  onBlurTrim,
+  inputMode,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  error?: string | null;
   type?: string;
   required?: boolean;
   maxLength?: number;
+  onBlurTrim?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 }) {
   const { locale: lc } = useLocale();
   const baseInputClass = "mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px]";
   return (
-    <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1">
-      {label}
+    <AuthFieldGroup label={label} error={error} labelClassName="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1">
       {type === "password" ? (
         <PasswordWithToggle
           value={value}
@@ -276,11 +480,13 @@ function RegisterField({
           value={value}
           required={required}
           maxLength={maxLength}
+          inputMode={inputMode}
           onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlurTrim ? () => onChange(value.trim()) : undefined}
           className={baseInputClass}
         />
       )}
-    </label>
+    </AuthFieldGroup>
   );
 }
 

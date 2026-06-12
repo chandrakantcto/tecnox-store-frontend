@@ -16,12 +16,14 @@ import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { checkoutFormHasErrors, validateCheckoutForm, type CheckoutFormValues } from "@/lib/checkout/validate";
 import { CHECKOUT_COUNTRIES, labelForCheckoutCountry } from "@/lib/checkout/countries";
+import { sendCheckoutEmails } from "@/lib/checkout/send-checkout-emails";
 import { runVendureGuestCheckout } from "@/lib/checkout/vendure-guest-checkout";
 import { loginOrRegisterAfterCheckout } from "@/lib/auth/shop-session-auth";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
 import { Check, ShieldCheck, Truck, Phone } from "lucide-react";
 import heroImg from "@/assets/hero-combi.jpg";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
+import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
 
 const emptyForm: CheckoutFormValues = {
   firstName: "",
@@ -74,6 +76,10 @@ export function KasseView({
   const [confirmed, setConfirmed] = useState(false);
   const [placedOrderCode, setPlacedOrderCode] = useState<string>("");
   const [placedPaymentSkipped, setPlacedPaymentSkipped] = useState(false);
+  const [placedRecipient, setPlacedRecipient] = useState("");
+  const [placedEmail, setPlacedEmail] = useState("");
+  const [placedAddress, setPlacedAddress] = useState("");
+  const [placedTotalKr, setPlacedTotalKr] = useState(0);
   const [postAuthBusy, setPostAuthBusy] = useState(false);
   const [postAuthError, setPostAuthError] = useState<string | null>(null);
 
@@ -116,32 +122,13 @@ export function KasseView({
 
     setSubmitting(true);
     try {
-      const result = await runVendureGuestCheckout(form, {
-        locale: locale === "en" ? "en" : "nb",
-        skipSetCustomer: isLoggedIn,
-      });
-      if (!result.ok) {
-        setSubmitError(result.error);
-        setSubmitting(false);
-        return;
-      }
-      clearCartOptimistic();
-      await refresh();
-      setSubmitting(false);
+      const orderLinesSnapshot = [...lines];
+      let checkoutAuthMode: "login" | "signup" = "login";
+      let accountCreated = false;
+      let skipSetCustomer = isLoggedIn;
 
-      if (isLoggedIn) {
-        await refreshAuth();
-        router.replace(`/konto/ordrer/${encodeURIComponent(result.orderId)}`);
-        return;
-      }
-
-      setPlacedOrderCode(result.orderCode);
-      setPlacedPaymentSkipped(Boolean(result.paymentSkipped));
-      setPostAuthError(null);
-      setPostAuthBusy(true);
-      setConfirmed(true);
-
-      void (async () => {
+      if (!isLoggedIn) {
+        setPostAuthBusy(true);
         const auth = await loginOrRegisterAfterCheckout(
           {
             email: form.email,
@@ -152,14 +139,69 @@ export function KasseView({
           },
           locale === "en" ? "en" : "nb",
         );
-        await refreshAuth();
         setPostAuthBusy(false);
         if (!auth.ok) {
-          setPostAuthError(auth.error);
+          setSubmitError(auth.error);
+          setSubmitting(false);
           return;
         }
-        router.replace(`/konto/ordrer/${encodeURIComponent(result.orderId)}`);
-      })();
+        checkoutAuthMode = auth.authMode;
+        accountCreated = auth.accountCreated;
+        skipSetCustomer = true;
+        await refreshAuth();
+      } else {
+        await refreshAuth();
+      }
+
+      const result = await runVendureGuestCheckout(form, {
+        locale: locale === "en" ? "en" : "nb",
+        skipSetCustomer,
+      });
+      if (!result.ok) {
+        setSubmitError(result.error);
+        setSubmitting(false);
+        return;
+      }
+
+      const checkoutEmailPayload = {
+        locale: locale === "en" ? "en" : "nb",
+        form: { ...form },
+        orderCode: result.orderCode,
+        lines: orderLinesSnapshot,
+        subtotalKr: Math.round(subtotal),
+      };
+
+      const recipientName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
+      const countryEntry = CHECKOUT_COUNTRIES.find((c) => c.code === form.countryCode.trim().toUpperCase());
+      const countryLabel = countryEntry
+        ? labelForCheckoutCountry(locale, countryEntry.nb, countryEntry.en)
+        : form.countryCode.trim().toUpperCase();
+      const addressLine = [
+        form.addressLine1.trim(),
+        [form.postalCode.trim(), form.city.trim()].filter(Boolean).join(" "),
+        countryLabel,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      await sendCheckoutEmails({
+        ...checkoutEmailPayload,
+        authMode: checkoutAuthMode,
+        accountCreated,
+      });
+
+      clearCartOptimistic();
+      await refresh();
+      setSubmitting(false);
+
+      setPlacedOrderCode(result.orderCode);
+      setPlacedPaymentSkipped(Boolean(result.paymentSkipped));
+      setPlacedRecipient(recipientName);
+      setPlacedEmail(form.email.trim().toLowerCase());
+      setPlacedAddress(addressLine);
+      setPlacedTotalKr(Math.round(subtotal));
+      setPostAuthError(null);
+      setConfirmed(true);
     } catch {
       setSubmitError(tr(locale, "Uventet feil — prøv igjen.", "Unexpected error — please try again."));
       setSubmitting(false);
@@ -186,27 +228,75 @@ export function KasseView({
         <section className="container-x py-16 lg:py-24">
           <Reveal>
             <div className="mx-auto max-w-xl text-center">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-copper)] text-white">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white">
                 <Check className="h-7 w-7" strokeWidth={2.5} />
               </div>
-              <h2 className="display-h3 mt-6 text-[var(--color-ink)]">{tr(locale, "Takk for bestillingen.", "Thank you for your order.")}</h2>
+              <h2 className="display-h3 mt-6 text-[var(--color-ink)]">
+                {tr(locale, "Takk for bestillingen!", "Thank you for your order!")}
+              </h2>
               <p className="mt-4 text-[15px] leading-[1.65] text-[var(--color-muted)]">
-                {placedPaymentSkipped ?
-                  tr(
-                    locale,
-                    "Automatisk betaling ble hoppet over (ingen nettbetaling for kanalen eller flagg satt). Ordren kan fullføres manuelt i Admin.",
-                    "Online payment was skipped (no gateway on the channel or skip flag enabled). Complete the order manually in Admin if needed.",
-                  )
-                : tr(
-                    locale,
-                    "Ordren er lagt til i Vendure med valgt offline/manuell betalingsflyt.",
-                    "The order has been created in Vendure using your offline/manual payment flow.",
-                  )}
+                {placedPaymentSkipped
+                  ? tr(
+                      locale,
+                      "Ordren er registrert med valgt offline/manuell betalingsflyt.",
+                      "The order has been placed with the selected offline/manual payment flow.",
+                    )
+                  : tr(
+                      locale,
+                      "Ordren er registrert i Vendure.",
+                      "The order has been created in Vendure.",
+                    )}{" "}
+                {placedEmail ? (
+                  <>
+                    {tr(locale, "Ordrebekreftelse er sendt til", "An order confirmation has been sent to")}{" "}
+                    <span className="font-semibold text-[var(--color-ink)]">{placedEmail}</span>.
+                  </>
+                ) : null}
               </p>
-              <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                {tr(locale, "Ordrekode", "Order code")}
+
+              <div className="mx-auto mt-8 max-w-md rounded-[3px] border border-[var(--color-divider)] bg-[var(--color-stone)]/40 px-5 py-5 text-left text-[14px]">
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-muted)]">
+                      {tr(locale, "Ordrenummer", "Order reference")}
+                    </dt>
+                    <dd className="mt-1 font-mono text-[15px] font-bold text-[var(--color-ink)]">{placedOrderCode}</dd>
+                  </div>
+                  {placedRecipient ? (
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-muted)]">
+                        {tr(locale, "Mottaker", "Recipient")}
+                      </dt>
+                      <dd className="mt-1 text-[var(--color-ink)]">{placedRecipient}</dd>
+                    </div>
+                  ) : null}
+                  {placedAddress ? (
+                    <div>
+                      <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-muted)]">
+                        {tr(locale, "Adresse", "Address")}
+                      </dt>
+                      <dd className="mt-1 text-[var(--color-ink)]">{placedAddress}</dd>
+                    </div>
+                  ) : null}
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-muted)]">
+                      {tr(locale, "Totalbeløp (inkl. MVA)", "Total amount (incl. VAT)")}
+                    </dt>
+                    <dd className="mt-1 font-mono text-[18px] font-bold text-[var(--color-copper)]">
+                      kr {formatNOK(placedTotalKr)}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              <p className="mt-6 text-[13px] text-[var(--color-muted)]">
+                {tr(
+                  locale,
+                  "Vi behandler ordren din så snart som mulig og tar kontakt ved behov.",
+                  "Our team will process your order promptly and contact you if needed.",
+                )}
               </p>
-              <p className="mt-1 font-mono text-[18px] font-bold text-[var(--color-ink)]">{placedOrderCode}</p>
+
               {postAuthBusy ? (
                 <p className="mt-4 text-[14px] text-[var(--color-muted)]">
                   {tr(
@@ -219,24 +309,29 @@ export function KasseView({
               {postAuthError ? (
                 <div className="mx-auto mt-6 max-w-md rounded-[3px] border border-amber-800/30 bg-amber-50 px-4 py-3 text-left text-[14px] text-amber-950">
                   <p className="font-semibold">
-                    {tr(locale, "Bestillingen er lagret, men automatisk innlogging feilet.", "Your order is saved, but automatic sign-in failed.")}
+                    {tr(
+                      locale,
+                      "Bestillingen er lagret, men automatisk innlogging feilet.",
+                      "Your order is saved, but automatic sign-in failed.",
+                    )}
                   </p>
                   <p className="mt-2">{postAuthError}</p>
-                  <Link className="mt-3 inline-block font-medium text-[var(--color-copper)] underline-offset-2 hover:underline" href="/logg-inn">
+                  <Link
+                    className="mt-3 inline-block font-medium text-[var(--color-copper)] underline-offset-2 hover:underline"
+                    href="/logg-inn"
+                  >
                     {tr(locale, "Logg inn manuelt", "Sign in manually")}
                   </Link>
                 </div>
               ) : null}
+
               <div className="mt-10 flex flex-wrap justify-center gap-3">
+                <button type="button" onClick={() => router.push("/produkter")} className="btn-primary">
+                  {tr(locale, "Fortsett å handle", "Continue shopping")}
+                </button>
                 <Link href="/konto/ordrer" className="btn-outline-dark">
                   {tr(locale, "Se ordrehistorikk", "View order history")}
                 </Link>
-                <Link href="/" className="btn-primary">
-                  {tr(locale, "Til forsiden", "Back to homepage")}
-                </Link>
-                <button type="button" onClick={() => router.push("/produkter")} className="btn-outline-dark">
-                  {tr(locale, "Fortsett å handle", "Continue shopping")}
-                </button>
               </div>
             </div>
           </Reveal>
@@ -338,16 +433,21 @@ export function KasseView({
                         disabled={submitting || isLoggedIn}
                         maxLength={255}
                       />
-                      <FieldInput
-                        label={tr(locale, "Telefon", "Phone")}
-                        required
-                        type="tel"
-                        value={form.phone}
-                        onChange={(v) => update({ phone: v })}
-                        error={fieldErrors.phone}
-                        disabled={submitting}
-                        maxLength={20}
-                      />
+                      <div>
+                        <label className="mb-2 block text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
+                          {tr(locale, "Telefon", "Phone")} *
+                        </label>
+                        <PhoneInputWithCountry
+                          value={form.phone}
+                          onChange={(v) => update({ phone: v })}
+                          disabled={submitting}
+                          required
+                          hasError={Boolean(fieldErrors.phone)}
+                        />
+                        {fieldErrors.phone ? (
+                          <p className="mt-2 text-[12px] text-red-700">{fieldErrors.phone}</p>
+                        ) : null}
+                      </div>
                     </div>
                   </Section>
 
@@ -484,7 +584,7 @@ export function KasseView({
                         disabled={submitting}
                         className="mt-0.5 h-4 w-4 accent-[var(--color-copper)]"
                       />
-                      <span>
+                      <span className="cursor-pointer">
                         {tr(
                           locale,
                           "Jeg godkjenner at opplysningene brukes til å behandle og fakturere denne ordren gjennom TECNOX .",
@@ -500,7 +600,7 @@ export function KasseView({
                   <button
                     type="submit"
                     disabled={submitting || authInitializing}
-                    className="btn-primary w-full sm:w-auto disabled:opacity-60"
+                    className="btn-primary w-full sm:w-auto disabled:opacity-60 cursor-pointer"
                   >
                     {submitting ? tr(locale, "Sender bestilling …", "Placing order …") : authInitializing ? tr(locale, "Laster …", "Loading …") : tr(locale, "Fullfør bestilling", "Complete order")}
                   </button>

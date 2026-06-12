@@ -27,8 +27,8 @@ export function buildPasswordChangedEmailHtml(email: string, baseUrl: string, lo
               </p>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;background-color:#fafafa;border:1px solid #ececec;border-radius:6px;">
                 <tr>
-                  <td style="padding:16px 18px;font-size:14px;line-height:1.8;color:#333333;">
-                    <strong>${tr(locale, "E-post", "Email")}</strong> <a href="mailto:${safeEmail}" style="color:${BRAND_BLUE};text-decoration:none;">${safeEmail}</a>
+                  <td style="padding:16px 18px;font-size:14px;line-height:2;color:#333333;">
+                    <strong>${tr(locale, "E-post", "Email")}:</strong> <a href="mailto:${safeEmail}" style="color:${BRAND_BLUE};text-decoration:none;">${safeEmail}</a>
                   </td>
                 </tr>
               </table>

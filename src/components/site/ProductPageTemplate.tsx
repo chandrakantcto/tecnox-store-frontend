@@ -49,7 +49,7 @@ export function ProductPageTemplate({
 }: ProductPageTemplateProps) {
   const locale = useActiveLocale();
   const router = useRouter();
-  const { addItemFromSnapshot, syncing, lastActionError, clearLastActionError } = useCart();
+  const { addItemFromSnapshot, syncing, lastActionError, clearLastActionError, setSidebarOpen } = useCart();
   const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const [selectedVid, setSelectedVid] = useState(() => {
     const v = product.hydratedVariantId ?? product.defaultVariantId ?? variants[0]?.id ?? "";
@@ -129,6 +129,7 @@ export function ProductPageTemplate({
       setCartMessage(res.message);
       return;
     }
+    setSidebarOpen(true);
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
   };

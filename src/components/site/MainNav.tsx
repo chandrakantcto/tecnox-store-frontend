@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { User, ShoppingBag, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
-import { useCartItemCount } from "@/contexts/CartContext";
+import { useCart, useCartItemCount } from "@/contexts/CartContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
 import type { MegaMain } from "@/data/megaMenu";
@@ -116,7 +116,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   const router = useRouter();
   const { locale, setLocale: setSiteLocale } = useLocale();
   const [open, setOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
+  const { sidebarOpen: cartOpen, setSidebarOpen: setCartOpen } = useCart();
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [mobileMegaMainId, setMobileMegaMainId] = useState<string | null>(null);
   const [mobileMegaSubId, setMobileMegaSubId] = useState<string | null>(null);

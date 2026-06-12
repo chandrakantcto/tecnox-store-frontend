@@ -58,6 +58,8 @@ type CartContextValue = {
   updateLineQuantity: (orderLineId: string, qty: number) => Promise<CartActionResult>;
   removeLine: (orderLineId: string) => Promise<CartActionResult>;
   emptyCart: () => Promise<CartActionResult>;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -92,6 +94,7 @@ export function CartProvider({
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [lastActionError, setLastActionError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const lines = useMemo(() => cartLinesFromActiveOrder(order), [order]);
   const itemCount = useMemo(() => orderTotalQuantity(order), [order]);
@@ -287,6 +290,8 @@ export function CartProvider({
       updateLineQuantity,
       removeLine,
       emptyCart,
+      sidebarOpen,
+      setSidebarOpen,
     }),
     [
       locale,
@@ -304,6 +309,7 @@ export function CartProvider({
       updateLineQuantity,
       removeLine,
       emptyCart,
+      sidebarOpen,
     ],
   );
 

@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import type { Attachment } from "nodemailer/lib/mailer";
+import { getTecnoXEmailAttachments } from "@/lib/email/email-assets";
 
 export interface SendEmailInput {
   to: string;
@@ -41,13 +42,15 @@ export async function sendTransactionalEmail(
       auth: { user, pass },
     });
 
+    const attachments = [...getTecnoXEmailAttachments(), ...(input.attachments ?? [])];
+
     await transporter.sendMail({
       from: smtpFrom(),
       to: input.to,
       subject: input.subject,
       html: input.html,
       text: input.text,
-      attachments: input.attachments,
+      attachments,
     });
 
     return { sent: true };

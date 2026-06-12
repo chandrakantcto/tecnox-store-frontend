@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const registered = await isCustomerEmailRegistered(email);
-    if (registered === false) {
+    if (registered !== true) {
       return NextResponse.json({ success: false, error: "email_not_registered" }, { status: 400 });
     }
 

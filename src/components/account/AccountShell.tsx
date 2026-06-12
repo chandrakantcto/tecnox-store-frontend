@@ -7,9 +7,9 @@ import { Footer } from "@/components/site/Footer";
 import { MainNav } from "@/components/site/MainNav";
 import { TopBar } from "@/components/site/TopBar";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
-import { type Locale } from "@/lib/locale";
-import { tr } from "@/lib/locale";
+import { type Locale, tr } from "@/lib/locale";
 
 const ACCOUNT_PAGE_INTERACTIVE =
   "[&_a]:cursor-pointer [&_button:not(:disabled)]:cursor-pointer";
@@ -22,7 +22,7 @@ const nav = (locale: Locale) =>
     { href: "/konto/ordrer", nb: "Bestillinger", en: "Orders" },
     { href: "/konto/adresser", nb: "Adresser", en: "Addresses" },
     { href: "/konto/profil", nb: "Kontodetaljer", en: "Account details" },
-    { href: "/konto/passord", nb: "Passord", en: "Password" },
+    { href: "/konto/passord", nb: "Endre passord", en: "Change Password" },
   ] as const;
 
 function isNavActive(pathname: string | null, href: string): boolean {
@@ -42,8 +42,8 @@ export function AccountShell({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { customer, initializing, logout, locale } = useShopAuth();
-  const lc: Locale = locale === "en" ? "en" : "nb";
+  const { customer, initializing, logout } = useShopAuth();
+  const lc = useActiveLocale();
 
   useEffect(() => {
     if (!initializing && !customer && pathname?.startsWith("/konto")) {

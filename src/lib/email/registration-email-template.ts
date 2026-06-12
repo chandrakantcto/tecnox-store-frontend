@@ -6,7 +6,6 @@ export interface RegistrationEmailData {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
 }
 
 export function getRegistrationEmailSubject(locale: Locale): string {
@@ -17,7 +16,6 @@ export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl:
   const firstName = escapeHtml(data.firstName);
   const lastName = escapeHtml(data.lastName);
   const email = escapeHtml(data.email);
-  const password = escapeHtml(data.password);
   const fullName = `${firstName} ${lastName}`.trim();
 
   const bodyHtml = `
@@ -41,11 +39,10 @@ export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl:
               </p>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;background-color:#fafafa;border:1px solid #ececec;border-radius:6px;">
                 <tr>
-                  <td style="padding:16px 18px;font-size:14px;line-height:1.8;color:#333333;">
-                    <strong>${tr(locale, "Fornavn", "First name")}</strong> ${firstName}<br />
-                    <strong>${tr(locale, "Etternavn", "Last name")}</strong> ${lastName}<br />
-                    <strong>${tr(locale, "E-post", "Email")}</strong> <a href="mailto:${email}" style="color:${BRAND_BLUE};text-decoration:none;">${email}</a><br />
-                    <strong>${tr(locale, "Passord", "Password")}</strong> ${password}
+                  <td style="padding:16px 18px;font-size:14px;line-height:2;color:#333333;">
+                    <strong>${tr(locale, "Fornavn", "First name")}:</strong> ${firstName}<br />
+                    <strong>${tr(locale, "Etternavn", "Last name")}:</strong> ${lastName}<br />
+                    <strong>${tr(locale, "E-post", "Email")}:</strong> <a href="mailto:${email}" style="color:${BRAND_BLUE};text-decoration:none;">${email}</a>
                   </td>
                 </tr>
               </table>
@@ -74,7 +71,6 @@ ${tr(locale, "Takk for at du registrerte deg hos TECNOX.", "Thank you for regist
 ${tr(locale, "Fornavn", "First name")}: ${data.firstName}
 ${tr(locale, "Etternavn", "Last name")}: ${data.lastName}
 ${tr(locale, "E-post", "Email")}: ${data.email}
-${tr(locale, "Passord", "Password")}: ${data.password}
 
 ${tr(locale, "Du kan nå logge inn med e-post og passord.", "You can now log in with your email and password.")}
 
