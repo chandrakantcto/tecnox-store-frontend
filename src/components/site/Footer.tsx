@@ -48,7 +48,7 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
               <Image
                 src="/logo-tecno-x.webp"
                 alt="TECNOX"
-                className="h-[52px] sm:h-[56px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left brightness-0 invert"
+                className="h-[52px] sm:h-[56px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
                 width={380}
                 height={70}
               />
