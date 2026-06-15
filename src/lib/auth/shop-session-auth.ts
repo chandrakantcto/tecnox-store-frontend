@@ -1,9 +1,18 @@
 import { shopGraphql } from "@/lib/vendure/shop-client-browser";
 import {
+  accountNotCreatedMessage,
+  checkoutEmailPasswordRequiredMessage,
+  couldNotLoginAfterRegisterMessage,
+  couldNotLoginMessage,
   emailAlreadyRegisteredMessage,
   emailNotRegisteredMessage,
   incorrectPasswordMessage,
+  loginAfterRegisterFailedMessage,
+  loginErrorMessage,
+  loginFailedGenericMessage,
   loginFailedMessage,
+  registerFailedMessage,
+  wrongPasswordForExistingAccountMessage,
 } from "@/lib/auth/auth-messages";
 import { normalizeAuthEmail } from "@/lib/auth/email-validation";
 import {
@@ -83,7 +92,7 @@ async function ensureLoggedInAfterRegister(
       error:
         loginRes.networkError ??
         loginRes.graphqlErrors.join("; ") ??
-        "Konto opprettet, men pålogging mislyktes. Prøv «Logg inn» manuelt.",
+        loginAfterRegisterFailedMessage(locale),
     };
   }
   const loginPayload = pickMutation(loginRes.data, "login");
@@ -92,8 +101,8 @@ async function ensureLoggedInAfterRegister(
 
   const wrongPw =
     tn === "InvalidCredentialsError"
-      ? "Feil passord for denne e-postadressen. Bruk samme passord som for din eksisterende konto."
-      : errorMessageFromMutationPayload(loginPayload, "Kunne ikke logge inn etter registering.");
+      ? wrongPasswordForExistingAccountMessage(locale)
+      : errorMessageFromMutationPayload(loginPayload, couldNotLoginAfterRegisterMessage(locale));
   return { ok: false, error: wrongPw };
 }
 
@@ -113,7 +122,7 @@ export async function loginOrRegisterAfterCheckout(
   const lc = locale === "en" ? "en" : "nb";
   const email = normalizeAuthEmail(input.email);
   if (!email || !input.password?.length) {
-    return { ok: false, error: "E-post og passord kreves for å fullføre konto." };
+    return { ok: false, error: checkoutEmailPasswordRequiredMessage(lc) };
   }
 
   const registerInput = {
@@ -138,7 +147,7 @@ export async function loginOrRegisterAfterCheckout(
     if (!isRegistrationConflict(regPayload)) {
       return {
         ok: false,
-        error: errorMessageFromMutationPayload(regPayload, "Konto ble ikke opprettet."),
+        error: errorMessageFromMutationPayload(regPayload, accountNotCreatedMessage(lc)),
       };
     }
   }
@@ -147,7 +156,7 @@ export async function loginOrRegisterAfterCheckout(
   if (loginRes.networkError || loginRes.graphqlErrors.length) {
     return {
       ok: false,
-      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? "Kunne ikke logge inn.",
+      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? couldNotLoginMessage(lc),
     };
   }
 
@@ -179,7 +188,7 @@ export async function shopLoginEmailPassword(
   if (loginRes.networkError || loginRes.graphqlErrors.length) {
     return {
       ok: false,
-      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? "Feil ved innlogging.",
+      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? loginErrorMessage(lc),
     };
   }
   const loginPayload = pickMutation(loginRes.data, "login");
@@ -196,7 +205,7 @@ export async function shopLoginEmailPassword(
     return { ok: false, error: loginFailedMessage(lc) };
   }
 
-  return { ok: false, error: errorMessageFromMutationPayload(loginPayload, "Innlogging mislyktes.") };
+  return { ok: false, error: errorMessageFromMutationPayload(loginPayload, loginFailedGenericMessage(lc)) };
 }
 
 export async function shopRegisterAccount(
@@ -246,13 +255,13 @@ export async function shopRegisterAccount(
   if (reg.networkError || reg.graphqlErrors.length) {
     return {
       ok: false,
-      error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? "Registrering feilet.",
+      error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? registerFailedMessage(lc),
     };
   }
 
   const regPayload = pickMutation(reg.data, reg.key);
   if (!registerSucceeded(regPayload)) {
-    const errMsg = errorMessageFromMutationPayload(regPayload, "Registrering feilet.");
+    const errMsg = errorMessageFromMutationPayload(regPayload, registerFailedMessage(lc));
     if (/email.*(already|exist|registered)|already.*registered/i.test(errMsg)) {
       return { ok: false, error: emailAlreadyRegisteredMessage(lc) };
     }

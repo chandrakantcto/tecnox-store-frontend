@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolveRequestLocale } from "@/lib/email/email-locale";
 import { parseNewsletterEmailPayload, ValidationError } from "@/lib/storefront-forms/validate";
 import { getVendureServerConfigOrNull } from "@/lib/vendure/env";
 import { GQL_SUBSCRIBE_NEWSLETTER, type SubmitLeadResultJson } from "@/lib/vendure/storefront-forms-mutations";
@@ -18,15 +19,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
   }
 
+  const locale = resolveRequestLocale(req, raw.locale);
+
   let email: string;
   try {
-    email = parseNewsletterEmailPayload(raw);
+    email = parseNewsletterEmailPayload(raw, locale);
   } catch (e) {
     const msg = e instanceof ValidationError ? e.message : "Invalid email";
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 
-  const lc = typeof raw.locale === "string" && raw.locale.startsWith("en") ? "en" : "nb";
+  const lc = locale;
 
   const { data, error } = await vendureShopQuery<SubmitLeadResultJson>(
     GQL_SUBSCRIBE_NEWSLETTER,

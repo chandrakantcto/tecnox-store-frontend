@@ -7,16 +7,20 @@ import { References } from "@/components/site/References";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
+import { localizedPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Referanser",
-  description:
-    "Et utvalg av virksomhetene som har valgt TECNOX som sin leverandør av profesjonelt kjøkkenutstyr.",
-  openGraph: {
-    title: "Referanser — TECNOX",
-    description: "Kjøkken vi er stolte av — restaurant, hotell og kantine over hele Norge.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedPageMetadata({
+    titleNb: "Referanser",
+    titleEn: "References",
+    descNb: "Et utvalg av virksomhetene som har valgt TECNOX som sin leverandør av profesjonelt kjøkkenutstyr.",
+    descEn: "A selection of businesses that have chosen TECNOX as their professional kitchen equipment supplier.",
+    ogTitleNb: "Referanser — TECNOX",
+    ogTitleEn: "References — TECNOX",
+    ogDescNb: "Kjøkken vi er stolte av — restaurant, hotell og kantine over hele Norge.",
+    ogDescEn: "Kitchens we are proud of — restaurants, hotels and canteens across Norway.",
+  });
+}
 
 export default async function ReferanserPage() {
   const locale = await getServerLocale();

@@ -73,6 +73,54 @@ export function requiredPasswordMessage(locale: Locale | string): string {
   return tr(locale as Locale, "Passord er påkrevd.", "Password is required.");
 }
 
+export function checkoutEmailPasswordRequiredMessage(locale: Locale | string): string {
+  return tr(
+    locale as Locale,
+    "E-post og passord kreves for å fullføre konto.",
+    "Email and password are required to complete your account.",
+  );
+}
+
+export function loginAfterRegisterFailedMessage(locale: Locale | string): string {
+  return tr(
+    locale as Locale,
+    "Konto opprettet, men pålogging mislyktes. Prøv «Logg inn» manuelt.",
+    "Account created, but sign-in failed. Try signing in manually.",
+  );
+}
+
+export function wrongPasswordForExistingAccountMessage(locale: Locale | string): string {
+  return tr(
+    locale as Locale,
+    "Feil passord for denne e-postadressen. Bruk samme passord som for din eksisterende konto.",
+    "Incorrect password for this email. Use the same password as your existing account.",
+  );
+}
+
+export function couldNotLoginAfterRegisterMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Kunne ikke logge inn etter registering.", "Could not sign in after registration.");
+}
+
+export function accountNotCreatedMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Konto ble ikke opprettet.", "Account was not created.");
+}
+
+export function couldNotLoginMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Kunne ikke logge inn.", "Could not sign in.");
+}
+
+export function loginErrorMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Feil ved innlogging.", "Sign-in error.");
+}
+
+export function registerFailedMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Registrering feilet.", "Registration failed.");
+}
+
+export function loginFailedGenericMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Innlogging mislyktes.", "Sign-in failed.");
+}
+
 export function requiredCurrentPasswordMessage(locale: Locale | string): string {
   return tr(locale as Locale, "Nåværende passord er påkrevd.", "Current password is required.");
 }

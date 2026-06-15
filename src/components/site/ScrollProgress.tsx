@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
+import { useActiveLocale } from "@/hooks/use-active-locale";
+import { tr } from "@/lib/locale";
 
 export function ScrollProgress() {
+  const locale = useActiveLocale();
   const [progress, setProgress] = useState(0);
   const [showTop, setShowTop] = useState(false);
 
@@ -34,7 +37,7 @@ export function ScrollProgress() {
 
       <button
         type="button"
-        aria-label="Tilbake til toppen"
+        aria-label={tr(locale, "Tilbake til toppen", "Back to top")}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         className={`fixed bottom-6 right-6 z-50 h-11 w-11 flex items-center justify-center bg-[var(--color-ink)] text-white rounded-[3px] shadow-xl border border-[oklch(0.28_0_0)] transition-all duration-300 hover:bg-[var(--color-copper)] hover:-translate-y-0.5 ${
           showTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"

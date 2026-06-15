@@ -25,6 +25,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { pickLocale, tr, type Locale } from "@/lib/locale";
 
 export type { VendureCartLine };
 
@@ -64,14 +65,16 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-function readMutationError(payload: Record<string, unknown> | null | undefined): string | null {
-  if (!payload) return "Ugyldig svar fra butikk-API.";
+function readMutationError(payload: Record<string, unknown> | null | undefined, locale: Locale): string | null {
+  if (!payload) return tr(locale, "Ugyldig svar fra butikk-API.", "Invalid response from storefront API.");
   const tn = typeof payload.__typename === "string" ? payload.__typename : "";
   if (tn === "Order") return null;
   const msg = typeof payload.message === "string" ? payload.message.trim() : "";
   if (msg) return msg;
   if (typeof payload.errorCode === "string" && payload.errorCode.trim()) return payload.errorCode.trim();
-  return tn ? `Kunne ikke oppdatere handlekurven (${tn}).` : "Kunne ikke oppdatere handlekurven.";
+  return tn
+    ? tr(locale, `Kunne ikke oppdatere handlekurven (${tn}).`, `Could not update the cart (${tn}).`)
+    : tr(locale, "Kunne ikke oppdatere handlekurven.", "Could not update the cart.");
 }
 
 function pickMutationPayload(data: unknown, key: string): Record<string, unknown> | null {
@@ -88,6 +91,7 @@ export function CartProvider({
   children: ReactNode;
   locale?: string;
 }) {
+  const lc = pickLocale(locale);
   const [order, setOrder] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -101,7 +105,7 @@ export function CartProvider({
   const subtotal = useMemo(() => orderSubtotalWithTaxKr(order), [order]);
 
   const refresh = useCallback(async () => {
-    const res = await shopGraphql<ActiveOrderQueryResult>(GQL_ACTIVE_ORDER, undefined, locale);
+    const res = await shopGraphql<ActiveOrderQueryResult>(GQL_ACTIVE_ORDER, undefined, lc);
     const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
     if (outer) {
       setBootstrapError(outer);
@@ -110,7 +114,7 @@ export function CartProvider({
     }
     setBootstrapError(null);
     setOrder(res.data?.activeOrder ?? null);
-  }, [locale]);
+  }, [lc]);
 
   useEffect(() => {
     setHydrated(true);
@@ -138,8 +142,11 @@ export function CartProvider({
   const addItemFromSnapshot = useCallback(
     async (snapshot: CartProductSnapshot | null | undefined, qty = 1): Promise<CartActionResult> => {
       if (!snapshot?.variantId?.trim()) {
-        const msg =
-          "Fant ikke produktvariant. Oppdater produktsiden eller velg en gyldig konfigurasjon før du legger i kurv.";
+        const msg = tr(
+          lc,
+          "Fant ikke produktvariant. Oppdater produktsiden eller velg en gyldig konfigurasjon før du legger i kurv.",
+          "Product variant not found. Refresh the product page or choose a valid configuration before adding to cart.",
+        );
         setLastActionError(msg);
         return { ok: false, message: msg };
       }
@@ -147,11 +154,11 @@ export function CartProvider({
       if (qty < 1) return { ok: true };
       setSyncing(true);
       setLastActionError(null);
-      const res = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+      const res = await runCartMutationWithAddingItemsRecovery(lc, async () => {
         const r = await shopGraphql<{ addItemToOrder: unknown }>(
           GQL_ADD_ITEM_TO_ORDER,
           { productVariantId, quantity: qty },
-          locale,
+          lc,
         );
         return {
           networkError: r.networkError,
@@ -166,7 +173,7 @@ export function CartProvider({
         return { ok: false, message: outer };
       }
       const payload = res.payload;
-      const err = readMutationError(payload);
+      const err = readMutationError(payload, lc);
       if (err) {
         setLastActionError(err);
         return { ok: false, message: err };
@@ -174,20 +181,20 @@ export function CartProvider({
       await refresh();
       return { ok: true };
     },
-    [locale, refresh],
+    [lc, refresh],
   );
 
   const updateLineQuantity = useCallback(
     async (orderLineId: string, qty: number): Promise<CartActionResult> => {
-      if (!orderLineId.trim()) return { ok: false, message: "Mangler linje-ID." };
+      if (!orderLineId.trim()) return { ok: false, message: tr(lc, "Mangler linje-ID.", "Missing line ID.") };
       setSyncing(true);
       setLastActionError(null);
       if (qty <= 0) {
-        const res = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+        const res = await runCartMutationWithAddingItemsRecovery(lc, async () => {
           const r = await shopGraphql<{ removeOrderLine: unknown }>(
             GQL_REMOVE_ORDER_LINE,
             { orderLineId },
-            locale,
+            lc,
           );
           return {
             networkError: r.networkError,
@@ -202,7 +209,7 @@ export function CartProvider({
           return { ok: false, message: outer };
         }
         const payload = res.payload;
-        const err = readMutationError(payload);
+        const err = readMutationError(payload, lc);
         if (err) {
           setLastActionError(err);
           return { ok: false, message: err };
@@ -211,11 +218,11 @@ export function CartProvider({
         return { ok: true };
       }
 
-      const adjRes = await runCartMutationWithAddingItemsRecovery(locale, async () => {
+      const adjRes = await runCartMutationWithAddingItemsRecovery(lc, async () => {
         const r = await shopGraphql<{ adjustOrderLine: unknown }>(
           GQL_ADJUST_ORDER_LINE,
           { orderLineId, quantity: qty },
-          locale,
+          lc,
         );
         return {
           networkError: r.networkError,
@@ -230,7 +237,7 @@ export function CartProvider({
         return { ok: false, message: outerAdj };
       }
       const payloadAdj = adjRes.payload;
-      const errAdj = readMutationError(payloadAdj);
+      const errAdj = readMutationError(payloadAdj, lc);
       if (errAdj) {
         setLastActionError(errAdj);
         return { ok: false, message: errAdj };
@@ -238,7 +245,7 @@ export function CartProvider({
       await refresh();
       return { ok: true };
     },
-    [locale, refresh],
+    [lc, refresh],
   );
 
   const removeLine = useCallback(
@@ -249,8 +256,8 @@ export function CartProvider({
   const emptyCart = useCallback(async (): Promise<CartActionResult> => {
     setSyncing(true);
     setLastActionError(null);
-    const res = await runCartMutationWithAddingItemsRecovery(locale, async () => {
-      const r = await shopGraphql<{ removeAllOrderLines: unknown }>(GQL_REMOVE_ALL_ORDER_LINES, undefined, locale);
+    const res = await runCartMutationWithAddingItemsRecovery(lc, async () => {
+      const r = await shopGraphql<{ removeAllOrderLines: unknown }>(GQL_REMOVE_ALL_ORDER_LINES, undefined, lc);
       return {
         networkError: r.networkError,
         graphqlErrors: r.graphqlErrors,
@@ -264,18 +271,18 @@ export function CartProvider({
       return { ok: false, message: outer };
     }
     const payload = res.payload;
-    const err = readMutationError(payload);
+        const err = readMutationError(payload, lc);
     if (err) {
       setLastActionError(err);
       return { ok: false, message: err };
     }
     await refresh();
     return { ok: true };
-  }, [locale, refresh]);
+  }, [lc, refresh]);
 
   const value = useMemo<CartContextValue>(
     () => ({
-      locale,
+      locale: lc,
       lines,
       itemCount,
       subtotal,
@@ -294,7 +301,7 @@ export function CartProvider({
       setSidebarOpen,
     }),
     [
-      locale,
+      lc,
       lines,
       itemCount,
       subtotal,

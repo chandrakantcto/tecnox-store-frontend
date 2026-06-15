@@ -117,7 +117,7 @@ export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
         if (ac.signal.aborted) return;
         if (json.errors?.length) {
           setProductHits([]);
-          setError(json.errors.map((e) => e.message).join("; ") || "Search failed");
+          setError(json.errors.map((e) => e.message).join("; ") || tr(locale, "Søket feilet", "Search failed"));
           return;
         }
         const data = json.data as { search?: unknown } | undefined;
@@ -133,7 +133,7 @@ export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
     })();
 
     return () => ac.abort();
-  }, [debounced, lc]);
+  }, [debounced, lc, locale]);
 
   const clearQuery = () => {
     setQuery("");

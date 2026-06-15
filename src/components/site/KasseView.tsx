@@ -379,7 +379,7 @@ export function KasseView({
           ) : null}
 
           {loading ? (
-            <p className="py-20 text-center text-[var(--color-muted)]">Laster…</p>
+            <p className="py-20 text-center text-[var(--color-muted)]">{tr(locale, "Laster…", "Loading…")}</p>
           ) : lines.length === 0 ? (
             <Reveal>
               <div className="mx-auto max-w-xl py-16 text-center">
@@ -662,10 +662,10 @@ export function KasseView({
                       <Truck className="h-4 w-4 text-[var(--color-copper)]" /> {tr(locale, "Levering hele Norge", "Nationwide delivery")}
                     </li>
                     <li className="flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4 text-[var(--color-copper)]" /> {tr(locale, "Professional support", "Professional support")}
+                      <ShieldCheck className="h-4 w-4 text-[var(--color-copper)]" /> {tr(locale, "Profesjonell support", "Professional support")}
                     </li>
                     <li className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-[var(--color-copper)]" /> Admin / Vendure
+                      <Phone className="h-4 w-4 text-[var(--color-copper)]" /> {tr(locale, "Admin / Vendure", "Admin / Vendure")}
                     </li>
                   </ul>
                 </aside>

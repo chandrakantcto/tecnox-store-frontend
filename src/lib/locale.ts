@@ -18,7 +18,10 @@ export function getClientLocale(): Locale {
     .split("; ")
     .find((cookie) => cookie.startsWith(`${LOCALE_COOKIE}=`))
     ?.split("=")[1];
-  return pickLocale(value);
+  if (isLocale(value)) return value;
+  const htmlLang = document.documentElement.lang;
+  if (isLocale(htmlLang)) return htmlLang;
+  return DEFAULT_LOCALE;
 }
 
 export function setClientLocale(locale: Locale) {

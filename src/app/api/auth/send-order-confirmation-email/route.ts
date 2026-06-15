@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isValidEmail, normalizeAuthEmail } from "@/lib/auth/email-validation";
-import { resolveEmailLocaleFromRequest } from "@/lib/email/email-locale";
+import { resolveRequestLocale } from "@/lib/email/email-locale";
 import {
   buildOrderConfirmationEmailHtml,
   buildOrderConfirmationEmailText,
@@ -52,7 +52,7 @@ function parseAddress(raw: unknown): OrderConfirmationEmailData["shippingAddress
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const locale = resolveEmailLocaleFromRequest(request, body.locale);
+    const locale = resolveRequestLocale(request, body.locale);
     const firstName = String(body.firstName || "").trim();
     const lastName = String(body.lastName || "").trim();
     const email = normalizeAuthEmail(String(body.email || ""));

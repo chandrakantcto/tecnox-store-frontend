@@ -9,17 +9,22 @@ import { Service } from "@/components/site/Service";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
+import { localizedPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Service og support",
-  description:
-    "Sertifiserte teknikere over hele Norge. Serviceavtaler, montering, reservedeler og rask responstid — vi er din faglige partner.",
-  openGraph: {
-    title: "Service og support — TECNOX",
-    description:
-      "Montering, serviceavtaler og reservedeler — sertifiserte teknikere fra Tromsø til Kristiansand.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedPageMetadata({
+    titleNb: "Service og support",
+    titleEn: "Service and support",
+    descNb:
+      "Sertifiserte teknikere over hele Norge. Serviceavtaler, montering, reservedeler og rask responstid — vi er din faglige partner.",
+    descEn:
+      "Certified technicians across Norway. Service agreements, installation, spare parts and fast response — your professional partner.",
+    ogTitleNb: "Service og support — TECNOX",
+    ogTitleEn: "Service and support — TECNOX",
+    ogDescNb: "Montering, serviceavtaler og reservedeler — sertifiserte teknikere fra Tromsø til Kristiansand.",
+    ogDescEn: "Installation, service agreements and spare parts — certified technicians from Tromsø to Kristiansand.",
+  });
+}
 
 const PROCESS = [
   {

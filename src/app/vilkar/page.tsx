@@ -7,16 +7,20 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { TERMS_SECTIONS } from "@/data/legalContent";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
+import { localizedPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Vilkår",
-  description:
-    "Salgs- og leveringsvilkår for TECNOX AS — profesjonelt kjøkkenutstyr, levering, betaling, garanti og service.",
-  openGraph: {
-    title: "Vilkår — TECNOX",
-    description: "Generelle vilkår for kjøp av storkjøkkenutstyr og tilhørende tjenester fra TECNOX.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedPageMetadata({
+    titleNb: "Vilkår",
+    titleEn: "Terms",
+    descNb: "Salgs- og leveringsvilkår for TECNOX AS — profesjonelt kjøkkenutstyr, levering, betaling, garanti og service.",
+    descEn: "Sales and delivery terms for TECNOX AS — professional kitchen equipment, delivery, payment, warranty and service.",
+    ogTitleNb: "Vilkår — TECNOX",
+    ogTitleEn: "Terms — TECNOX",
+    ogDescNb: "Generelle vilkår for kjøp av storkjøkkenutstyr og tilhørende tjenester fra TECNOX.",
+    ogDescEn: "General terms for purchasing large-scale kitchen equipment and related services from TECNOX.",
+  });
+}
 
 export default async function VilkarPage() {
   const locale = await getServerLocale();

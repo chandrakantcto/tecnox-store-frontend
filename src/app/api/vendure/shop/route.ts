@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolveRequestLocale } from "@/lib/email/email-locale";
 import { getVendureServerConfigOrNull } from "@/lib/vendure/env";
 
 type Body = {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
   }
 
   const variables = body.variables && typeof body.variables === "object" ? body.variables : undefined;
-  const lc = body.locale === "en" ? "en" : "nb";
+  const lc = resolveRequestLocale(req, body.locale);
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
