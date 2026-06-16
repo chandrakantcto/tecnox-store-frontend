@@ -593,7 +593,7 @@ function ProductQuoteSection({
   return (
     <section className="bg-[var(--color-stone)] py-16 lg:py-20 border-t border-[var(--color-divider)]">
       <div className="container-x grid lg:grid-cols-[1fr_1.2fr] gap-10 lg:gap-16">
-        <Reveal>
+        <Reveal className="sticky top-30 h-max">
           <div>
             <span className="label-tag inline-flex items-center gap-2">
               <span className="h-px w-8 bg-[var(--color-copper)] inline-block" />
