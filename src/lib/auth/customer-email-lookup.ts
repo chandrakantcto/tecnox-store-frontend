@@ -105,6 +105,7 @@ export async function isCustomerEmailRegistered(email: string): Promise<boolean 
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${adminToken}`,
+        "vendure-token": getVendureServerConfigOrNull()?.channelToken || "",
       },
       body: JSON.stringify({
         query: CUSTOMERS_BY_EMAIL,
