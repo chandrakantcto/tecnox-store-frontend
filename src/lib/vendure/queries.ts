@@ -248,6 +248,10 @@ export const GQL_STOREFRONT_PRODUCT_PDP_EXTRA = /* GraphQL */ `
         storefrontReviewsJson
         storefrontServiceBulletsJson
         storefrontQuoteBulletsJson
+        modelNumber
+        status
+        type
+        tags
       }
     }
   }

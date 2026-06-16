@@ -3,7 +3,7 @@ import { tr } from "@/lib/locale";
 import { buildTecnoXEmailShell, escapeHtml, BRAND_BLUE } from "@/lib/email/tecno-x-email-shell";
 
 export function getPasswordChangedEmailSubject(locale: Locale): string {
-  return tr(locale, "TECNOX — passordet ditt er oppdatert", "TECNOX — your password has been updated");
+  return tr(locale, "Tecno X — passordet ditt er oppdatert", "Tecno X — your password has been updated");
 }
 
 export function buildPasswordChangedEmailHtml(email: string, baseUrl: string, locale: Locale): string {
@@ -21,8 +21,8 @@ export function buildPasswordChangedEmailHtml(email: string, baseUrl: string, lo
               <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333333;">
                 ${tr(
                   locale,
-                  "Passordet for TECNOX-kontoen din er oppdatert.",
-                  "The password for your TECNOX account has been updated.",
+                  "Passordet for Tecno X-kontoen din er oppdatert.",
+                  "The password for your Tecno X account has been updated.",
                 )}
               </p>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;background-color:#fafafa;border:1px solid #ececec;border-radius:6px;">
@@ -55,7 +55,7 @@ export function buildPasswordChangedEmailHtml(email: string, baseUrl: string, lo
 export function buildPasswordChangedEmailText(email: string, locale: Locale): string {
   return `${tr(locale, "Hei,", "Hello,")}
 
-${tr(locale, "Passordet for TECNOX-kontoen din er oppdatert.", "The password for your TECNOX account has been updated.")}
+${tr(locale, "Passordet for Tecno X-kontoen din er oppdatert.", "The password for your Tecno X account has been updated.")}
 
 ${tr(locale, "E-post", "Email")}: ${email}
 

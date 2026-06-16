@@ -35,7 +35,7 @@ export function TopBar({
             <span>{prices}</span>
             <span className="mx-3 text-[var(--dark-muted)]">·</span>
             <span>
-              {callUs} <span className="text-[var(--copper)] font-medium">922 22 800</span>
+              {callUs} <span className="text-[var(--copper)] font-medium">411 90 600</span>
             </span>
           </p>
         </div>

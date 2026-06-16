@@ -8,4 +8,4 @@ alwaysApply: true
 - **User-facing UI** (pages, components, `aria-label`, meta descriptions, emails shown to users): **Norwegian Bokmål** (`lang="nb"`). Keep tone professional and clear for B2B kitchen equipment.
 - **Code** (identifiers, file names, routes): English is fine; prefer readable English for symbols.
 - **Assistant ↔ developer chat**: Respond in **English** unless the user explicitly asks for another language.
-- **Brand**: TECNOX; accent colour is electric blue (existing `--copper` token maps to blue). Contact email **`post@tecnox.no`**.
+- **Brand**: TECNO X; accent colour is electric blue (existing `--copper` token maps to blue). Contact email **`post@tecnox.no`**.

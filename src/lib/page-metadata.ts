@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getServerLocale } from "@/lib/locale.server";
+import { BRAND_NAME } from "@/lib/brand";
 import { tr, type Locale } from "@/lib/locale";
 
 export type LocalizedPageCopy = {
@@ -23,7 +24,7 @@ export function buildPageMetadata(locale: Locale, copy: LocalizedPageCopy): Meta
     title,
     description,
     openGraph: {
-      title: `${ogTitle} — TECNOX`,
+      title: `${ogTitle} — ${BRAND_NAME}`,
       description: ogDesc,
     },
   };

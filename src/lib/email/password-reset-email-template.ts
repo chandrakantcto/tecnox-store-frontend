@@ -3,7 +3,7 @@ import { tr } from "@/lib/locale";
 import { buildTecnoXEmailShell, escapeHtml, BRAND_BLUE } from "@/lib/email/tecno-x-email-shell";
 
 export function getPasswordResetEmailSubject(locale: Locale): string {
-  return tr(locale, "TECNOX — tilbakestill passord", "TECNOX — reset your password");
+  return tr(locale, "Tecno X — tilbakestill passord", "Tecno X — reset your password");
 }
 
 export function buildPasswordResetEmailHtml(otp: string, baseUrl: string, locale: Locale): string {

@@ -127,7 +127,7 @@ export function Service({ hideReadMore = false, locale: _locale }: ServiceProps)
                   <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
                     {tr(locale, "Telefon", "Phone")}
                   </p>
-                  <p className="text-[18px] font-bold text-[var(--color-ink)] tracking-[-0.015em]">922 22 800</p>
+                  <p className="text-[18px] font-bold text-[var(--color-ink)] tracking-[-0.015em]">411 90 600</p>
                 </div>
               </a>
 

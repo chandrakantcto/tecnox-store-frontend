@@ -19,8 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
       "Sertifiserte teknikere over hele Norge. Serviceavtaler, montering, reservedeler og rask responstid — vi er din faglige partner.",
     descEn:
       "Certified technicians across Norway. Service agreements, installation, spare parts and fast response — your professional partner.",
-    ogTitleNb: "Service og support — TECNOX",
-    ogTitleEn: "Service and support — TECNOX",
+    ogTitleNb: "Service og support — Tecno X",
+    ogTitleEn: "Service and support — Tecno X",
     ogDescNb: "Montering, serviceavtaler og reservedeler — sertifiserte teknikere fra Tromsø til Kristiansand.",
     ogDescEn: "Installation, service agreements and spare parts — certified technicians from Tromsø to Kristiansand.",
   });

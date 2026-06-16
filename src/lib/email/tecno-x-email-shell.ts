@@ -27,7 +27,7 @@ function emailNavLink(href: string, label: string): string {
 function emailLogoBlock(home: string, logoSrc: string, width: number, pad: string): string {
   return `<a href="${home}" style="text-decoration:none;display:inline-block;">
                 <span style="display:inline-block;background-color:#f5f2ec;padding:${pad};border-radius:2px;">
-                  <img src="${logoSrc}" alt="TECNOX" width="${width}" style="display:block;max-width:${width}px;width:${width}px;height:auto;border:0;margin:0 auto;" />
+                  <img src="${logoSrc}" alt="Tecno X" width="${width}" style="display:block;max-width:${width}px;width:${width}px;height:auto;border:0;margin:0 auto;" />
                 </span>
               </a>`;
 }
@@ -68,7 +68,7 @@ export function buildTecnoXEmailShell(
     "Utstyr som jobber like hardt som du gjør.",
     "Equipment that works as hard as you do.",
   );
-  const copyright = `© ${new Date().getFullYear()} TECNOX AS`;
+  const copyright = `© ${new Date().getFullYear()} Tecno X AS`;
   const navSep = `<span style="color:rgba(255,255,255,0.65);font-size:11px;margin:0 2px;">·</span>`;
 
   const nav = [
@@ -134,7 +134,7 @@ export function buildTecnoXEmailShell(
                 </tr>
                 <tr>
                   <td align="center" style="padding-bottom:16px;color:#c4bbbd;">
-                    ${tr(locale, "Telefon", "Phone")}: <a href="tel:92222800" style="color:#ffffff;text-decoration:none;">922 22 800</a>
+                    ${tr(locale, "Telefon", "Phone")}: <a href="tel:92222800" style="color:#ffffff;text-decoration:none;">411 90 600</a>
                   </td>
                 </tr>
                 <tr>

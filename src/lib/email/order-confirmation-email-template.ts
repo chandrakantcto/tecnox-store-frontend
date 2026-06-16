@@ -143,7 +143,7 @@ export function buildOrderConfirmationEmailHtml(
               </p>
               <p style="margin:20px 0 0;font-size:15px;line-height:1.7;color:#333333;">
                 ${tr(locale, "Vennlig hilsen,", "Warm regards,")}<br />
-                <strong style="color:${BRAND_BLUE};">${tr(locale, "TECNOX-teamet", "The TECNOX Team")}</strong>
+                <strong style="color:${BRAND_BLUE};">${tr(locale, "Tecno X-teamet", "The Tecno X Team")}</strong>
               </p>
             </td>
           </tr>`;
@@ -171,7 +171,7 @@ ${lines}
 
 ${tr(locale, "Total inkl. MVA", "Total incl. VAT")}: ${formatKr(data.totalWithTaxKr)}
 
-TECNOX`;
+Tecno X`;
 }
 
 export { getEmailBaseUrl };

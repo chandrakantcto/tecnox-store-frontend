@@ -63,8 +63,8 @@ export function OmOssView() {
         title={<>{tr(locale, "30 år med kompromissløst håndverk.", "30 years of uncompromising craftsmanship.")}</>}
         description={tr(
           locale,
-          "TECNOX ble grunnlagt i 1995 med en enkel idé — at norske storkjøkken fortjener europeisk toppkvalitet, levert av folk som faktisk vet hva utstyret skal tåle.",
-          "TECNOX was founded in 1995 with a simple idea: Norwegian commercial kitchens deserve top European quality delivered by people who understand real kitchen demands.",
+          "Tecno X ble grunnlagt i 1995 med en enkel idé — at norske storkjøkken fortjener europeisk toppkvalitet, levert av folk som faktisk vet hva utstyret skal tåle.",
+          "Tecno X was founded in 1995 with a simple idea: Norwegian commercial kitchens deserve top European quality delivered by people who understand real kitchen demands.",
         )}
         crumbs={[{ label: tr(locale, "Om oss", "About us") }]}
         bgImage={bgImg}

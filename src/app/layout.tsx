@@ -21,14 +21,14 @@ function orgJsonLd(locale: "nb" | "en") {
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    name: "TECNOX AS",
+    name: "Tecno X AS",
     description: tr(
       locale,
       "Profesjonelt kjøkkenutstyr for restaurant, kantine og storhusholdning. Levering, montering og service over hele Norge.",
       "Professional kitchen equipment for restaurants, canteens and large-scale catering. Delivery, installation and service across Norway.",
     ),
     url: "https://technox.lovable.app",
-    telephone: "+47 922 22 800",
+    telephone: "+47 411 90 600",
     email: "post@tecnox.no",
     address: {
       "@type": "PostalAddress",
@@ -57,19 +57,19 @@ export async function generateMetadata(): Promise<Metadata> {
     title: {
       default: tr(
         locale,
-        "TECNOX — Profesjonelt kjøkkenutstyr for storhusholdning",
-        "TECNOX — Professional kitchen equipment for large-scale catering",
+        "Tecno X — Profesjonelt kjøkkenutstyr for storhusholdning",
+        "Tecno X — Professional kitchen equipment for large-scale catering",
       ),
-      template: "%s — TECNOX",
+      template: "%s — Tecno X",
     },
     description: tr(
       locale,
       "Over 5 000 produkter for restaurant, kantine og storhusholdning. Ledende europeiske merker, montering og service over hele Norge.",
       "Over 5,000 products for restaurants and large-scale catering. Leading European brands, installation and service across Norway.",
     ),
-    authors: [{ name: "TECNOX" }],
+    authors: [{ name: "Tecno X" }],
     openGraph: {
-      siteName: "TECNOX",
+      siteName: "Tecno X",
       locale: locale === "en" ? "en_GB" : "nb_NO",
       type: "website",
     },

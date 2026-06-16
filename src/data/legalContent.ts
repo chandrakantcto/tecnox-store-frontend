@@ -5,11 +5,11 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     headingNb: "1. Innledning",
     headingEn: "1. Introduction",
     paragraphsNb: [
-      "TECNOX AS («TECNOX», «vi») respekterer ditt personvern. Denne personvernerklæringen forklarer hvordan vi samler inn, bruker, lagrer og deler personopplysninger når du besøker nettstedet vårt, oppretter konto, legger inn bestilling, ber om tilbud, bestiller service eller på annen måte kontakter oss.",
+      "Tecno X AS («Tecno X», «vi») respekterer ditt personvern. Denne personvernerklæringen forklarer hvordan vi samler inn, bruker, lagrer og deler personopplysninger når du besøker nettstedet vårt, oppretter konto, legger inn bestilling, ber om tilbud, bestiller service eller på annen måte kontakter oss.",
       "Vi behandler personopplysninger i samsvar med personopplysningsloven og EUs personvernforordning (GDPR).",
     ],
     paragraphsEn: [
-      "TECNOX AS (\"TECNOX\", \"we\") respects your privacy. This privacy policy explains how we collect, use, store, and share personal data when you visit our website, create an account, place an order, request a quote, book service, or otherwise contact us.",
+      "Tecno X AS (\"Tecno X\", \"we\") respects your privacy. This privacy policy explains how we collect, use, store, and share personal data when you visit our website, create an account, place an order, request a quote, book service, or otherwise contact us.",
       "We process personal data in accordance with the Norwegian Personal Data Act and the EU General Data Protection Regulation (GDPR).",
     ],
   },
@@ -17,15 +17,15 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     headingNb: "2. Behandlingsansvarlig",
     headingEn: "2. Data controller",
     paragraphsNb: [
-      "TECNOX AS er behandlingsansvarlig for personopplysningene vi behandler i forbindelse med våre tjenester.",
-      "Kontakt oss på post@tecnox.no eller telefon 922 22 800 dersom du har spørsmål om hvordan vi behandler personopplysninger.",
+      "Tecno X AS er behandlingsansvarlig for personopplysningene vi behandler i forbindelse med våre tjenester.",
+      "Kontakt oss på post@tecnox.no eller telefon 411 90 600 dersom du har spørsmål om hvordan vi behandler personopplysninger.",
     ],
     paragraphsEn: [
-      "TECNOX AS is the data controller for personal data processed in connection with our services.",
-      "Contact us at post@tecnox.no or phone 922 22 800 if you have questions about how we process personal data.",
+      "Tecno X AS is the data controller for personal data processed in connection with our services.",
+      "Contact us at post@tecnox.no or phone 411 90 600 if you have questions about how we process personal data.",
     ],
-    listNb: ["TECNOX AS", "Adresseveien 1, 0000 Oslo", "Org.nr. 000 000 000", "post@tecnox.no"],
-    listEn: ["TECNOX AS", "Adresseveien 1, 0000 Oslo", "Org.no. 000 000 000", "post@tecnox.no"],
+    listNb: ["Tecno X AS", "Adresseveien 1, 0000 Oslo", "Org.nr. 000 000 000", "post@tecnox.no"],
+    listEn: ["Tecno X AS", "Adresseveien 1, 0000 Oslo", "Org.no. 000 000 000", "post@tecnox.no"],
   },
   {
     headingNb: "3. Hvilke opplysninger vi samler inn",
@@ -144,11 +144,11 @@ export const TERMS_SECTIONS: LegalSection[] = [
     headingNb: "1. Generelt",
     headingEn: "1. General",
     paragraphsNb: [
-      "Disse vilkårene gjelder for kjøp av profesjonelt kjøkkenutstyr, reservedeler og tilhørende tjenester fra TECNOX AS via nettstedet tecnox.no, telefon, e-post eller ved direkte avtale.",
+      "Disse vilkårene gjelder for kjøp av profesjonelt kjøkkenutstyr, reservedeler og tilhørende tjenester fra Tecno X AS via nettstedet tecnox.no, telefon, e-post eller ved direkte avtale.",
       "Ved bestilling bekrefter du at du handler på vegne av en næringsdrivende virksomhet, med mindre annet er avtalt skriftlig.",
     ],
     paragraphsEn: [
-      "These terms apply to purchases of professional kitchen equipment, spare parts, and related services from TECNOX AS via the tecnox.no website, phone, email, or by direct agreement.",
+      "These terms apply to purchases of professional kitchen equipment, spare parts, and related services from Tecno X AS via the tecnox.no website, phone, email, or by direct agreement.",
       "By placing an order, you confirm that you are acting on behalf of a business entity unless otherwise agreed in writing.",
     ],
   },
@@ -156,11 +156,11 @@ export const TERMS_SECTIONS: LegalSection[] = [
     headingNb: "2. Avtaleinngåelse og bestilling",
     headingEn: "2. Contract formation and orders",
     paragraphsNb: [
-      "Informasjon på nettstedet utgjør ikke et bindende tilbud, men en invitasjon til å bestille. En avtale anses inngått når TECNOX har bekreftet bestillingen skriftlig (ordrebekreftelse eller faktura).",
+      "Informasjon på nettstedet utgjør ikke et bindende tilbud, men en invitasjon til å bestille. En avtale anses inngått når Tecno X har bekreftet bestillingen skriftlig (ordrebekreftelse eller faktura).",
       "Vi forbeholder oss retten til å avvise bestillinger ved feilprising, manglende lagerbeholdning eller åpenbart feilaktige opplysninger.",
     ],
     paragraphsEn: [
-      "Information on the website does not constitute a binding offer, but an invitation to order. A contract is considered formed when TECNOX has confirmed the order in writing (order confirmation or invoice).",
+      "Information on the website does not constitute a binding offer, but an invitation to order. A contract is considered formed when Tecno X has confirmed the order in writing (order confirmation or invoice).",
       "We reserve the right to reject orders in cases of pricing errors, stock shortages, or clearly incorrect information.",
     ],
   },
@@ -214,11 +214,11 @@ export const TERMS_SECTIONS: LegalSection[] = [
     headingNb: "7. Service, montering og rådgivning",
     headingEn: "7. Service, installation, and consulting",
     paragraphsNb: [
-      "Montering, servicebesøk og rådgivning avtales særskilt. TECNOX kan tilby serviceavtaler for utvalgte produkter og merker.",
+      "Montering, servicebesøk og rådgivning avtales særskilt. Tecno X kan tilby serviceavtaler for utvalgte produkter og merker.",
       "Kunden er ansvarlig for at installasjonsstedet oppfyller tekniske krav, herunder strøm, vann, avtrekk og sikkerhetskrav, med mindre annet fremgår av avtalen.",
     ],
     paragraphsEn: [
-      "Installation, service visits, and consulting are agreed separately. TECNOX may offer service agreements for selected products and brands.",
+      "Installation, service visits, and consulting are agreed separately. Tecno X may offer service agreements for selected products and brands.",
       "The customer is responsible for ensuring the installation site meets technical requirements, including power, water, ventilation, and safety requirements, unless otherwise stated in the agreement.",
     ],
   },
@@ -226,11 +226,11 @@ export const TERMS_SECTIONS: LegalSection[] = [
     headingNb: "8. Ansvarsbegrensning",
     headingEn: "8. Limitation of liability",
     paragraphsNb: [
-      "TECNOX er ikke ansvarlig for indirekte tap, driftstap eller følgeskader med mindre dette følger av ufravikelig lov.",
+      "Tecno X er ikke ansvarlig for indirekte tap, driftstap eller følgeskader med mindre dette følger av ufravikelig lov.",
       "Vårt ansvar er i alle tilfeller begrenset til det beløp som er betalt for den aktuelle varen eller tjenesten, med mindre grov uaktsomhet eller forsett foreligger.",
     ],
     paragraphsEn: [
-      "TECNOX is not liable for indirect loss, business interruption, or consequential damage unless required by mandatory law.",
+      "Tecno X is not liable for indirect loss, business interruption, or consequential damage unless required by mandatory law.",
       "Our liability is in all cases limited to the amount paid for the relevant product or service, unless gross negligence or intent is present.",
     ],
   },
@@ -238,10 +238,10 @@ export const TERMS_SECTIONS: LegalSection[] = [
     headingNb: "9. Immaterielle rettigheter",
     headingEn: "9. Intellectual property",
     paragraphsNb: [
-      "Alt innhold på nettstedet, inkludert tekst, bilder, logoer og produktdata, tilhører TECNOX eller våre leverandører og kan ikke kopieres eller gjenbrukes uten skriftlig samtykke.",
+      "Alt innhold på nettstedet, inkludert tekst, bilder, logoer og produktdata, tilhører Tecno X eller våre leverandører og kan ikke kopieres eller gjenbrukes uten skriftlig samtykke.",
     ],
     paragraphsEn: [
-      "All content on the website, including text, images, logos, and product data, belongs to TECNOX or our suppliers and may not be copied or reused without written consent.",
+      "All content on the website, including text, images, logos, and product data, belongs to Tecno X or our suppliers and may not be copied or reused without written consent.",
     ],
   },
   {
@@ -268,8 +268,8 @@ export const COOKIES_SECTIONS: LegalSection[] = [
     ],
   },
   {
-    headingNb: "2. Hvorfor TECNOX bruker cookies",
-    headingEn: "2. Why TECNOX uses cookies",
+    headingNb: "2. Hvorfor Tecno X bruker cookies",
+    headingEn: "2. Why Tecno X uses cookies",
     paragraphsNb: [
       "På tecnox.no bruker vi cookies for å sikre grunnleggende funksjonalitet i nettbutikken, forbedre brukeropplevelsen og måle trafikk på en aggregert måte.",
     ],

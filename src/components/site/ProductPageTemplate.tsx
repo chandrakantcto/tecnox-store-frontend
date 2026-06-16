@@ -28,6 +28,7 @@ import {
 } from "@/lib/catalog/storefront-product";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
+import { displayBrandName } from "@/lib/brand";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { isMissingStorefrontImageSource } from "@/lib/storefront-image";
@@ -103,6 +104,35 @@ export function ProductPageTemplate({
   const displayDescriptionHtml = productLocalizedDescriptionHtml(product, locale);
   const displayDescriptionPlain = productLocalizedPlainDescription(product, locale);
   const displayPrice = productLocalizedPriceLabel(product, locale, effectiveVariant);
+
+  const productMetaRows = useMemo(() => {
+    const rows: { label: string; value: string }[] = [];
+    if (product.modelNumber?.trim()) {
+      rows.push({
+        label: tr(locale, "Modellnummer", "Model number"),
+        value: product.modelNumber.trim(),
+      });
+    }
+    if (product.productStatus?.trim()) {
+      rows.push({
+        label: tr(locale, "Produktstatus", "Product status"),
+        value: product.productStatus.trim(),
+      });
+    }
+    if (product.productType?.trim()) {
+      rows.push({
+        label: tr(locale, "Produkttype", "Product type"),
+        value: product.productType.trim(),
+      });
+    }
+    if (product.tags?.length) {
+      rows.push({
+        label: tr(locale, "Tagger", "Tags"),
+        value: product.tags.join(", "),
+      });
+    }
+    return rows;
+  }, [locale, product.modelNumber, product.productStatus, product.productType, product.tags]);
 
   const pickVariant = (id: string) => {
     setSelectedVid(id);
@@ -216,11 +246,11 @@ export function ProductPageTemplate({
 
           <Reveal delay={0.15}>
             <div className="lg:sticky lg:top-28">
-              <p className="text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] font-semibold">{product.brand}</p>
+              <p className="text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] font-semibold">{displayBrandName(product.brand)}</p>
               <h1 className="mt-3 text-[26px] lg:text-[32px] font-bold text-[var(--color-ink)] tracking-[-0.025em] leading-[1.1]">
                 {displayName}
               </h1>
-              <p className="mt-3 font-mono text-[13px] text-[var(--color-muted)]">{specLineBelowTitle}</p>
+             {/*  <p className="mt-3 font-mono text-[13px] text-[var(--color-muted)]">{specLineBelowTitle}</p> */}
 
               {effectiveVariant?.stockLevel?.trim() ? (
                 <p className="mt-2 text-[12px] text-[var(--color-muted)]">
@@ -253,8 +283,21 @@ export function ProductPageTemplate({
 
               <p className="mt-6 text-[28px] font-bold text-[var(--color-copper)] tracking-[-0.02em]">{displayPrice}</p>
               <p className="text-[12px] text-[var(--color-muted)]">
-                {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated in quote")}
+                {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated at checkout/order")}
               </p>
+
+              {productMetaRows.length > 0 ? (
+                <dl className="mt-4 space-y-1.5 border-t border-[var(--color-divider)] pt-4">
+                  {productMetaRows.map((row) => (
+                    <div key={row.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
+                      <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
+                        {row.label}:
+                      </dt>
+                      <dd className="text-[var(--color-ink)]">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
 
               {displayDescriptionHtml.trim() ? (
                 <div
@@ -270,7 +313,7 @@ export function ProductPageTemplate({
                   <button
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    className="px-3 hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] transition-colors"
+                    className="px-3 hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] transition-colors cursor-pointer"
                     aria-label={tr(locale, "Reduser antall", "Decrease quantity")}
                   >
                     <Minus className="h-4 w-4" />
@@ -279,7 +322,7 @@ export function ProductPageTemplate({
                   <button
                     type="button"
                     onClick={() => setQty((q) => q + 1)}
-                    className="px-3 hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] transition-colors"
+                    className="px-3 hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] transition-colors cursor-pointer"
                     aria-label={tr(locale, "Øk antall", "Increase quantity")}
                   >
                     <Plus className="h-4 w-4" />
@@ -291,8 +334,8 @@ export function ProductPageTemplate({
                   {added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
                 </button>
                 <Link href="/kontakt" className="btn-outline-dark">
-                  {tr(locale, "Be om tilbud", "Request a quote")}
-                </Link>
+                  {tr(locale, "Kontakt meg", "Contact me")}
+                </Link> 
               </div>
 
               {added && (
@@ -474,7 +517,7 @@ export function ProductPageTemplate({
                     </div>
                     <div className="p-4">
                       <h3 className="text-[14px] font-bold text-[var(--color-ink)] leading-snug">{relatedName}</h3>
-                      <p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] font-medium">{p.brand}</p>
+                      <p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] font-medium">{displayBrandName(p.brand)}</p>
                       <p className="mt-2 text-[13px] font-bold text-[var(--color-copper)]">{relatedPrice}</p>
                     </div>
                   </Link>
@@ -554,7 +597,7 @@ function ProductQuoteSection({
           <div>
             <span className="label-tag inline-flex items-center gap-2">
               <span className="h-px w-8 bg-[var(--color-copper)] inline-block" />
-              {tr(locale, "Be om tilbud", "Request a quote")}
+              {/* {tr(locale, "Be om tilbud", "Request a quote")} */}
             </span>
             <h2 className="mt-5 display-h3 text-[var(--color-ink)]">
               {tr(locale, "Ønsker du pris og leveringstid?", "Need pricing and delivery time?")}

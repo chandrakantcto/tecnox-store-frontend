@@ -7,8 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return localizedPageMetadata({
     titleNb: "Logg inn",
     titleEn: "Sign in",
-    descNb: "Logg inn på TECNOX nettbutikk.",
-    descEn: "Sign in to the TECNOX online store.",
+    descNb: "Logg inn på Tecno X nettbutikk.",
+    descEn: "Sign in to the Tecno X online store.",
   });
 }
 

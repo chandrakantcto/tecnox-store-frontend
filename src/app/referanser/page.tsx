@@ -13,10 +13,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return localizedPageMetadata({
     titleNb: "Referanser",
     titleEn: "References",
-    descNb: "Et utvalg av virksomhetene som har valgt TECNOX som sin leverandør av profesjonelt kjøkkenutstyr.",
-    descEn: "A selection of businesses that have chosen TECNOX as their professional kitchen equipment supplier.",
-    ogTitleNb: "Referanser — TECNOX",
-    ogTitleEn: "References — TECNOX",
+    descNb: "Et utvalg av virksomhetene som har valgt Tecno X som sin leverandør av profesjonelt kjøkkenutstyr.",
+    descEn: "A selection of businesses that have chosen Tecno X AS their professional kitchen equipment supplier.",
+    ogTitleNb: "Referanser — Tecno X",
+    ogTitleEn: "References — Tecno X",
     ogDescNb: "Kjøkken vi er stolte av — restaurant, hotell og kantine over hele Norge.",
     ogDescEn: "Kitchens we are proud of — restaurants, hotels and canteens across Norway.",
   });

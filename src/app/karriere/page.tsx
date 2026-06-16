@@ -13,10 +13,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return localizedPageMetadata({
     titleNb: "Karriere",
     titleEn: "Careers",
-    descNb: "Jobb hos TECNOX — servicetekniker, salg og åpen søknad. Bli med i et fagmiljø med 30 års erfaring i storkjøkken.",
-    descEn: "Work at TECNOX — service technician, sales and open applications. Join a team with 30 years of large-scale kitchen experience.",
-    ogTitleNb: "Karriere — TECNOX",
-    ogTitleEn: "Careers — TECNOX",
+    descNb: "Jobb hos Tecno X — servicetekniker, salg og åpen søknad. Bli med i et fagmiljø med 30 års erfaring i storkjøkken.",
+    descEn: "Work at Tecno X — service technician, sales and open applications. Join a team with 30 years of large-scale kitchen experience.",
+    ogTitleNb: "Karriere — Tecno X",
+    ogTitleEn: "Careers — Tecno X",
     ogDescNb: "Ledige stillinger og åpen søknad. Kontakt oss på post@tecnox.no.",
     ogDescEn: "Open positions and open applications. Contact us at post@tecnox.no.",
   });

@@ -9,6 +9,7 @@ import { formatNOK, useCart } from "@/contexts/CartContext";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { displayBrandName } from "@/lib/brand";
 
 type CartSidebarProps = {
   open: boolean;
@@ -159,7 +160,7 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
 
                     <div className="pr-9">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--color-muted)]">
-                        {line.brand}
+                        {displayBrandName(line.brand)}
                       </p>
                       <Link
                         href={`/produkter/${encodeURIComponent(line.productSlug)}`}

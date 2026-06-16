@@ -47,7 +47,7 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
             <Link href="/" className="inline-block leading-none">
               <Image
                 src="/logo-tecno-x.webp"
-                alt="TECNOX"
+                alt="Tecno X"
                 className="h-[52px] sm:h-[56px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
                 width={380}
                 height={70}
@@ -121,7 +121,7 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
           <div>
             <h4 className="text-[16px] font-bold text-white mb-4">{tr(locale, "Kontakt", "Contact")}</h4>
             <a href="tel:92222800" className="block text-[16px] font-bold text-[var(--color-copper)]">
-              922 22 800
+              411 90 600
             </a>
             <a href="mailto:post@tecnox.no" className="mt-3 block text-[14px] text-[#c4bbbd] hover:text-[var(--color-copper)]">
               post@tecnox.no
@@ -185,8 +185,8 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
           <p className="text-[14px] text-[#c4bbbd]">
             {tr(
               locale,
-              "© 2026 TECNOX AS  ·  Org.nr. 000 000 000  ·  Alle priser inkl. MVA",
-              "© 2026 TECNOX AS  ·  Org.no. 000 000 000  ·  All prices incl. VAT",
+              "© 2026 Tecno X AS  ·  Org.nr. 000 000 000  ·  Alle priser inkl. MVA",
+              "© 2026 Tecno X AS  ·  Org.no. 000 000 000  ·  All prices incl. VAT",
             )}
           </p>
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">

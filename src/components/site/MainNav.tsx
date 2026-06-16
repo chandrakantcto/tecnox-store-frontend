@@ -197,7 +197,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
           <Link href="/" className="flex items-center shrink-0">
             <Image
               src="/logo-tecno-x.webp"
-              alt="TECNOX"
+              alt="Tecno X"
               className="h-[52px] sm:h-[50px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
               width={380}
               height={70}

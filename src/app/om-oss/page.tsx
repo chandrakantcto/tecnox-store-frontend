@@ -11,10 +11,10 @@ export async function generateMetadata(): Promise<Metadata> {
     titleEn: "About us",
     descNb: "30 års erfaring med profesjonelt kjøkkenutstyr i Norge. Møt teamet og verdiene som driver oss.",
     descEn: "30 years of professional kitchen equipment in Norway. Meet the team and values that drive us.",
-    ogTitleNb: "Om TECNOX — 30 års erfaring",
-    ogTitleEn: "About TECNOX — 30 years of experience",
-    ogDescNb: "Faglig integritet, lokal tilstedeværelse og lange relasjoner. Det er TECNOX.",
-    ogDescEn: "Professional integrity, local presence and long-term relationships. That is TECNOX.",
+    ogTitleNb: "Om Tecno X — 30 års erfaring",
+    ogTitleEn: "About Tecno X — 30 years of experience",
+    ogDescNb: "Faglig integritet, lokal tilstedeværelse og lange relasjoner. Det er Tecno X.",
+    ogDescEn: "Professional integrity, local presence and long-term relationships. That is Tecno X.",
   });
 }
 

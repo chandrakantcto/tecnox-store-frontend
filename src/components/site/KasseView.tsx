@@ -14,6 +14,7 @@ import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { displayBrandName } from "@/lib/brand";
 import { checkoutFormHasErrors, validateCheckoutForm, type CheckoutFormValues } from "@/lib/checkout/validate";
 import { CHECKOUT_COUNTRIES, labelForCheckoutCountry } from "@/lib/checkout/countries";
 import { sendCheckoutEmails } from "@/lib/checkout/send-checkout-emails";
@@ -587,8 +588,8 @@ export function KasseView({
                       <span className="cursor-pointer">
                         {tr(
                           locale,
-                          "Jeg godkjenner at opplysningene brukes til å behandle og fakturere denne ordren gjennom TECNOX .",
-                          "I agree my details may be used to process and fulfil this order through Tecnox .",
+                          "Jeg godkjenner at opplysningene brukes til å behandle og fakturere denne ordren gjennom Tecno X.",
+                          "I agree my details may be used to process and fulfil this order through Tecno X.",
                         )}
                       </span>
                     </label>
@@ -635,7 +636,7 @@ export function KasseView({
                         <div className="min-w-0 flex-1">
                           <p className="text-[13px] font-bold leading-snug text-white">{line.productName}</p>
                           <p className="mt-0.5 text-[11px] text-[var(--color-dark-muted)]">
-                            {line.brand} · {line.quantity}{" "}
+                            {displayBrandName(line.brand)} · {line.quantity}{" "}
                             {locale === "en" ? "pcs" : "stk"}
                           </p>
                         </div>

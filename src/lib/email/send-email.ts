@@ -22,7 +22,7 @@ function smtpFrom(): string {
   const from = process.env.SMTP_FROM?.trim() || process.env.EMAIL_FROM?.trim();
   if (from) return from;
   const user = smtpUser();
-  return user ? `"TECNOX" <${user}>` : '"TECNOX" <post@tecnox.no>';
+  return user ? `"Tecno X" <${user}>` : '"Tecno X" <post@tecnox.no>';
 }
 
 export async function sendTransactionalEmail(

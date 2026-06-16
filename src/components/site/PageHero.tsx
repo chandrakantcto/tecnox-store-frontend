@@ -62,7 +62,7 @@ export function PageHero({
         </div>
       )}
 
-      {/* brand accent glow (TECNOX blue) */}
+      {/* brand accent glow (Tecno X blue) */}
       <div
         className="absolute inset-0 opacity-[0.6] pointer-events-none"
         style={{

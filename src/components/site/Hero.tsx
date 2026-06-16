@@ -132,7 +132,7 @@ export function Hero({ locale: _locale }: { locale?: Locale }) {
 
   return (
     <section className="bg-[var(--color-stone)] text-[var(--color-ink)] relative overflow-hidden border-b border-[var(--color-divider)]">
-      {/* subtle TECNOX blue accent */}
+      {/* subtle Tecno X blue accent */}
       <div
         className="absolute inset-0 opacity-[0.6] pointer-events-none"
         style={{
@@ -171,8 +171,8 @@ export function Hero({ locale: _locale }: { locale?: Locale }) {
               {tr(locale, "Utforsk produkter", "Explore products")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link href="/kontakt" className="btn-outline-dark">
-              {tr(locale, "Be om tilbud", "Request a quote")}
+           <Link href="/kontakt" className="btn-outline-dark">
+              {tr(locale, "Kontakt meg", "Contact me")}
             </Link>
           </div>
 

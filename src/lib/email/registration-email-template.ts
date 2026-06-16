@@ -9,7 +9,7 @@ export interface RegistrationEmailData {
 }
 
 export function getRegistrationEmailSubject(locale: Locale): string {
-  return tr(locale, "Velkommen til TECNOX", "Welcome to TECNOX");
+  return tr(locale, "Velkommen til Tecno X", "Welcome to Tecno X");
 }
 
 export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl: string, locale: Locale): string {
@@ -22,7 +22,7 @@ export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl:
           <tr>
             <td style="padding:36px 32px 28px;background-color:#ffffff;">
               <h1 style="margin:0 0 18px;font-size:28px;line-height:1.25;color:#111111;font-weight:700;">
-                ${tr(locale, "Velkommen til", "Welcome to")}<span style="color:${BRAND_BLUE};padding:0 4px;"> TECNOX</span>
+                ${tr(locale, "Velkommen til", "Welcome to")}<span style="color:${BRAND_BLUE};padding:0 4px;"> Tecno X</span>
               </h1>
               <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333333;">
                 <strong>${tr(locale, "Hei", "Dear")} ${fullName},</strong>
@@ -30,8 +30,8 @@ export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl:
               <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333333;">
                 ${tr(
                   locale,
-                  "Takk for at du registrerte deg hos TECNOX. Kontoen din er opprettet.",
-                  "Thank you for registering at TECNOX. Your account has been created successfully.",
+                  "Takk for at du registrerte deg hos Tecno X. Kontoen din er opprettet.",
+                  "Thank you for registering at Tecno X. Your account has been created successfully.",
                 )}
               </p>
               <p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#333333;">
@@ -55,7 +55,7 @@ export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl:
               </p>
               <p style="margin:0;font-size:15px;line-height:1.7;color:#333333;">
                 ${tr(locale, "Vennlig hilsen,", "Warm regards,")}<br />
-                <strong style="color:${BRAND_BLUE};">${tr(locale, "TECNOX-teamet", "The TECNOX Team")}</strong>
+                <strong style="color:${BRAND_BLUE};">${tr(locale, "Tecno X-teamet", "The Tecno X Team")}</strong>
               </p>
             </td>
           </tr>`;
@@ -66,7 +66,7 @@ export function buildRegistrationEmailHtml(data: RegistrationEmailData, baseUrl:
 export function buildRegistrationEmailText(data: RegistrationEmailData, locale: Locale): string {
   return `${tr(locale, "Hei", "Dear")} ${data.firstName} ${data.lastName},
 
-${tr(locale, "Takk for at du registrerte deg hos TECNOX.", "Thank you for registering at TECNOX.")}
+${tr(locale, "Takk for at du registrerte deg hos Tecno X.", "Thank you for registering at Tecno X.")}
 
 ${tr(locale, "Fornavn", "First name")}: ${data.firstName}
 ${tr(locale, "Etternavn", "Last name")}: ${data.lastName}
@@ -75,7 +75,7 @@ ${tr(locale, "E-post", "Email")}: ${data.email}
 ${tr(locale, "Du kan nå logge inn med e-post og passord.", "You can now log in with your email and password.")}
 
 ${tr(locale, "Vennlig hilsen,", "Warm regards,")}
-TECNOX`;
+Tecno X`;
 }
 
 export { getEmailBaseUrl };
