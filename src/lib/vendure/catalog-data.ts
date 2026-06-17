@@ -517,7 +517,7 @@ function buildSidebarTree(
       name,
       nameNb: nb,
       nameEn: en,
-      count: rollupVariantTotalsFromCounts(node, directVariantCounts),
+      count: (node.children ?? []).length,
       children: node.children ? buildSidebarTree(node.children, locale, nbNames, enNames, directVariantCounts) : [],
     };
   });

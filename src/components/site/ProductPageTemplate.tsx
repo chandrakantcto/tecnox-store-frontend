@@ -703,7 +703,6 @@ function ProductQuoteSection({
     </section>
   );
 }
-
 function QuoteField({
   label,
   required,
@@ -730,3 +729,4 @@ function QuoteField({
     </div>
   );
 }
+
