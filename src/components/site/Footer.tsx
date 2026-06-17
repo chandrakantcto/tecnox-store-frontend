@@ -135,7 +135,7 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
               <p className="text-white/90 font-semibold uppercase tracking-[0.12em] text-[12px] mb-1.5">
                 {tr(locale, "Åpningstider", "Opening hours")}
               </p>
-              {tr(locale, "Man–fre 08:00–16:00", "Mon–Fri 08:00–16:00")}<br />
+              {tr(locale, "Man–fre 09:30–15:00", "Mon–Fri 09:30–15:00")}<br />
               {tr(locale, "Lør–søn stengt", "Sat–Sun closed")}
             </div>
 

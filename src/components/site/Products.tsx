@@ -170,7 +170,9 @@ export function Products({
     (slug: string | null) => {
       if (catalog.sidebarTree) {
         if (slug === null) {
-          return catalog.sidebarTree.reduce((acc, node) => acc + node.count, 0);
+          const list = catalog.products ?? [];
+          if (list.length > 0) return list.length;
+          return catalog.sidebarTree.length;
         }
         const findNode = (nodes: SidebarTreeNode[], s: string): SidebarTreeNode | null => {
           for (const n of nodes) {
@@ -429,7 +431,7 @@ export function Products({
             <span className="flex-1 truncate">
               {locale === "en" ? node.nameEn || node.name : node.nameNb || node.name}
             </span>
-            <span className="tabular-nums text-[10px] text-[var(--color-muted)] font-normal bg-white/50 px-1.5 py-0.5 rounded-[2px]">
+            <span className="tabular-nums text-[10px] text-[var(--color-muted)] font-normal bg-white/50 pr-4 rounded-[2px]">
               {node.count}
             </span>
 
@@ -480,7 +482,7 @@ export function Products({
               >
                 <button
                   type="button"
-                  className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left lg:hidden"
+                  className="flex w-full items-center justify-between   cursor-pointer gap-3 px-3 py-3 text-left lg:hidden"
                   onClick={() => setCategoryMenuOpen((v) => !v)}
                   aria-expanded={categoryMenuOpen}
                 >

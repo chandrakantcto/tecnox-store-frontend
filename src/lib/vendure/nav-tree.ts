@@ -1,9 +1,6 @@
 import type { MegaLeaf, MegaMain, MegaSub } from "@/data/megaMenu";
 import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
-import {
-  rollupVariantTotalsFromCounts,
-  type DirectVariantCounts,
-} from "@/lib/vendure/collection-variant-counts";
+import type { DirectVariantCounts } from "@/lib/vendure/collection-variant-counts";
 import type { VCollectionNav } from "@/lib/vendure/normalize";
 import { tr, type Locale } from "@/lib/locale";
 
@@ -24,10 +21,10 @@ function branchToMegaSub(mid: VCollectionNav): MegaSub {
   };
 }
 
-/** Mega menu counts roll up descendant collections using flat direct-count map from Shop API */
+/** Mega menu column-1 count = number of direct subcategories shown in column 2 */
 export function navCollectionsToMegaMains(
   navRoots: VCollectionNav[],
-  directCounts: DirectVariantCounts,
+  _directCounts: DirectVariantCounts,
 ): MegaMain[] {
   return navRoots.map((root) => {
     const subs: MegaSub[] = (root.children ?? []).map((mid) => branchToMegaSub(mid));
@@ -35,7 +32,7 @@ export function navCollectionsToMegaMains(
       collectionId: root.id,
       id: root.slug,
       label: root.name,
-      count: rollupVariantTotalsFromCounts(root, directCounts),
+      count: subs.length,
       subs,
     };
   });
@@ -93,7 +90,7 @@ function branchToMegaSubLocalized(
 /** Same tree shape for NB/EN; labels resolved from both locale fetches (matches catalog tiles). */
 export function navCollectionsToMegaMainsForLocale(
   navRoots: VCollectionNav[],
-  directCounts: DirectVariantCounts,
+  _directCounts: DirectVariantCounts,
   nbRoots: VCollectionNav[],
   enRoots: VCollectionNav[],
   locale: Locale,
@@ -108,7 +105,7 @@ export function navCollectionsToMegaMainsForLocale(
       collectionId: root.id,
       id: root.slug,
       label: megaMenuLabel(root.slug, root.name, nbNames, enNames, locale),
-      count: rollupVariantTotalsFromCounts(root, directCounts),
+      count: subs.length,
       subs,
     };
   });

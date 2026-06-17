@@ -252,7 +252,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                         <li key={main.collectionId}>
                           <button
                             type="button"
-                            className={`w-full text-left flex items-center justify-between gap-2 px-4 py-3 text-[13.5px] font-medium transition-colors border-l-[3px] ${
+                            className={`w-full text-left flex items-center cursor-pointer justify-between gap-2 px-4 py-3 text-[13.5px] font-medium transition-colors border-l-[3px] ${
                               megaMainId === main.collectionId
                                 ? "border-[var(--color-copper)] bg-white text-[var(--color-copper)]"
                                 : "border-transparent text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
@@ -282,7 +282,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                               closeMega();
                               refreshProdukterListing(pathname, router);
                             }}
-                            className={`flex items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
+                            className={`flex  cursor-pointer items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
                               megaSubId === sub.collectionId
                                 ? "border-[var(--color-copper)] bg-[var(--color-stone)]/35 text-[var(--color-copper)] font-medium"
                                 : "border-transparent text-[var(--color-ink)] hover:bg-[var(--color-stone)]/50 hover:text-[var(--color-copper)]"
@@ -310,7 +310,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                 closeMega();
                                 refreshProdukterListing(pathname, router);
                               }}
-                              className="block px-4 py-2.5 text-[13px] text-[var(--color-ink)] border-l-[3px] border-transparent hover:border-[var(--color-copper)] hover:bg-[var(--color-stone)]/35 hover:text-[var(--color-copper)] transition-colors"
+                              className="block px-4  cursor-pointer py-2.5 text-[13px] text-[var(--color-ink)] border-l-[3px] border-transparent hover:border-[var(--color-copper)] hover:bg-[var(--color-stone)]/35 hover:text-[var(--color-copper)] transition-colors"
                             >
                               {leaf.label}
                             </Link>
@@ -411,7 +411,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                         setMobileProductsOpen((v) => !v);
                       }}
                       aria-expanded={mobileProductsOpen}
-                      className="flex w-full items-center justify-between gap-2 border-b border-[var(--color-divider)] py-3 text-left text-[15px] text-[var(--color-ink)] hover:text-[var(--color-copper)]"
+                      className="flex w-full items-center justify-between cursor-pointer  gap-2 border-b border-[var(--color-divider)] py-3 text-left text-[15px] text-[var(--color-ink)] hover:text-[var(--color-copper)]"
                     >
                       <span>{tr(locale, link.nb, link.en)}</span>
                       {megaMenuTree.length > 0 ? (
@@ -442,7 +442,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                       setMobileMegaMainId((id) => (id === main.collectionId ? null : main.collectionId));
                                       setMobileMegaSubId(null);
                                     }}
-                                    className={`flex w-full items-center justify-between gap-2 rounded-[3px] border px-3 py-2.5 text-left text-[13px] font-medium transition-colors ${
+                                    className={`flex w-full items-center justify-between  cursor-pointer gap-2 rounded-[3px] border px-3 py-2.5 text-left text-[13px] font-medium transition-colors ${
                                       mainOpen
                                         ? "border-[var(--color-divider)] border-l-[3px] border-l-[var(--color-copper)] bg-white text-[var(--color-ink)] shadow-sm"
                                         : "border-transparent text-[var(--color-muted)] hover:bg-white/70 hover:text-[var(--color-ink)]"
@@ -472,7 +472,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                                   onClick={() =>
                                                     setMobileMegaSubId((id) => (id === sub.collectionId ? null : sub.collectionId))
                                                   }
-                                                  className={`flex w-full items-center justify-between gap-2 rounded-[3px] px-3 py-2 text-left text-[13px] transition-colors ${
+                                                  className={`flex w-full items-center justify-between  cursor-pointer gap-2 rounded-[3px] px-3 py-2 text-left text-[13px] transition-colors ${
                                                     subOpen
                                                       ? "bg-white/90 font-medium text-[var(--color-copper)]"
                                                       : "text-[var(--color-ink)] hover:bg-white/70 hover:text-[var(--color-copper)]"
