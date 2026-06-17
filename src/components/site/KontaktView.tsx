@@ -14,14 +14,14 @@ const OFFICES = [
     cityNb: "Moss",
     cityEn: "Moss",
     address: "Adresseveien 1, 0150 Oslo",
-    phone: "922 22 800",
+    phone: "411 90 600",
     email: "post@tecnox.no",
   },
   {
     cityNb: "Oslo",
     cityEn: "Oslo",
     address: "Strandgaten 14, 5013 Bergen",
-    phone: "922 22 810",
+    phone: "411 90 600",
     email: "post@tecnox.no",
   },
 ];
@@ -69,15 +69,16 @@ export function KontaktView() {
               <h3 className="text-[20px] font-bold tracking-[-0.02em]">{tr(locale, "Direktekontakt", "Direct contact")}</h3>
 
               <div className="mt-8 space-y-6">
-                <a href="tel:92222800" className="flex items-start gap-4 group">
+                <a href="tel:41190600" className="flex items-start gap-4 group">
                   <Phone className="h-5 w-5 text-[var(--color-copper)] mt-0.5 shrink-0" strokeWidth={1.5} />
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-dark-muted)]">
                       {tr(locale, "Sentralbord", "Main line")}
                     </p>
                     <p className="mt-1 text-[20px] font-bold text-[var(--color-copper)] tracking-[-0.02em] group-hover:opacity-90">
-                      922 22 800
+                    411 90 600
                     </p>
+                    <p className="mt-1 text-[14px] text-white">{tr(locale, "Telefon 9:00 - 16:00", "Telephone 9:00 - 16:00")}</p>
                   </div>
                 </a>
 
@@ -99,7 +100,7 @@ export function KontaktView() {
                     <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--color-dark-muted)]">
                       {tr(locale, "Åpningstider", "Opening hours")}
                     </p>
-                    <p className="mt-1 text-[14px] text-white">{tr(locale, "Man–fre 08:00–16:00", "Mon-Fri 08:00-16:00")}</p>
+                    <p className="mt-1 text-[14px] text-white">{tr(locale, "Man–fre 09:30 – 15:00", "Mon-Fri 09:30 – 15:00")}</p>
                     <p className="text-[13px] text-[var(--color-dark-muted)]">
                       {tr(locale, "Service: 24/7 for avtalekunder", "Service: 24/7 for contract customers")}
                     </p>

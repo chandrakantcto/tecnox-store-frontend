@@ -15,7 +15,6 @@ export async function POST(request: Request) {
     const firstName = String(body.firstName || "").trim();
     const lastName = String(body.lastName || "").trim();
     const email = normalizeAuthEmail(String(body.email || ""));
-    const password = String(body.password || "");
     const locale = resolveEmailLocaleFromRequest(request, body.locale);
 
     if (!firstName || !lastName) {
@@ -29,8 +28,8 @@ export async function POST(request: Request) {
     const mail = await sendTransactionalEmail({
       to: email,
       subject: getRegistrationEmailSubject(locale),
-      html: buildRegistrationEmailHtml({ firstName, lastName, email, password }, baseUrl, locale),
-      text: buildRegistrationEmailText({ firstName, lastName, email, password }, locale),
+      html: buildRegistrationEmailHtml({ firstName, lastName, email }, baseUrl, locale),
+      text: buildRegistrationEmailText({ firstName, lastName, email }, locale),
     });
 
     return NextResponse.json({ success: true, emailSent: mail.sent });

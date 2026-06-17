@@ -7,16 +7,20 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { COOKIES_SECTIONS } from "@/data/legalContent";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
+import { localizedPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Informasjonskapsler",
-  description:
-    "Cookie-erklæring for tecnox.no — hvilke informasjonskapsler TECNOX bruker og hvordan du kan administrere dem.",
-  openGraph: {
-    title: "Informasjonskapsler — TECNOX",
-    description: "Les om cookies på TECNOX nettsted og hvordan de brukes for funksjonalitet og statistikk.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedPageMetadata({
+    titleNb: "Informasjonskapsler",
+    titleEn: "Cookies",
+    descNb: "Cookie-erklæring for tecnox.no — hvilke informasjonskapsler Tecno X bruker og hvordan du kan administrere dem.",
+    descEn: "Cookie policy for tecnox.no — which cookies Tecno X uses and how you can manage them.",
+    ogTitleNb: "Informasjonskapsler — Tecno X",
+    ogTitleEn: "Cookies — Tecno X",
+    ogDescNb: "Les om cookies på Tecno X nettsted og hvordan de brukes for funksjonalitet og statistikk.",
+    ogDescEn: "Read about cookies on the Tecno X website and how they are used for functionality and analytics.",
+  });
+}
 
 export default async function InformasjonskapslerPage() {
   const locale = await getServerLocale();

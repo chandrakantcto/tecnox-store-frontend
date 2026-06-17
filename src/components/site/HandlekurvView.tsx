@@ -13,6 +13,7 @@ import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { displayBrandName } from "@/lib/brand";
 import { ConfirmDialog } from "@/components/ui/storefront-dialogs";
 import { ShoppingBag, Minus, Plus, ArrowRight, Trash2 } from "lucide-react";
 import heroImg from "@/assets/hero-combi.jpg";
@@ -148,7 +149,7 @@ export function HandlekurvView({
                       </Link>
 
                       <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{line.brand}</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{displayBrandName(line.brand)}</p>
                         <Link
                           href={`/produkter/${encodeURIComponent(line.productSlug)}`}
                           className="mt-1 block text-[15px] font-bold tracking-[-0.015em] text-[var(--color-ink)] hover:text-[var(--color-copper)]"

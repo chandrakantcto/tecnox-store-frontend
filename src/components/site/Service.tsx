@@ -100,8 +100,8 @@ export function Service({ hideReadMore = false, locale: _locale }: ServiceProps)
       </div>
 
       {/* Right — sticky contact card on stone */}
-      <div className="bg-[var(--color-stone)] py-16 lg:py-20 px-6 lg:px-14 xl:px-16 border-t lg:border-t-0 lg:border-l border-[var(--color-divider)]">
-        <Reveal delay={0.15}>
+      <div className="bg-[var(--color-stone)]  py-16 lg:py-20 px-6 lg:px-14 xl:px-16 border-t lg:border-t-0 lg:border-l border-[var(--color-divider)]">
+        <Reveal delay={0.15} className="sticky top-[120px] h-max" >
           <div className="max-w-md">
             <span className="label-tag inline-flex items-center gap-2 mb-4">
               <span className="h-px w-8 bg-[var(--color-copper)] inline-block" />
@@ -127,7 +127,7 @@ export function Service({ hideReadMore = false, locale: _locale }: ServiceProps)
                   <p className="text-[10px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
                     {tr(locale, "Telefon", "Phone")}
                   </p>
-                  <p className="text-[18px] font-bold text-[var(--color-ink)] tracking-[-0.015em]">922 22 800</p>
+                  <p className="text-[18px] font-bold text-[var(--color-ink)] tracking-[-0.015em]">411 90 600</p>
                 </div>
               </a>
 

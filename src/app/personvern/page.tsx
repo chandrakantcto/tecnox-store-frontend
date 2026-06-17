@@ -7,16 +7,20 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { PRIVACY_SECTIONS } from "@/data/legalContent";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
+import { localizedPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Personvern",
-  description:
-    "Personvernerklæring for TECNOX AS — hvordan vi behandler personopplysninger ved kjøp, tilbud, service og bruk av nettstedet.",
-  openGraph: {
-    title: "Personvern — TECNOX",
-    description: "Les hvordan TECNOX behandler personopplysninger i tråd med GDPR og norsk personvernlovgivning.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedPageMetadata({
+    titleNb: "Personvern",
+    titleEn: "Privacy",
+    descNb: "Personvernerklæring for Tecno X AS — hvordan vi behandler personopplysninger ved kjøp, tilbud, service og bruk av nettstedet.",
+    descEn: "Privacy policy for Tecno X AS — how we process personal data for purchases, quotes, service and use of the website.",
+    ogTitleNb: "Personvern — Tecno X",
+    ogTitleEn: "Privacy — Tecno X",
+    ogDescNb: "Les hvordan Tecno X behandler personopplysninger i tråd med GDPR og norsk personvernlovgivning.",
+    ogDescEn: "Read how Tecno X processes personal data in accordance with GDPR and Norwegian privacy law.",
+  });
+}
 
 export default async function PersonvernPage() {
   const locale = await getServerLocale();
@@ -29,8 +33,8 @@ export default async function PersonvernPage() {
         title={<>{tr(locale, "Dine data. Vårt ansvar.", "Your data. Our responsibility.")}</>}
         description={tr(
           locale,
-          "TECNOX behandler personopplysninger trygt og transparent — enten du bestiller utstyr, ber om tilbud eller kontakter oss for service.",
-          "TECNOX processes personal data safely and transparently — whether you order equipment, request a quote, or contact us for service.",
+          "Tecno X behandler personopplysninger trygt og transparent — enten du bestiller utstyr, ber om tilbud eller kontakter oss for service.",
+          "Tecno X processes personal data safely and transparently — whether you order equipment, request a quote, or contact us for service.",
         )}
         crumbs={[{ label: tr(locale, "Personvern", "Privacy") }]}
         bgImage={bgImg}

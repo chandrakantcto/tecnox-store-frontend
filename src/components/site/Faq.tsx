@@ -71,7 +71,7 @@ export function Faq({ locale: _locale }: { locale?: Locale }) {
             <p className="mt-5 text-[15px] leading-[1.7] text-[var(--color-muted)] max-w-md">
               {tr(locale, "Finner du ikke svaret? Ring oss på ", "Can't find the answer? Call us at ")}
               <a href="tel:92222800" className="text-[var(--color-copper)] font-semibold">
-                922 22 800
+                411 90 600
               </a>{" "}
               {tr(locale, "eller send en e-post — vi svarer normalt samme dag.", "or send an email - we usually reply the same day.")}
             </p>

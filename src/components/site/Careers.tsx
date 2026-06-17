@@ -67,7 +67,7 @@ export function Careers({ locale: _locale }: { locale?: Locale }) {
               {tr(locale, "Karriere", "Careers")}
             </span>
             <h2 className="display-h2 mt-5 text-[var(--color-ink)]">
-              {tr(locale, "Bli en del av TECNOX.", "Become part of TECNOX.")}
+              {tr(locale, "Bli en del av Tecno X.", "Become part of Tecno X.")}
             </h2>
             <p className="mt-5 text-[16px] text-[var(--color-muted)] leading-[1.6] max-w-[560px]">
               {tr(

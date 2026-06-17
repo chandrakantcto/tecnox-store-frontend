@@ -139,6 +139,7 @@ export const GQL_CUSTOMER_ORDER_LIST = /* GraphQL */ `
           code
           state
           orderPlacedAt
+          createdAt
           currencyCode
           totalQuantity
           subTotalWithTax
@@ -158,6 +159,7 @@ export const GQL_ORDER_DETAIL = /* GraphQL */ `
       state
       active
       orderPlacedAt
+      createdAt
       currencyCode
       totalQuantity
       subTotal
@@ -183,6 +185,8 @@ export const GQL_ORDER_DETAIL = /* GraphQL */ `
       lines {
         id
         quantity
+        unitPriceWithTax
+        discountedUnitPriceWithTax
         linePriceWithTax
         discountedLinePriceWithTax
         productVariant {

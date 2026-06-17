@@ -47,8 +47,8 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
             <Link href="/" className="inline-block leading-none">
               <Image
                 src="/logo-tecno-x.webp"
-                alt="TECNOX"
-                className="h-[52px] sm:h-[56px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left brightness-0 invert"
+                alt="Tecno X"
+                className="h-[52px] sm:h-[56px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
                 width={380}
                 height={70}
               />
@@ -121,7 +121,7 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
           <div>
             <h4 className="text-[16px] font-bold text-white mb-4">{tr(locale, "Kontakt", "Contact")}</h4>
             <a href="tel:92222800" className="block text-[16px] font-bold text-[var(--color-copper)]">
-              922 22 800
+              411 90 600
             </a>
             <a href="mailto:post@tecnox.no" className="mt-3 block text-[14px] text-[#c4bbbd] hover:text-[var(--color-copper)]">
               post@tecnox.no
@@ -147,16 +147,32 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
       <div className="border-t border-[var(--color-dark-border)]">
         <div className="container-x py-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] uppercase tracking-[0.16em] text-[var(--color-dark-muted)] font-semibold">
-            {["CE-merket", "NEMKO", "Energi A+", "Miljøfyrtårn", "ISO 9001"].map((c) => (
-              <li key={c} className="px-2.5 py-1 border border-[var(--color-dark-border)] rounded-[2px]">
-                {c}
+            {(
+              [
+                ["CE-merket", "CE marked"],
+                ["NEMKO", "NEMKO"],
+                ["Energi A+", "Energy A+"],
+                ["Miljøfyrtårn", "Eco-Lighthouse"],
+                ["ISO 9001", "ISO 9001"],
+              ] as const
+            ).map(([nb, en]) => (
+              <li key={nb} className="px-2.5 py-1 border border-[var(--color-dark-border)] rounded-[2px]">
+                {tr(locale, nb, en)}
               </li>
             ))}
           </ul>
           <ul className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] uppercase tracking-[0.16em] text-[var(--color-dark-muted)] font-semibold">
-            {["Faktura", "Visa", "Mastercard", "Vipps", "Leasing"].map((p) => (
-              <li key={p} className="px-2.5 py-1 bg-[oklch(0.2_0_0)] rounded-[2px]">
-                {p}
+            {(
+              [
+                ["Faktura", "Invoice"],
+                ["Visa", "Visa"],
+                ["Mastercard", "Mastercard"],
+                ["Vipps", "Vipps"],
+                ["Leasing", "Leasing"],
+              ] as const
+            ).map(([nb, en]) => (
+              <li key={nb} className="px-2.5 py-1 bg-[oklch(0.2_0_0)] rounded-[2px]">
+                {tr(locale, nb, en)}
               </li>
             ))}
           </ul>
@@ -169,8 +185,8 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
           <p className="text-[14px] text-[#c4bbbd]">
             {tr(
               locale,
-              "© 2026 TECNOX AS  ·  Org.nr. 000 000 000  ·  Alle priser inkl. MVA",
-              "© 2026 TECNOX AS  ·  Org.no. 000 000 000  ·  All prices incl. VAT",
+              "© 2026 Tecno X AS  ·  Org.nr. 000 000 000  ·  Alle priser inkl. MVA",
+              "© 2026 Tecno X AS  ·  Org.no. 000 000 000  ·  All prices incl. VAT",
             )}
           </p>
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">

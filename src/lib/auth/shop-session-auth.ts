@@ -1,9 +1,18 @@
 import { shopGraphql } from "@/lib/vendure/shop-client-browser";
 import {
+  accountNotCreatedMessage,
+  checkoutEmailPasswordRequiredMessage,
+  couldNotLoginAfterRegisterMessage,
+  couldNotLoginMessage,
   emailAlreadyRegisteredMessage,
   emailNotRegisteredMessage,
   incorrectPasswordMessage,
+  loginAfterRegisterFailedMessage,
+  loginErrorMessage,
+  loginFailedGenericMessage,
   loginFailedMessage,
+  registerFailedMessage,
+  wrongPasswordForExistingAccountMessage,
 } from "@/lib/auth/auth-messages";
 import { normalizeAuthEmail } from "@/lib/auth/email-validation";
 import {
@@ -13,7 +22,7 @@ import {
 } from "@/lib/vendure/shop-auth-documents";
 
 export type PostCheckoutAuthResult =
-  | { ok: true; authMode: "login" | "signup" }
+  | { ok: true; authMode: "login" | "signup"; accountCreated: boolean }
   | { ok: false; error: string };
 
 function pickMutation(data: unknown, key: string): Record<string, unknown> | null {
@@ -59,12 +68,46 @@ async function doRegister(
 }
 
 function registerSucceeded(payload: Record<string, unknown> | null): boolean {
-  return payload?.__typename === "Success" && payload.success === true;
+  if (!payload || payload.__typename !== "Success") return false;
+  return payload.success !== false;
+}
+
+function isRegistrationConflict(payload: Record<string, unknown> | null): boolean {
+  if (!payload) return false;
+  const code = typeof payload.errorCode === "string" ? payload.errorCode : "";
+  if (/EMAIL|DUPLICATE|ALREADY|NOT_AVAILABLE/i.test(code)) return true;
+  const msg = errorMessageFromMutationPayload(payload, "");
+  return /email.*(already|exist|registered|not available|in use)/i.test(msg) || /already.*registered/i.test(msg);
+}
+
+async function ensureLoggedInAfterRegister(
+  email: string,
+  password: string,
+  locale: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const loginRes = await doLogin(email, password, locale);
+  if (loginRes.networkError || loginRes.graphqlErrors.length) {
+    return {
+      ok: false,
+      error:
+        loginRes.networkError ??
+        loginRes.graphqlErrors.join("; ") ??
+        loginAfterRegisterFailedMessage(locale),
+    };
+  }
+  const loginPayload = pickMutation(loginRes.data, "login");
+  const tn = typeof loginPayload?.__typename === "string" ? loginPayload.__typename : "";
+  if (tn === "CurrentUser") return { ok: true };
+
+  const wrongPw =
+    tn === "InvalidCredentialsError"
+      ? wrongPasswordForExistingAccountMessage(locale)
+      : errorMessageFromMutationPayload(loginPayload, couldNotLoginAfterRegisterMessage(locale));
+  return { ok: false, error: wrongPw };
 }
 
 /**
- * Uses the checkout session bearer token after order placement:
- * try native login → on invalid credentials attempt register then login again.
+ * Guest checkout: register new shoppers on the cart session first, then log in existing customers.
  */
 export async function loginOrRegisterAfterCheckout(
   input: {
@@ -79,86 +122,59 @@ export async function loginOrRegisterAfterCheckout(
   const lc = locale === "en" ? "en" : "nb";
   const email = normalizeAuthEmail(input.email);
   if (!email || !input.password?.length) {
-    return { ok: false, error: "E-post og passord kreves for å fullføre konto." };
+    return { ok: false, error: checkoutEmailPasswordRequiredMessage(lc) };
   }
 
-  let loginRes = await doLogin(email, input.password, lc);
-  if (loginRes.networkError || loginRes.graphqlErrors.length) {
-    return {
-      ok: false,
-      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? "Kunne ikke logge inn.",
-    };
-  }
+  const registerInput = {
+    firstName: input.firstName.trim(),
+    lastName: input.lastName.trim(),
+    phoneNumber: input.phoneNumber?.trim() || undefined,
+    password: input.password,
+  };
 
-  let loginPayload = pickMutation(loginRes.data, "login");
-  let tn = typeof loginPayload?.__typename === "string" ? loginPayload.__typename : "";
-
-  if (tn === "CurrentUser") {
-    return { ok: true, authMode: "login" };
-  }
-
-  if (tn !== "InvalidCredentialsError" && tn !== "NotVerifiedError") {
-    return { ok: false, error: errorMessageFromMutationPayload(loginPayload, "Innlogging mislyktes.") };
-  }
-
-  let reg = await doRegister(
-    email,
-    {
-      firstName: input.firstName.trim(),
-      lastName: input.lastName.trim(),
-      phoneNumber: input.phoneNumber?.trim() || undefined,
-      password: input.password,
-    },
-    lc,
-    true,
-  );
+  let reg = await doRegister(email, registerInput, lc, true);
   if (reg.graphqlErrors.some((e) => e.includes("registerIsolatedCustomerAccount"))) {
-    reg = await doRegister(
-      email,
-      {
-        firstName: input.firstName.trim(),
-        lastName: input.lastName.trim(),
-        phoneNumber: input.phoneNumber?.trim() || undefined,
-        password: input.password,
-      },
-      lc,
-      false,
-    );
+    reg = await doRegister(email, registerInput, lc, false);
   }
 
-  if (reg.networkError || reg.graphqlErrors.length) {
-    return {
-      ok: false,
-      error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? "Kunne ikke opprette konto.",
-    };
-  }
-  const regPayload = pickMutation(reg.data, reg.key);
-  if (!registerSucceeded(regPayload)) {
-    return { ok: false, error: errorMessageFromMutationPayload(regPayload, "Konto ble ikke opprettet.") };
+  if (!reg.networkError && !reg.graphqlErrors.length) {
+    const regPayload = pickMutation(reg.data, reg.key);
+    if (registerSucceeded(regPayload)) {
+      const loggedIn = await ensureLoggedInAfterRegister(email, input.password, lc);
+      if (!loggedIn.ok) return { ok: false, error: loggedIn.error };
+      return { ok: true, authMode: "signup", accountCreated: true };
+    }
+    if (!isRegistrationConflict(regPayload)) {
+      return {
+        ok: false,
+        error: errorMessageFromMutationPayload(regPayload, accountNotCreatedMessage(lc)),
+      };
+    }
   }
 
-  loginRes = await doLogin(email, input.password, lc);
+  const loginRes = await doLogin(email, input.password, lc);
   if (loginRes.networkError || loginRes.graphqlErrors.length) {
     return {
       ok: false,
-      error:
-        loginRes.networkError ??
-        loginRes.graphqlErrors.join("; ") ??
-        "Konto opprettet, men pålogging mislyktes. Prøv «Logg inn» manuelt.",
+      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? couldNotLoginMessage(lc),
     };
   }
-  loginPayload = pickMutation(loginRes.data, "login");
-  tn = typeof loginPayload?.__typename === "string" ? loginPayload.__typename : "";
+
+  const loginPayload = pickMutation(loginRes.data, "login");
+  const tn = typeof loginPayload?.__typename === "string" ? loginPayload.__typename : "";
 
   if (tn === "CurrentUser") {
-    return { ok: true, authMode: "signup" };
+    return { ok: true, authMode: "login", accountCreated: false };
   }
 
-  const wrongPw =
-    tn === "InvalidCredentialsError"
-      ? "Feil passord for denne e-postadressen. Bruk samme passord som for din eksisterende konto."
-      : errorMessageFromMutationPayload(loginPayload, "Kunne ikke logge inn etter registering.");
-  return { ok: false, error: wrongPw };
+  if (tn === "InvalidCredentialsError") {
+    return {
+      ok: false,
+      error: incorrectPasswordMessage(lc),
+    };
+  }
+
+  return { ok: false, error: errorMessageFromMutationPayload(loginPayload, loginFailedMessage(lc)) };
 }
 
 export async function shopLoginEmailPassword(
@@ -172,7 +188,7 @@ export async function shopLoginEmailPassword(
   if (loginRes.networkError || loginRes.graphqlErrors.length) {
     return {
       ok: false,
-      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? "Feil ved innlogging.",
+      error: loginRes.networkError ?? loginRes.graphqlErrors.join("; ") ?? loginErrorMessage(lc),
     };
   }
   const loginPayload = pickMutation(loginRes.data, "login");
@@ -189,7 +205,7 @@ export async function shopLoginEmailPassword(
     return { ok: false, error: loginFailedMessage(lc) };
   }
 
-  return { ok: false, error: errorMessageFromMutationPayload(loginPayload, "Innlogging mislyktes.") };
+  return { ok: false, error: errorMessageFromMutationPayload(loginPayload, loginFailedGenericMessage(lc)) };
 }
 
 export async function shopRegisterAccount(
@@ -239,13 +255,17 @@ export async function shopRegisterAccount(
   if (reg.networkError || reg.graphqlErrors.length) {
     return {
       ok: false,
-      error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? "Registrering feilet.",
+      error: reg.networkError ?? reg.graphqlErrors.join("; ") ?? registerFailedMessage(lc),
     };
   }
 
   const regPayload = pickMutation(reg.data, reg.key);
   if (!registerSucceeded(regPayload)) {
-    return { ok: false, error: errorMessageFromMutationPayload(regPayload, "Registrering feilet.") };
+    const errMsg = errorMessageFromMutationPayload(regPayload, registerFailedMessage(lc));
+    if (/email.*(already|exist|registered)|already.*registered/i.test(errMsg)) {
+      return { ok: false, error: emailAlreadyRegisteredMessage(lc) };
+    }
+    return { ok: false, error: errMsg };
   }
 
   const loginResult = await shopLoginEmailPassword(email, input.password, lc);

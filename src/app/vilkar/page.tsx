@@ -7,16 +7,20 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { TERMS_SECTIONS } from "@/data/legalContent";
 import { getServerLocale } from "@/lib/locale.server";
 import { tr } from "@/lib/locale";
+import { localizedPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Vilkår",
-  description:
-    "Salgs- og leveringsvilkår for TECNOX AS — profesjonelt kjøkkenutstyr, levering, betaling, garanti og service.",
-  openGraph: {
-    title: "Vilkår — TECNOX",
-    description: "Generelle vilkår for kjøp av storkjøkkenutstyr og tilhørende tjenester fra TECNOX.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedPageMetadata({
+    titleNb: "Vilkår",
+    titleEn: "Terms",
+    descNb: "Salgs- og leveringsvilkår for Tecno X AS — profesjonelt kjøkkenutstyr, levering, betaling, garanti og service.",
+    descEn: "Sales and delivery terms for Tecno X AS — professional kitchen equipment, delivery, payment, warranty and service.",
+    ogTitleNb: "Vilkår — Tecno X",
+    ogTitleEn: "Terms — Tecno X",
+    ogDescNb: "Generelle vilkår for kjøp av storkjøkkenutstyr og tilhørende tjenester fra Tecno X.",
+    ogDescEn: "General terms for purchasing large-scale kitchen equipment and related services from Tecno X.",
+  });
+}
 
 export default async function VilkarPage() {
   const locale = await getServerLocale();
@@ -29,8 +33,8 @@ export default async function VilkarPage() {
         title={<>{tr(locale, "Klare rammer for profesjonelle kjøp.", "Clear terms for professional purchases.")}</>}
         description={tr(
           locale,
-          "Disse vilkårene gjelder når du kjøper utstyr, reservedeler eller tjenester fra TECNOX som næringsdrivende kunde.",
-          "These terms apply when you purchase equipment, spare parts, or services from TECNOX as a business customer.",
+          "Disse vilkårene gjelder når du kjøper utstyr, reservedeler eller tjenester fra Tecno X som næringsdrivende kunde.",
+          "These terms apply when you purchase equipment, spare parts, or services from Tecno X as a business customer.",
         )}
         crumbs={[{ label: tr(locale, "Vilkår", "Terms") }]}
         bgImage={bgImg}

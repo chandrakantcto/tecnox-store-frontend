@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { User, ShoppingBag, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
-import { useCartItemCount } from "@/contexts/CartContext";
+import { useCart, useCartItemCount } from "@/contexts/CartContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
 import type { MegaMain } from "@/data/megaMenu";
@@ -116,7 +116,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
   const router = useRouter();
   const { locale, setLocale: setSiteLocale } = useLocale();
   const [open, setOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
+  const { sidebarOpen: cartOpen, setSidebarOpen: setCartOpen } = useCart();
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [mobileMegaMainId, setMobileMegaMainId] = useState<string | null>(null);
   const [mobileMegaSubId, setMobileMegaSubId] = useState<string | null>(null);
@@ -197,7 +197,7 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
           <Link href="/" className="flex items-center shrink-0">
             <Image
               src="/logo-tecno-x.webp"
-              alt="TECNOX"
+              alt="Tecno X"
               className="h-[52px] sm:h-[50px] md:h-[60px] lg:h-[64px] w-auto max-w-[min(100%,380px)] object-contain object-left"
               width={380}
               height={70}

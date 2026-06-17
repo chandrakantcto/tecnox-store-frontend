@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     openGraph: {
-      title: `${title} — TECNOX`,
+      title: `${title} — Tecno X`,
       description: lp.metaDescription?.trim() || fb.ogDesc,
     },
   };

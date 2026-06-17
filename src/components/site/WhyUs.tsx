@@ -39,7 +39,7 @@ export function WhyUs({ locale: _locale }: { locale?: Locale }) {
           <div className="mb-10 lg:mb-14 max-w-2xl">
             <span className="label-tag inline-flex items-center gap-2">
               <span className="h-px w-8 bg-[var(--color-copper)] inline-block" />
-              {tr(locale, "Hvorfor TECNOX", "Why TECNOX")}
+              {tr(locale, "Hvorfor Tecno X", "Why Tecno X")}
             </span>
             <h2 className="display-h2 mt-4 text-[var(--color-ink)]">
               {tr(locale, "Mer enn en leverandør — en faglig partner.", "More than a supplier - a professional partner.")}

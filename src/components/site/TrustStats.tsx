@@ -84,7 +84,7 @@ export function TrustStats({ locale: _locale }: { locale?: Locale }) {
               )}
             </p>
             <footer className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[var(--color-copper)] font-semibold">
-              — TECNOX
+              — Tecno X
             </footer>
           </blockquote>
         </Reveal>

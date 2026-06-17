@@ -82,6 +82,11 @@ export type Product = {
   /** Localized PDP bullet strings from Product.customFields JSON */
   serviceBulletsLocalized?: LocalizedBulletBundle | null;
   quoteBulletsLocalized?: LocalizedBulletBundle | null;
+  /** Product.customFields — model, status, type, tags from Vendure admin */
+  modelNumber?: string | null;
+  productStatus?: string | null;
+  productType?: string | null;
+  tags?: string[];
 };
 
 /** Persisted alongside cart rows so totals stay accurate offline from API. */

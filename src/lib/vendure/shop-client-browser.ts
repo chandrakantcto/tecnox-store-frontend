@@ -1,6 +1,6 @@
 "use client";
 
-/** Session token storage — issued by Vendure as Bearer token (`vendure-auth-token` header on responses). */
+import { pickLocale, tr, type Locale } from "@/lib/locale";
 const TOKEN_KEY = "tecnox.vendure-shop-session";
 
 export function getStoredShopAuthToken(): string | null {
@@ -62,7 +62,12 @@ export async function shopGraphql<T>(
   try {
     json = (await res.json()) as GraphqlPayload<T>;
   } catch {
-    return { data: null, graphqlErrors: [], networkError: "Invalid response from storefront API route." };
+    const lc = pickLocale(locale);
+    return {
+      data: null,
+      graphqlErrors: [],
+      networkError: tr(lc, "Ugyldig svar fra butikk-API.", "Invalid response from storefront API route."),
+    };
   }
 
   const graphqlErrors =

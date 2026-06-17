@@ -1,25 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import { errorMessageFromShopResult, shopGraphql } from "@/lib/vendure/shop-client-browser";
 import {
   GQL_ACTIVE_CUSTOMER_PANEL,
   GQL_CREATE_CUSTOMER_ADDRESS,
-  GQL_CUSTOMER_ORDER_LIST,
-  GQL_ORDER_DETAIL,
   GQL_UPDATE_CUSTOMER,
   GQL_UPDATE_CUSTOMER_PASSWORD,
 } from "@/lib/vendure/shop-auth-documents";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
+import { useActiveLocale } from "@/hooks/use-active-locale";
 import { tr } from "@/lib/locale";
 import type { Locale } from "@/lib/locale";
-import { absoluteAssetUrl } from "@/lib/vendure/normalize";
-import { formatMoneyMinorKr } from "@/lib/vendure/money-display";
+import { AuthFieldGroup } from "@/components/account/AuthFieldGroup";
+import { PasswordRequirementsHint } from "@/components/account/PasswordRequirementsHint";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
+import { requiredCurrentPasswordMessage } from "@/lib/auth/auth-messages";
+import { isBlankInput } from "@/lib/auth/email-validation";
+import { firstFieldError } from "@/lib/auth/field-errors";
 import { validatePasswordComplexity } from "@/lib/auth/validate";
+import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
 
 type CustomerAddress = {
   id: string;
@@ -64,39 +66,6 @@ function parseCustomerAddresses(raw: unknown): CustomerAddress[] {
   return out;
 }
 
-function orderStateLabel(state: string, lc: Locale): string {
-  const labels: Record<string, [string, string]> = {
-    ArrangingPayment: ["Arrangerer betaling", "Arranging payment"],
-    AddingItems: ["Handlekurv", "Cart"],
-    PaymentAuthorized: ["Betaling godkjent", "Payment authorized"],
-    PaymentSettled: ["Betalt", "Paid"],
-    Shipped: ["Sendt", "Shipped"],
-    Delivered: ["Levert", "Delivered"],
-    Cancelled: ["Kansellert", "Cancelled"],
-  };
-  const hit = labels[state];
-  return hit ? tr(lc, hit[0], hit[1]) : state;
-}
-
-function orderStateTone(state: string): string {
-  if (state === "ArrangingPayment" || state === "AddingItems") {
-    return "text-amber-700";
-  }
-  if (state === "PaymentSettled" || state === "Delivered" || state === "Shipped") {
-    return "text-emerald-700";
-  }
-  if (state === "Cancelled") return "text-red-700";
-  return "text-[var(--color-muted)]";
-}
-
-function formatOrderTotalSummary(lc: Locale, totalWithTax: unknown, totalQuantity: number): string {
-  const kr = formatMoneyMinorKr(totalWithTax).replace(/,-$/, "");
-  const count = totalQuantity > 0 ? totalQuantity : 1;
-  const word =
-    count === 1 ? tr(lc, "produkt", "product") : tr(lc, "produkter", "products");
-  return `kr ${kr} ${tr(lc, "for", "for")} ${count} ${word}`;
-}
-
 const ACCOUNT_FORM_GRID = "grid w-full gap-4 sm:grid-cols-2";
 const ACCOUNT_FIELD_LABEL =
   "block text-[11px] uppercase tracking-[0.12em] text-[var(--color-muted)]";
@@ -133,9 +102,9 @@ function formatAddressBlock(addr: CustomerAddress): string {
 }
 
 export function AccountDashboardPanel() {
-  const { locale, customer, logout } = useShopAuth();
+  const { customer, logout } = useShopAuth();
   const router = useRouter();
-  const lc: Locale = locale === "en" ? "en" : "nb";
+  const lc = useActiveLocale();
   const displayName =
     [customer?.firstName, customer?.lastName].filter(Boolean).join(" ").trim() ||
     customer?.emailAddress ||
@@ -182,12 +151,11 @@ export function AccountDashboardPanel() {
 }
 
 export function AccountProfilePanel() {
-  const { locale, refresh, customer } = useShopAuth();
-  const lc: Locale = locale === "en" ? "en" : "nb";
+  const { refresh, customer } = useShopAuth();
+  const lc = useActiveLocale();
   const [firstName, setFirstName] = useState(customer?.firstName ?? "");
   const [lastName, setLastName] = useState(customer?.lastName ?? "");
   const [phone, setPhone] = useState(customer?.phoneNumber ?? "");
-  const [addressLine, setAddressLine] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -198,15 +166,6 @@ export function AccountProfilePanel() {
       setPhone(customer.phoneNumber ?? "");
     }
   }, [customer]);
-
-  useEffect(() => {
-    void (async () => {
-      const res = await shopGraphql<{ activeCustomer: unknown }>(GQL_ACTIVE_CUSTOMER_PANEL, undefined, lc);
-      if (res.data?.activeCustomer) {
-        setAddressLine(primaryAddressLine(parseCustomerAddresses(res.data.activeCustomer)));
-      }
-    })();
-  }, [lc]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,21 +197,11 @@ export function AccountProfilePanel() {
       <h2 className="text-[16px] sm:text-[18px] font-bold text-[var(--color-ink)]">
         {tr(lc, "Kontodetaljer", "Account details")}
       </h2>
-      <p className="mt-1 text-[12px] sm:text-[13px] text-[var(--color-muted)]">
-        {customer?.emailAddress}
-      </p>
-      <p className="mt-2 text-[12px] text-[var(--color-muted)]">
-        {tr(
-          lc,
-          "E-postadressen fungerer som brukernavn og kan ikke endres direkte.",
-          "Your email address is your username and cannot be changed directly.",
-        )}
-      </p>
 
       <form onSubmit={(e) => void save(e)} className="mt-6 w-full space-y-4 sm:mt-8">
         <div className={ACCOUNT_FORM_GRID}>
           <label className={ACCOUNT_FIELD_LABEL}>
-            {tr(lc, "Fornavn", "First name")}
+            {tr(lc, "Fornavn", "First name")} *
             <input
               className={ACCOUNT_FIELD_INPUT}
               value={firstName}
@@ -262,7 +211,7 @@ export function AccountProfilePanel() {
             />
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
-            {tr(lc, "Etternavn", "Last name")}
+            {tr(lc, "Etternavn", "Last name")} *
             <input
               className={ACCOUNT_FIELD_INPUT}
               value={lastName}
@@ -272,31 +221,38 @@ export function AccountProfilePanel() {
             />
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
-            {tr(lc, "Telefon", "Phone")}
+            {tr(lc, "E-postadresse (brukernavn)", "Email address (username)")}
             <input
-              className={ACCOUNT_FIELD_INPUT}
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              maxLength={20}
+              type="email"
+              className={`${ACCOUNT_FIELD_INPUT} cursor-not-allowed bg-[var(--color-stone)]/40 text-[var(--color-muted)]`}
+              value={customer?.emailAddress ?? ""}
+              disabled
+              readOnly
             />
+            <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-[var(--color-muted)]">
+              {tr(
+                lc,
+                "E-postadressen fungerer som brukernavn og kan ikke endres direkte.",
+                "The email address acts as your username and cannot be changed directly.",
+              )}
+            </span>
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
-            {tr(lc, "Adresse", "Address")}
-            <input
-              className={`${ACCOUNT_FIELD_INPUT} bg-[var(--color-stone)]/40`}
-              value={addressLine}
-              readOnly
-              placeholder={tr(lc, "Ingen adresse lagret", "No address saved")}
+            {tr(lc, "Telefonnummer", "Phone number")}
+            <PhoneInputWithCountry
+              value={phone}
+              onChange={setPhone}
+              className="mt-1"
             />
           </label>
         </div>
-        <p className="text-[12px] text-[var(--color-muted)]">
+      {/*   <p className="text-[12px] text-[var(--color-muted)]">
           {tr(lc, "Endre adresser under ", "Manage addresses under ")}
           <Link href="/konto/adresser" className="text-[var(--color-copper)] underline-offset-2 hover:underline">
             {tr(lc, "Adresser", "Addresses")}
           </Link>
           .
-        </p>
+        </p> */}
         {msg ? <p className="text-[12px] sm:text-[13px] text-[var(--color-ink)]">{msg}</p> : null}
         <button
           type="submit"
@@ -394,7 +350,7 @@ function AccountAddressEditForm({
         </label>
         <label className={ACCOUNT_FIELD_LABEL}>
           {tr(lc, "Telefonnummer", "Phone number")}
-          <input className={ACCOUNT_FIELD_INPUT} value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} />
+          <PhoneInputWithCountry value={phone} onChange={setPhone} className="mt-1" />
         </label>
         <label className={`${ACCOUNT_FIELD_LABEL} sm:col-span-2`}>
           {tr(lc, "Gateadresse", "Street address")} *
@@ -448,8 +404,8 @@ function AccountAddressEditForm({
 }
 
 export function AccountAddressesPanel() {
-  const { locale, customer } = useShopAuth();
-  const lc: Locale = locale === "en" ? "en" : "nb";
+  const { customer } = useShopAuth();
+  const lc = useActiveLocale();
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<AddressKind | null>(null);
@@ -553,27 +509,46 @@ export function AccountAddressesPanel() {
   );
 }
 
+type PasswordFieldKey = "current" | "next" | "confirm";
+
 export function AccountPasswordPanel() {
-  const { locale } = useShopAuth();
-  const lc: Locale = locale === "en" ? "en" : "nb";
+  const router = useRouter();
+  const { customer } = useShopAuth();
+  const lc = useActiveLocale();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<PasswordFieldKey, string>>>({});
   const [busy, setBusy] = useState(false);
+
+  const clearFieldError = (field: PasswordFieldKey) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
+    });
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMsg(null);
+    setFieldErrors({});
+
     const pwdErr = validatePasswordComplexity(next, lc);
-    if (pwdErr) {
-      setMsg(pwdErr);
+    const errors = firstFieldError<PasswordFieldKey>([
+      { field: "current", message: isBlankInput(current) ? requiredCurrentPasswordMessage(lc) : null },
+      { field: "next", message: pwdErr },
+      {
+        field: "confirm",
+        message: next !== confirm ? tr(lc, "Nytt passord stemmer ikke overens.", "New passwords do not match.") : null,
+      },
+    ]);
+
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
       return;
     }
-    if (next !== confirm) {
-      setMsg(tr(lc, "Nytt passord stemmer ikke overens.", "New passwords do not match."));
-      return;
-    }
+
     setBusy(true);
     const res = await shopGraphql<{ updateCustomerPassword: unknown }>(
       GQL_UPDATE_CUSTOMER_PASSWORD,
@@ -583,7 +558,7 @@ export function AccountPasswordPanel() {
     setBusy(false);
     const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
     if (outer) {
-      setMsg(outer);
+      setFieldErrors({ current: outer });
       return;
     }
     const p = res.data?.updateCustomerPassword && typeof res.data.updateCustomerPassword === "object"
@@ -592,13 +567,27 @@ export function AccountPasswordPanel() {
     const ok = p && typeof p.__typename === "string" ? p.__typename === "Success" : false;
     if (!ok) {
       const m = typeof p?.message === "string" ? p.message : tr(lc, "Kunne ikke bytte passord.", "Could not change password.");
-      setMsg(m);
+      setFieldErrors({ current: m });
       return;
     }
+
+    const accountEmail = customer?.emailAddress?.trim();
+    if (accountEmail) {
+      try {
+        await fetch("/api/auth/send-password-changed-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: accountEmail, locale: lc }),
+        });
+      } catch {
+        // Password change succeeded; email failure should not block the update.
+      }
+    }
+
     setCurrent("");
     setNext("");
     setConfirm("");
-    setMsg(tr(lc, "Passord oppdatert.", "Password updated."));
+    router.replace("/");
   };
 
   return (
@@ -609,11 +598,17 @@ export function AccountPasswordPanel() {
 
   <form onSubmit={(e) => void submit(e)} className="mt-4 sm:mt-6 w-full space-y-4">
     <div className={ACCOUNT_FORM_GRID}>
-      <label className={ACCOUNT_FIELD_LABEL}>
-        {tr(lc, "Nåværende passord", "Current password")}
+      <AuthFieldGroup
+        label={tr(lc, "Nåværende passord", "Current password")}
+        error={fieldErrors.current}
+        labelClassName={ACCOUNT_FIELD_LABEL}
+      >
         <PasswordWithToggle
           value={current}
-          onChange={setCurrent}
+          onChange={(v) => {
+            setCurrent(v);
+            clearFieldError("current");
+          }}
           required
           autoComplete="current-password"
           maxLength={255}
@@ -621,28 +616,42 @@ export function AccountPasswordPanel() {
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 text-sm sm:text-base"
         />
-      </label>
-     
+      </AuthFieldGroup>
 
-      <label className={ACCOUNT_FIELD_LABEL}>
-        {tr(lc, "Nytt passord", "New password")}
-        <PasswordWithToggle
-          value={next}
-          onChange={setNext}
-          required
-          autoComplete="new-password"
-          maxLength={255}
-          showLabel={tr(lc, "Vis passord", "Show password")}
-          hideLabel={tr(lc, "Skjul passord", "Hide password")}
-          className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
-        />
-      </label>
+      <div>
+        <AuthFieldGroup
+          label={tr(lc, "Nytt passord", "New password")}
+          error={fieldErrors.next}
+          labelClassName={ACCOUNT_FIELD_LABEL}
+        >
+          <PasswordWithToggle
+            value={next}
+            onChange={(v) => {
+              setNext(v);
+              clearFieldError("next");
+            }}
+            required
+            autoComplete="new-password"
+            maxLength={255}
+            showLabel={tr(lc, "Vis passord", "Show password")}
+            hideLabel={tr(lc, "Skjul passord", "Hide password")}
+            className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
+          />
+        </AuthFieldGroup>
+        <PasswordRequirementsHint />
+      </div>
 
-      <label className={ACCOUNT_FIELD_LABEL}>
-        {tr(lc, "Gjenta nytt passord", "Confirm new password")}
+      <AuthFieldGroup
+        label={tr(lc, "Gjenta nytt passord", "Confirm new password")}
+        error={fieldErrors.confirm}
+        labelClassName={ACCOUNT_FIELD_LABEL}
+      >
         <PasswordWithToggle
           value={confirm}
-          onChange={setConfirm}
+          onChange={(v) => {
+            setConfirm(v);
+            clearFieldError("confirm");
+          }}
           required
           autoComplete="new-password"
           maxLength={255}
@@ -650,12 +659,8 @@ export function AccountPasswordPanel() {
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
           className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
         />
-      </label>
+      </AuthFieldGroup>
     </div>
-
-    {msg ? (
-      <p className="text-[12px] sm:text-[13px]">{msg}</p>
-    ) : null}
 
     <button
       type="submit"
@@ -670,276 +675,5 @@ export function AccountPasswordPanel() {
   );
 }
 
-type OrderRow = {
-  id: string;
-  code: string;
-  state: string;
-  orderPlacedAt: string | null;
-  currencyCode?: string | null;
-  totalWithTax?: unknown;
-  totalQuantity: number;
-};
-
-export function AccountOrdersPanel() {
-  const { locale } = useShopAuth();
-  const lc: Locale = locale === "en" ? "en" : "nb";
-  const [rows, setRows] = useState<OrderRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    const res = await shopGraphql<{
-      activeCustomer: { orders: { items: unknown[] | null } | null } | null;
-    }>(GQL_CUSTOMER_ORDER_LIST, { options: { take: 100, skip: 0 } }, lc);
-    const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
-    if (outer || !res.data?.activeCustomer?.orders?.items) {
-      setRows([]);
-      setLoading(false);
-      return;
-    }
-    const items: OrderRow[] = [];
-    for (const raw of res.data.activeCustomer.orders.items) {
-      if (!raw || typeof raw !== "object") continue;
-      const o = raw as Record<string, unknown>;
-      const id = typeof o.id === "string" || typeof o.id === "number" ? String(o.id) : "";
-      const code = typeof o.code === "string" ? o.code : "";
-      const state = typeof o.state === "string" ? o.state : "";
-      if (!id || !code) continue;
-      const orderPlacedAt = typeof o.orderPlacedAt === "string" ? o.orderPlacedAt : null;
-      items.push({
-        id,
-        code,
-        state,
-        orderPlacedAt,
-        currencyCode: typeof o.currencyCode === "string" ? o.currencyCode : "",
-        totalWithTax: o.totalWithTax,
-        totalQuantity:
-          typeof o.totalQuantity === "number"
-            ? o.totalQuantity
-            : Number(o.totalQuantity) || 0,
-      });
-    }
-    setRows(items);
-    setLoading(false);
-  }, [lc]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-6 sm:p-8 lg:p-10">
-      <h2 className="text-[18px] font-bold">{tr(lc, "Bestillinger", "Orders")}</h2>
-      {loading ? (
-        <p className="mt-6 text-[14px] text-[var(--color-muted)]">{tr(lc, "Laster …", "Loading …")}</p>
-      ) : rows.length === 0 ? (
-        <p className="mt-6 text-[14px] text-[var(--color-muted)]">{tr(lc, "Ingen ordrer funnet ennå.", "No orders yet.")}</p>
-      ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-[var(--color-divider)] bg-[var(--color-stone)]/50">
-                <th className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
-                  {tr(lc, "Ordrenummer", "Order number")}
-                </th>
-                <th className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
-                  {tr(lc, "Dato", "Date")}
-                </th>
-                <th className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
-                  {tr(lc, "Status", "Status")}
-                </th>
-                <th className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
-                  {tr(lc, "Total", "Total")}
-                </th>
-                <th className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">
-                  {tr(lc, "Handlinger", "Actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id} className="border-b border-[var(--color-divider)] last:border-b-0">
-                  <td className="px-3 py-4 font-mono text-[14px] font-bold text-[var(--color-ink)]">
-                    #{row.code}
-                  </td>
-                  <td className="px-3 py-4 text-[14px] text-[var(--color-muted)]">
-                    {row.orderPlacedAt
-                      ? new Date(row.orderPlacedAt).toLocaleDateString(lc === "en" ? "en-GB" : "nb-NO", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : "—"}
-                  </td>
-                  <td className={`px-3 py-4 text-[14px] font-medium ${orderStateTone(row.state)}`}>
-                    {orderStateLabel(row.state, lc)}
-                  </td>
-                  <td className="px-3 py-4 text-[14px] text-[var(--color-muted)]">
-                    {formatOrderTotalSummary(lc, row.totalWithTax, row.totalQuantity)}
-                  </td>
-                  <td className="px-3 py-4">
-                    <Link
-                      href={`/konto/ordrer/${encodeURIComponent(row.id)}`}
-                      className="inline-flex rounded-[3px] px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] btn-primary"
-                    >
-                      {tr(lc, "Vis", "View")}
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export function AccountOrderDetailPanel() {
-  const params = useParams();
-  const rawId = params?.orderId;
-  const orderId = typeof rawId === "string" ? decodeURIComponent(rawId) : "";
-
-  const { locale } = useShopAuth();
-  const lc: Locale = locale === "en" ? "en" : "nb";
-  const [data, setData] = useState<unknown>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!orderId) {
-      setLoading(false);
-      return;
-    }
-    void (async () => {
-      setLoading(true);
-      const res = await shopGraphql<{ order: unknown }>(GQL_ORDER_DETAIL, { id: orderId }, lc);
-      const outer = errorMessageFromShopResult(res.networkError, res.graphqlErrors);
-      if (outer || !res.data?.order) {
-        setErr(outer ?? tr(lc, "Ordre ikke tilgjengelig.", "Order not available."));
-        setData(null);
-      } else {
-        setErr(null);
-        setData(res.data.order);
-      }
-      setLoading(false);
-    })();
-  }, [orderId, lc]);
-
-  if (!orderId) return <p>{tr(lc, "Ugyldig ordre.", "Invalid order.")}</p>;
-  if (loading) return <p className="text-[var(--color-muted)]">{tr(lc, "Laster …", "Loading …")}</p>;
-  if (err || !data || typeof data !== "object") {
-    return (
-      <p className="text-red-800">
-        {err ?? tr(lc, "Fant ikke ordren.", "Order not found.")}
-      </p>
-    );
-  }
-  const o = data as Record<string, unknown>;
-
-  return (
-    <div className="space-y-8">
-      <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-8">
-        <p className="font-mono text-[22px] font-bold">{typeof o.code === "string" ? o.code : ""}</p>
-        <p className="mt-2 text-[14px] text-[var(--color-muted)]">
-          {typeof o.state === "string" ? o.state : ""}{" "}
-          {typeof o.orderPlacedAt === "string" ?
-            `· ${new Date(o.orderPlacedAt).toLocaleString(lc === "en" ? "en-GB" : "nb-NO")}`
-          : null}
-        </p>
-        <dl className="mt-8 grid gap-3 sm:grid-cols-2 text-[14px]">
-          <dt className="text-[var(--color-muted)]">{tr(lc, "Total m/MVA", "Total inc. VAT")}</dt>
-          <dd className="font-mono">kr {formatMoneyMinorKr(o.totalWithTax)}</dd>
-        </dl>
-        <ShippingBlock title={tr(lc, "Leveranse", "Shipping")} addr={o.shippingAddress} />
-        <ShippingBlock title={tr(lc, "Faktura", "Billing")} addr={o.billingAddress} />
-      </div>
-      <LinesBlock lines={o.lines as unknown[]} locale={lc} />
-      <Link href="/konto/ordrer" className="inline-block text-[14px] text-[var(--color-copper)] underline-offset-2 hover:underline">
-        ← {tr(lc, "Tilbake til ordrer", "Back to orders")}
-      </Link>
-    </div>
-  );
-}
-
-function ShippingBlock({ title, addr }: { title: string; addr: unknown }) {
-  if (!addr || typeof addr !== "object") return null;
-  const a = addr as Record<string, unknown>;
-  return (
-    <div className="mt-8 border-t border-[var(--color-divider)] pt-8">
-      <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--color-copper)]">{title}</p>
-      <address className="mt-3 whitespace-pre-line not-italic text-[14px] leading-relaxed">
-        {typeof a.fullName === "string" ? `${a.fullName}\n` : null}
-        {typeof a.streetLine1 === "string" ? `${a.streetLine1}\n` : null}
-        {typeof a.postalCode === "string" || typeof a.city === "string"
-          ? `${String(a.postalCode ?? "").trim()} ${String(a.city ?? "").trim()}`.trim() + "\n"
-          : null}
-        {typeof a.countryCode === "string" ? `${a.countryCode}\n` : null}
-        {typeof a.phoneNumber === "string" ? a.phoneNumber : null}
-      </address>
-    </div>
-  );
-}
-
-function LinesBlock({ lines, locale }: { lines: unknown[] | undefined | null; locale: Locale }) {
-  if (!Array.isArray(lines) || !lines.length) return null;
-  return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white">
-      <h3 className="border-b px-8 py-4 text-[14px] font-bold">{tr(locale, "Linjer", "Lines")}</h3>
-      <ul className="divide-y divide-[var(--color-divider)]">
-        {lines.map((raw) => {
-          if (!raw || typeof raw !== "object") return null;
-          const line = raw as Record<string, unknown>;
-          const pv = line.productVariant && typeof line.productVariant === "object" ? (line.productVariant as Record<string, unknown>) : null;
-          const prod =
-            pv?.product && typeof pv.product === "object" ? (pv.product as Record<string, unknown>) : null;
-          const name =
-            typeof prod?.name === "string" ? prod.name
-            : typeof pv?.name === "string"
-              ? pv.name
-              : tr(locale, "Vare", "Item");
-          const slug = typeof prod?.slug === "string" ? prod.slug : "";
-          const qty = typeof line.quantity === "number" ? line.quantity : 0;
-          const preview =
-            pv?.featuredAsset && typeof pv.featuredAsset === "object"
-              ? String((pv.featuredAsset as Record<string, unknown>).preview ?? "")
-              : "";
-          const img = preview ? absoluteAssetUrl(preview) : "";
-          const lineKr = formatMoneyMinorKr(line.discountedLinePriceWithTax);
-
-          const inner = (
-            <div className="flex items-start gap-4 p-5">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[2px] bg-[var(--color-stone)]">
-                <StorefrontRemoteImage
-                  src={img}
-                  alt=""
-                  locale={locale}
-                  fill
-                  compact
-                  className="object-cover"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold">{name}</p>
-                <p className="text-[13px] text-[var(--color-muted)]">
-                  {qty} × kr {formatMoneyMinorKr(line.discountedUnitPriceWithTax)}
-                </p>
-              </div>
-              <p className="font-mono whitespace-nowrap">kr {lineKr}</p>
-            </div>
-          );
-
-          return (
-            <li key={typeof line.id === "string" || typeof line.id === "number" ? String(line.id) : slug + qty}>
-              {slug ?
-                <Link href={`/produkter/${encodeURIComponent(slug)}`} className="block hover:bg-[var(--color-stone)]">
-                  {inner}
-                </Link>
-              : inner}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
+export { AccountOrdersPanel } from "@/components/account/AccountOrdersPanel";
+export { AccountOrderDetailPanel } from "@/components/account/AccountOrderDetailPanel";

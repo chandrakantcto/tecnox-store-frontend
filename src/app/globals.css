@@ -185,7 +185,8 @@
     gap: 8px;
     background-color: var(--color-copper);
     color: white;
-    padding: 14px 26px;
+    padding: 10px 26px;
+    cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     letter-spacing: -0.005em;

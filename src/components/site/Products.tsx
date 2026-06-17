@@ -13,6 +13,7 @@ import { formatNOKExclVatCardAmount } from "@/lib/vendure/normalize";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { displayBrandName } from "@/lib/brand";
 import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
 import { BsArrowUpRightCircleFill } from "react-icons/bs";
 import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
@@ -674,7 +675,7 @@ export function Products({
                       </div>
                       <div className="p-4 flex flex-col flex-1">
                         <p className="text-[11px] text-[var(--color-muted)] uppercase tracking-[0.14em] font-semibold">
-                          {p.brand}
+                          {displayBrandName(p.brand)}
                         </p>
                         <h3 className="mt-1.5 text-[15px] font-bold text-[var(--color-ink)] leading-snug tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
                           {productDisplayName(p, locale)}
@@ -686,9 +687,9 @@ export function Products({
                         ) : null}
                         <div className="mt-auto pt-4 flex items-end justify-between gap-2 border-t border-[var(--color-divider)]">
                           <div >
-                            <p className="text-[12px] text-[var(--color-muted)] uppercase tracking-[0.12em]">
+                          {/*   <p className="text-[12px] text-[var(--color-muted)] uppercase tracking-[0.12em]">
                               {tr(locale, "Fra", "From")}
-                            </p>
+                            </p> */}
                             <p className="text-[12px] font-bold text-[var(--color-copper)] tracking-[-0.01em] leading-tight">
                               {productPriceDisplay(p, locale)}
                             </p>

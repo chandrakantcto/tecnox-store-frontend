@@ -224,8 +224,8 @@ function formatNokAmount(locale: string, minor: number): string {
 export function formatNOKExclVatFromMinor(locale: string, minor: number | null): string {
   if (minor === null || !Number.isFinite(minor)) return "—";
   const amount = formatNokAmount(locale, minor);
-  if (locale === "en") return `From NOK ${amount},- incl. VAT`;
-  return `Fra kr ${amount},- inkl. MVA`;
+  if (locale === "en") return ` NOK ${amount},- incl. VAT`;
+  return ` kr ${amount},- inkl. MVA`;
 }
 
 /** Amount + VAT note only — product cards that already show a separate “From” label. */

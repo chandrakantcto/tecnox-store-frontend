@@ -3,16 +3,20 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AuthValidationAlert } from "@/components/account/AuthValidationAlert";
+import { AuthFieldGroup } from "@/components/account/AuthFieldGroup";
+import { PasswordRequirementsHint } from "@/components/account/PasswordRequirementsHint";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
 import {
   emailNotRegisteredMessage,
   invalidEmailFormatMessage,
   invalidOtpMessage,
   passwordsDoNotMatchMessage,
+  requiredEmailMessage,
+  requiredPasswordMessage,
 } from "@/lib/auth/auth-messages";
-import { isValidEmail } from "@/lib/auth/email-validation";
+import { isBlankInput, isValidEmail, normalizeAuthEmail } from "@/lib/auth/email-validation";
 import { OTP_VALIDITY_SECONDS } from "@/lib/auth/otp-store";
+import { firstFieldError } from "@/lib/auth/field-errors";
 import { validatePasswordComplexity } from "@/lib/auth/validate";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
@@ -20,6 +24,7 @@ import { shopLoginEmailPassword } from "@/lib/auth/shop-session-auth";
 import { tr } from "@/lib/locale";
 
 type Step = "email" | "otp" | "reset";
+type ForgotFieldKey = "email" | "otp" | "password" | "confirmPassword";
 
 function formatTimer(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -36,7 +41,7 @@ export function ForgotPasswordForm() {
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<ForgotFieldKey, string>>>({});
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [devOtp, setDevOtp] = useState("");
@@ -56,31 +61,62 @@ export function ForgotPasswordForm() {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setFieldErrors({});
     setInfo(null);
     setDevOtp("");
 
-    if (!isValidEmail(email)) {
-      setError(invalidEmailFormatMessage(lc));
+    const trimmedEmail = normalizeAuthEmail(email);
+    setEmail(trimmedEmail);
+
+    if (isBlankInput(trimmedEmail)) {
+      setFieldErrors({ email: requiredEmailMessage(lc) });
+      return;
+    }
+    if (!isValidEmail(trimmedEmail)) {
+      setFieldErrors({ email: invalidEmailFormatMessage(lc) });
       return;
     }
 
     setBusy(true);
     try {
+      const checkRes = await fetch("/api/auth/check-customer-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmedEmail }),
+      });
+      const checkData = (await checkRes.json()) as {
+        registered?: boolean;
+        lookupAvailable?: boolean;
+      };
+      if (!checkData.lookupAvailable) {
+        setFieldErrors({
+          email: tr(
+            lc,
+            "Kunne ikke verifisere e-post. Prøv igjen senere.",
+            "Could not verify email. Please try again later.",
+          ),
+        });
+        return;
+      }
+      if (!checkData.registered) {
+        setFieldErrors({ email: emailNotRegisteredMessage(lc) });
+        return;
+      }
+
       const res = await fetch("/api/auth/send-reset-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, locale: lc }),
+        body: JSON.stringify({ email: trimmedEmail, locale: lc }),
       });
       const data = (await res.json()) as { success?: boolean; error?: string; emailSent?: boolean; devOtp?: string };
 
       if (!data.success) {
         if (data.error === "email_not_registered") {
-          setError(emailNotRegisteredMessage(lc));
+          setFieldErrors({ email: emailNotRegisteredMessage(lc) });
         } else if (data.error === "invalid_email") {
-          setError(invalidEmailFormatMessage(lc));
+          setFieldErrors({ email: invalidEmailFormatMessage(lc) });
         } else {
-          setError(tr(lc, "Kunne ikke sende kode. Prøv igjen.", "Could not send code. Please try again."));
+          setFieldErrors({ email: tr(lc, "Kunne ikke sende kode. Prøv igjen.", "Could not send code. Please try again.") });
         }
         return;
       }
@@ -94,7 +130,7 @@ export function ForgotPasswordForm() {
       setStep("otp");
       startOtpExpiryTimer();
     } catch {
-      setError(tr(lc, "Kunne ikke sende kode. Prøv igjen.", "Could not send code. Please try again."));
+      setFieldErrors({ email: tr(lc, "Kunne ikke sende kode. Prøv igjen.", "Could not send code. Please try again.") });
     } finally {
       setBusy(false);
     }
@@ -105,7 +141,12 @@ export function ForgotPasswordForm() {
     const next = [...otpDigits];
     next[index] = digit;
     setOtpDigits(next);
-    setError(null);
+    setFieldErrors((prev) => {
+      if (!prev.otp) return prev;
+      const nextErrors = { ...prev };
+      delete nextErrors.otp;
+      return nextErrors;
+    });
     if (digit && index < 5) {
       document.getElementById(`otp-${index + 1}`)?.focus();
     }
@@ -117,7 +158,12 @@ export function ForgotPasswordForm() {
       const next = [...otpDigits];
       next[index] = "";
       setOtpDigits(next);
-      setError(null);
+      setFieldErrors((prev) => {
+        if (!prev.otp) return prev;
+        const nextErrors = { ...prev };
+        delete nextErrors.otp;
+        return nextErrors;
+      });
       e.preventDefault();
       return;
     }
@@ -125,25 +171,31 @@ export function ForgotPasswordForm() {
       const next = [...otpDigits];
       next[index - 1] = "";
       setOtpDigits(next);
-      setError(null);
+      setFieldErrors((prev) => {
+        if (!prev.otp) return prev;
+        const nextErrors = { ...prev };
+        delete nextErrors.otp;
+        return nextErrors;
+      });
       document.getElementById(`otp-${index - 1}`)?.focus();
       e.preventDefault();
     }
   };
 
   const handleResendOtp = async () => {
-    if (busy || !email) return;
-    setError(null);
+    const trimmedEmail = normalizeAuthEmail(email);
+    if (busy || !trimmedEmail) return;
+    setFieldErrors({});
     setBusy(true);
     try {
       const res = await fetch("/api/auth/send-reset-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, locale: lc }),
+        body: JSON.stringify({ email: trimmedEmail, locale: lc }),
       });
       const data = (await res.json()) as { success?: boolean; devOtp?: string };
       if (!data.success) {
-        setError(tr(lc, "Kunne ikke sende kode på nytt.", "Could not resend code."));
+        setFieldErrors({ otp: tr(lc, "Kunne ikke sende kode på nytt.", "Could not resend code.") });
         return;
       }
       if (data.devOtp) setDevOtp(String(data.devOtp));
@@ -151,7 +203,7 @@ export function ForgotPasswordForm() {
       startOtpExpiryTimer();
       document.getElementById("otp-0")?.focus();
     } catch {
-      setError(tr(lc, "Kunne ikke sende kode på nytt.", "Could not resend code."));
+      setFieldErrors({ otp: tr(lc, "Kunne ikke sende kode på nytt.", "Could not resend code.") });
     } finally {
       setBusy(false);
     }
@@ -159,9 +211,9 @@ export function ForgotPasswordForm() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setFieldErrors({});
     if (otp.length !== 6) {
-      setError(invalidOtpMessage(lc));
+      setFieldErrors({ otp: invalidOtpMessage(lc) });
       return;
     }
     setBusy(true);
@@ -173,13 +225,13 @@ export function ForgotPasswordForm() {
       });
       const data = (await res.json()) as { success?: boolean };
       if (!data.success) {
-        setError(invalidOtpMessage(lc));
+        setFieldErrors({ otp: invalidOtpMessage(lc) });
         return;
       }
       setInfo(null);
       setStep("reset");
     } catch {
-      setError(invalidOtpMessage(lc));
+      setFieldErrors({ otp: invalidOtpMessage(lc) });
     } finally {
       setBusy(false);
     }
@@ -187,47 +239,58 @@ export function ForgotPasswordForm() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setFieldErrors({});
     setInfo(null);
 
-    const pwdErr = validatePasswordComplexity(password, lc);
-    if (pwdErr) {
-      setError(pwdErr);
+    const pwdErr = isBlankInput(password) ? null : validatePasswordComplexity(password, lc);
+    const errors = firstFieldError<ForgotFieldKey>([
+      {
+        field: "password",
+        message: isBlankInput(password) ? requiredPasswordMessage(lc) : pwdErr,
+      },
+      {
+        field: "confirmPassword",
+        message: password !== confirmPassword ? passwordsDoNotMatchMessage(lc) : null,
+      },
+    ]);
+
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
       return;
     }
-    if (password !== confirmPassword) {
-      setError(passwordsDoNotMatchMessage(lc));
-      return;
-    }
+
+    const trimmedEmail = normalizeAuthEmail(email);
 
     setBusy(true);
     try {
       const res = await fetch("/api/auth/complete-password-reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp, password, locale: lc }),
+        body: JSON.stringify({ email: trimmedEmail, otp, password, locale: lc }),
       });
       const data = (await res.json()) as { success?: boolean; message?: string };
       if (!data.success) {
-        setError(data.message ?? tr(lc, "Kunne ikke tilbakestille passord.", "Could not reset password."));
+        setFieldErrors({
+          password: data.message ?? tr(lc, "Kunne ikke tilbakestille passord.", "Could not reset password."),
+        });
         return;
       }
 
-      const login = await shopLoginEmailPassword(email, password, lc);
+      const login = await shopLoginEmailPassword(trimmedEmail, password, lc);
       if (!login.ok) {
-        setError(
-          tr(
+        setFieldErrors({
+          password: tr(
             lc,
             "Passordet er oppdatert, men automatisk innlogging mislyktes. Prøv å logge inn manuelt.",
             "Password updated, but automatic sign-in failed. Please sign in manually.",
           ),
-        );
+        });
         return;
       }
       await refresh();
       router.replace("/");
     } catch {
-      setError(tr(lc, "Kunne ikke tilbakestille passord.", "Could not reset password."));
+      setFieldErrors({ password: tr(lc, "Kunne ikke tilbakestille passord.", "Could not reset password.") });
     } finally {
       setBusy(false);
     }
@@ -242,33 +305,55 @@ export function ForgotPasswordForm() {
         <p className="mb-6 text-[14px] text-[var(--color-muted)]">
           {tr(lc, "Velg et nytt passord for kontoen din.", "Choose a new password for your account.")}
         </p>
-        {error ? <div className="mb-4"><AuthValidationAlert>{error}</AuthValidationAlert></div> : null}
         <form onSubmit={(e) => void handleResetPassword(e)} className="space-y-5">
-          <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
-            {tr(lc, "Nytt passord", "New password")}
-            <PasswordWithToggle
-              value={password}
-              onChange={setPassword}
-              required
-              autoComplete="new-password"
-              showLabel={tr(lc, "Vis passord", "Show password")}
-              hideLabel={tr(lc, "Skjul passord", "Hide password")}
-              className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
-            />
-          </label>
-          <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
-            {tr(lc, "Gjenta passord", "Confirm password")}
+          <div>
+            <AuthFieldGroup
+              label={tr(lc, "Nytt passord", "New password")}
+              error={fieldErrors.password}
+            >
+              <PasswordWithToggle
+                value={password}
+                onChange={(v) => {
+                  setPassword(v);
+                  setFieldErrors((prev) => {
+                    if (!prev.password) return prev;
+                    const next = { ...prev };
+                    delete next.password;
+                    return next;
+                  });
+                }}
+                required
+                autoComplete="new-password"
+                showLabel={tr(lc, "Vis passord", "Show password")}
+                hideLabel={tr(lc, "Skjul passord", "Hide password")}
+                className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
+              />
+            </AuthFieldGroup>
+            <PasswordRequirementsHint />
+          </div>
+          <AuthFieldGroup
+            label={tr(lc, "Gjenta passord", "Confirm password")}
+            error={fieldErrors.confirmPassword}
+          >
             <PasswordWithToggle
               value={confirmPassword}
-              onChange={setConfirmPassword}
+              onChange={(v) => {
+                setConfirmPassword(v);
+                setFieldErrors((prev) => {
+                  if (!prev.confirmPassword) return prev;
+                  const next = { ...prev };
+                  delete next.confirmPassword;
+                  return next;
+                });
+              }}
               required
               autoComplete="new-password"
               showLabel={tr(lc, "Vis passord", "Show password")}
               hideLabel={tr(lc, "Skjul passord", "Hide password")}
               className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 pr-11 text-[14px]"
             />
-          </label>
-          <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
+          </AuthFieldGroup>
+          <button type="submit" disabled={busy} className="btn-primary cursor-pointer w-full disabled:opacity-60">
             {busy ? tr(lc, "Lagrer …", "Saving …") : tr(lc, "Oppdater passord", "Update password")}
           </button>
         </form>
@@ -283,13 +368,15 @@ export function ForgotPasswordForm() {
           {tr(lc, "Glemt passord", "Forgot Password")}
         </h2>
         <p className="mb-6 text-[14px] text-[var(--color-muted)]">
-          {tr(lc, "Skriv inn den 6-sifrede koden fra e-posten.", "Enter the 6-digit code from your email.")}
+          {tr(lc, "Skriv inn den 6-sifrede koden fra ", "Enter the 6-digit code from your ")}{" "}
+          <span className="font-semibold text-[var(--color-copper)]">{email}</span>.
         </p>
         {devOtp ? (
           <p className="mb-4 rounded-[2px] bg-amber-50 px-3 py-2 font-mono text-[12px] text-amber-900">Dev OTP: {devOtp}</p>
         ) : null}
         <form onSubmit={(e) => void handleVerifyOtp(e)} className="space-y-5">
-          <div className="flex justify-between gap-2">
+          <AuthFieldGroup error={fieldErrors.otp}>
+            <div className="flex justify-between gap-2">
             {otpDigits.map((digit, index) => (
               <input
                 key={index}
@@ -303,9 +390,9 @@ export function ForgotPasswordForm() {
                 className="h-12 w-11 rounded-[2px] border border-[var(--color-divider)] text-center text-lg font-bold focus:border-[var(--color-copper)] focus:outline-none"
               />
             ))}
-          </div>
-          {error ? <AuthValidationAlert>{error}</AuthValidationAlert> : null}
-          <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
+            </div>
+          </AuthFieldGroup>
+          <button type="submit" disabled={busy} className="btn-primary cursor-pointer w-full disabled:opacity-60">
             {busy ? tr(lc, "Verifiserer …", "Verifying …") : tr(lc, "Verifiser kode", "Verify code")}
           </button>
           <div className="flex items-center justify-between gap-4 text-[12px] text-[var(--color-muted)]">
@@ -319,7 +406,7 @@ export function ForgotPasswordForm() {
           </div>
         </form>
         <p className="mt-6 text-center">
-          <button type="button" onClick={() => { setStep("email"); setOtpDigits(["", "", "", "", "", ""]); setError(null); }} className="text-[14px] text-[var(--color-copper)] hover:underline">
+          <button type="button" onClick={() => { setStep("email"); setOtpDigits(["", "", "", "", "", ""]); setFieldErrors({}); }} className="text-[14px] text-[var(--color-copper)] hover:underline">
             ← {tr(lc, "Tilbake", "Back")}
           </button>
         </p>
@@ -335,21 +422,31 @@ export function ForgotPasswordForm() {
       <p className="mb-6 text-[14px] text-[var(--color-muted)]">
         {tr(lc, "Skriv inn e-postadressen din for å tilbakestille passordet.", "Enter your email address to reset your password.")}
       </p>
-      {error ? <div className="mb-4"><AuthValidationAlert>{error}</AuthValidationAlert></div> : null}
       {info ? <p className="mb-4 text-[13px] text-[var(--color-muted)]">{info}</p> : null}
       <form onSubmit={(e) => void handleSendOtp(e)} className="space-y-5">
-        <label className="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)]">
-          {tr(lc, "E-post", "Email")}
+        <AuthFieldGroup
+          label={tr(lc, "E-post", "Email")}
+          error={fieldErrors.email}
+        >
           <input
             type="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setFieldErrors((prev) => {
+                if (!prev.email) return prev;
+                const next = { ...prev };
+                delete next.email;
+                return next;
+              });
+            }}
+            onBlur={() => setEmail((v) => v.trim())}
             placeholder={tr(lc, "Skriv inn e-post", "Enter your email")}
             className="mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px] focus:border-[var(--color-copper)] focus:outline-none"
           />
-        </label>
-        <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
+        </AuthFieldGroup>
+        <button type="submit" disabled={busy} className="btn-primary cursor-pointer w-full disabled:opacity-60">
           {busy ? tr(lc, "Sender …", "Sending …") : tr(lc, "Send kode", "Send code")}
         </button>
       </form>
