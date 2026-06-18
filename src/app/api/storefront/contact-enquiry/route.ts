@@ -5,11 +5,11 @@ import { vendureShopQuery } from "@/lib/vendure/shop-fetch";
 import { resolveRequestLocale } from "@/lib/email/email-locale";
 import { ValidationError, parseContactPayload } from "@/lib/storefront-forms/validate";
 import { sendTransactionalEmail } from "@/lib/email/send-email";
-import { 
-  buildContactEnquiryAdminHtml, 
-  buildContactEnquiryUserHtml, 
-  getContactEnquiryAdminSubject, 
-  getContactEnquiryUserSubject 
+import {
+  buildContactEnquiryAdminHtml,
+  buildContactEnquiryUserHtml,
+  getContactEnquiryAdminSubject,
+  getContactEnquiryUserSubject
 } from "@/lib/email/contact-enquiry-email-template";
 import { getEmailBaseUrl } from "@/lib/email/tecno-x-email-shell";
 

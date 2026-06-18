@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createOtp } from "@/lib/auth/otp-store";
 import { isValidEmail, normalizeAuthEmail } from "@/lib/auth/email-validation";
 import { isCustomerEmailRegistered } from "@/lib/auth/customer-email-lookup";
 import { resolveEmailLocaleFromRequest } from "@/lib/email/email-locale";
@@ -10,6 +9,7 @@ import {
 } from "@/lib/email/password-reset-email-template";
 import { getEmailBaseUrl } from "@/lib/email/registration-email-template";
 import { sendTransactionalEmail } from "@/lib/email/send-email";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "email_not_registered" }, { status: 400 });
     }
 
-    const otp = createOtp(email, "password-reset");
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
     const baseUrl = getEmailBaseUrl(new URL(request.url).origin);
 
     const mail = await sendTransactionalEmail({
@@ -38,11 +38,24 @@ export async function POST(request: Request) {
 
     const isDev = process.env.NODE_ENV === "development";
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       emailSent: mail.sent,
       ...(isDev && !mail.sent ? { devOtp: otp } : {}),
     });
+
+    const expiresAt = Date.now() + 15 * 60 * 1000;
+    const payload = `${email}:${otp}:${expiresAt}`;
+    const signature = crypto.createHmac('sha256', process.env.FRONTEND_OTP_SECRET || 'emida-super-secret-2026').update(payload).digest('hex');
+
+    response.cookies.set('tecnox_pwd_reset', `${payload}|${signature}`, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60,
+    });
+
+    return response;
   } catch {
     return NextResponse.json({ success: false, error: "server_error" }, { status: 500 });
   }
