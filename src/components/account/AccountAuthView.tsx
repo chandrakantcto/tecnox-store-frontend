@@ -24,6 +24,7 @@ import {
   requiredLastNameMessage,
   requiredPasswordMessage,
   termsNotAcceptedMessage,
+  passwordsDoNotMatchMessage,
 } from "@/lib/auth/auth-messages";
 import {
   isBlankInput,
@@ -45,7 +46,7 @@ const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
 export type AuthTab = "login" | "register";
 
 type LoginFieldKey = "email" | "password";
-type RegisterFieldKey = "firstName" | "lastName" | "email" | "phone" | "password" | "terms";
+type RegisterFieldKey = "firstName" | "lastName" | "email" | "phone" | "password" | "confirmPassword" | "terms";
 
 function AuthTabs({ active }: { active: AuthTab }) {
   const { locale: lc } = useLocale();
@@ -72,8 +73,9 @@ function AuthTabs({ active }: { active: AuthTab }) {
 function LoginPanel() {
   const router = useRouter();
   const sp = useSearchParams();
-  const rawNext = sp.get("next") || "/konto";
-  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/konto";
+  const rawNext = sp.get("next") || "/";
+  const nextRawSafe = rawNext.startsWith("/konto") ? "/" : rawNext;
+  const next = nextRawSafe.startsWith("/") && !nextRawSafe.startsWith("//") ? nextRawSafe : "/";
   const { locale: lc } = useLocale();
   const { refresh } = useShopAuth();
   const [email, setEmail] = useState("");
@@ -159,7 +161,11 @@ function LoginPanel() {
       return;
     }
     await refresh();
-    router.replace(next);
+    if (next === "/") {
+      window.location.href = "/";
+    } else {
+      router.replace(next);
+    }
   };
 
   return (
@@ -223,12 +229,17 @@ function LoginPanel() {
 function RegisterPanel() {
   const { locale: lc } = useLocale();
   const router = useRouter();
+  const sp = useSearchParams();
+  const rawNext = sp.get("next") || "/";
+  const nextRawSafe = rawNext.startsWith("/konto") ? "/" : rawNext;
+  const next = nextRawSafe.startsWith("/") && !nextRawSafe.startsWith("//") ? nextRawSafe : "/";
   const { refresh } = useShopAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<RegisterFieldKey, string>>>({});
   const [busy, setBusy] = useState(false);
@@ -264,6 +275,10 @@ function RegisterPanel() {
       {
         field: "password",
         message: isBlankInput(password) ? requiredPasswordMessage(lc) : pwdErr,
+      },
+      {
+        field: "confirmPassword",
+        message: password !== confirmPassword ? passwordsDoNotMatchMessage(lc) : null,
       },
       { field: "terms", message: !termsAccepted ? termsNotAcceptedMessage(lc) : null },
     ]);
@@ -348,7 +363,11 @@ function RegisterPanel() {
 
     setBusy(false);
     await refresh();
-    router.replace("/");
+    if (next === "/") {
+      window.location.href = "/";
+    } else {
+      router.replace(next);
+    }
   };
 
   return (
@@ -416,11 +435,26 @@ function RegisterPanel() {
           onChange={(v) => {
             setPassword(v);
             clearFieldError("password");
+            if (v === confirmPassword && !isBlankInput(v)) clearFieldError("confirmPassword");
           }}
           required
           maxLength={255}
         />
         <PasswordRequirementsHint />
+      </div>
+      <div>
+        <RegisterField
+          label={tr(lc, "Bekreft passord", "Confirm password")}
+          type="password"
+          value={confirmPassword}
+          error={fieldErrors.confirmPassword}
+          onChange={(v) => {
+            setConfirmPassword(v);
+            clearFieldError("confirmPassword");
+          }}
+          required
+          maxLength={255}
+        />
       </div>
       <AuthFieldGroup error={fieldErrors.terms}>
         <TermsAcceptanceCheckbox
