@@ -3,8 +3,14 @@ import { normalizeAuthEmail } from "@/lib/auth/email-validation";
 
 const CUSTOMERS_BY_EMAIL = /* GraphQL */ `
   query CustomersByEmail($email: String!) {
-    customers(options: { filter: { emailAddress: { eq: $email } }, take: 1 }) {
-      totalItems
+    customers(options: { filter: { emailAddress: { eq: $email } } }) {
+      items {
+        id
+        user {
+          id
+          identifier
+        }
+      }
     }
   }
 `;
@@ -99,13 +105,16 @@ export async function isCustomerEmailRegistered(email: string): Promise<boolean 
   if (!adminToken) return null;
 
   const normalized = normalizeAuthEmail(email);
+  const channelToken = getVendureServerConfigOrNull()?.channelToken || "";
+  const expectedIdentifier = `${normalized}::${channelToken.toLowerCase()}`;
+
   try {
     const res = await fetch(adminUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${adminToken}`,
-        "vendure-token": getVendureServerConfigOrNull()?.channelToken || "",
+        "vendure-token": channelToken,
       },
       body: JSON.stringify({
         query: CUSTOMERS_BY_EMAIL,
@@ -114,11 +123,18 @@ export async function isCustomerEmailRegistered(email: string): Promise<boolean 
       cache: "no-store",
     });
     const json = (await res.json()) as {
-      data?: { customers?: { totalItems?: number } };
+      data?: { customers?: { items?: Array<{ user?: { identifier: string } | null }> } };
       errors?: Array<{ message: string }>;
     };
     if (!res.ok || json.errors?.length) return null;
-    return (json.data?.customers?.totalItems ?? 0) > 0;
+
+    const items = json.data?.customers?.items;
+    if (!Array.isArray(items)) return false;
+
+    return items.some((item) => {
+      const ident = item?.user?.identifier;
+      return typeof ident === "string" && ident.toLowerCase() === expectedIdentifier;
+    });
   } catch {
     return null;
   }
