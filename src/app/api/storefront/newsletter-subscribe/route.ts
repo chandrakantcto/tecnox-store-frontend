@@ -4,6 +4,14 @@ import { parseNewsletterEmailPayload, ValidationError } from "@/lib/storefront-f
 import { getVendureServerConfigOrNull } from "@/lib/vendure/env";
 import { GQL_SUBSCRIBE_NEWSLETTER, type SubmitLeadResultJson } from "@/lib/vendure/storefront-forms-mutations";
 import { vendureShopQuery } from "@/lib/vendure/shop-fetch";
+import { sendTransactionalEmail } from "@/lib/email/send-email";
+import { 
+  buildNewsletterSubscribeAdminHtml, 
+  buildNewsletterSubscribeUserHtml, 
+  getNewsletterSubscribeAdminSubject, 
+  getNewsletterSubscribeUserSubject 
+} from "@/lib/email/newsletter-subscribe-email-template";
+import { getEmailBaseUrl } from "@/lib/email/tecno-x-email-shell";
 
 type Body = Record<string, unknown>;
 
@@ -48,6 +56,25 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+
+  // Send Emails
+  const baseUrl = getEmailBaseUrl(new URL(req.url).origin);
+  const adminEmail = process.env.SMTP_USERNAME?.trim() || "giteshrewathi@gmail.com";
+
+  await Promise.allSettled([
+    // User Email
+    sendTransactionalEmail({
+      to: email,
+      subject: getNewsletterSubscribeUserSubject(locale),
+      html: buildNewsletterSubscribeUserHtml(baseUrl, locale),
+    }),
+    // Admin Email
+    sendTransactionalEmail({
+      to: adminEmail,
+      subject: getNewsletterSubscribeAdminSubject(locale),
+      html: buildNewsletterSubscribeAdminHtml({ email }, baseUrl, locale),
+    }),
+  ]);
 
   return NextResponse.json({ ok: true });
 }
