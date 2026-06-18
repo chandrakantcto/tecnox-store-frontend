@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { checkOtp } from "@/lib/auth/otp-store";
 import { isValidEmail, normalizeAuthEmail } from "@/lib/auth/email-validation";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +14,34 @@ export async function POST(request: Request) {
     if (!/^\d{6}$/.test(otp)) {
       return NextResponse.json({ success: false, error: "invalid_otp" }, { status: 400 });
     }
-    if (!checkOtp(email, "password-reset", otp)) {
+
+    const cookieStr = request.headers.get("cookie") || "";
+    const cookieMatch = cookieStr.match(/tecnox_pwd_reset=([^;]+)/);
+    if (!cookieMatch) {
+      return NextResponse.json({ success: false, error: "otp_invalid" }, { status: 400 });
+    }
+
+    const decodedCookie = decodeURIComponent(cookieMatch[1]);
+    const [payload, signature] = decodedCookie.split("|");
+    if (!payload || !signature) {
+      return NextResponse.json({ success: false, error: "otp_invalid" }, { status: 400 });
+    }
+
+    const [cookieEmail, cookieOtp, expiresAtStr] = payload.split(":");
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.FRONTEND_OTP_SECRET || "emida-super-secret-2026")
+      .update(payload)
+      .digest("hex");
+
+    if (signature !== expectedSignature) {
+      return NextResponse.json({ success: false, error: "otp_invalid" }, { status: 400 });
+    }
+
+    if (Date.now() > parseInt(expiresAtStr, 10)) {
+      return NextResponse.json({ success: false, error: "otp_invalid" }, { status: 400 });
+    }
+
+    if (normalizeAuthEmail(cookieEmail) !== email || cookieOtp !== otp) {
       return NextResponse.json({ success: false, error: "otp_invalid" }, { status: 400 });
     }
 
