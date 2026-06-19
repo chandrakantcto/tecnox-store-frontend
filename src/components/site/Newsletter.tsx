@@ -7,6 +7,8 @@ import { Reveal } from "./Reveal";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { isValidEmail } from "@/lib/auth/email-validation";
+import { invalidEmailFormatMessage } from "@/lib/auth/auth-messages";
 
 export function Newsletter({ locale: _locale }: { locale?: Locale }) {
   const locale = useActiveLocale();
@@ -18,10 +20,10 @@ export function Newsletter({ locale: _locale }: { locale?: Locale }) {
     e.preventDefault();
     setFeedback(null);
     const trimmed = email.trim();
-    if (!trimmed) {
+    if (!trimmed || !isValidEmail(trimmed)) {
       setFeedback({
         kind: "err",
-        text: tr(locale, "Skriv inn e-postadresse.", "Please enter your email address."),
+        text: invalidEmailFormatMessage(locale),
       });
       return;
     }
@@ -103,7 +105,7 @@ export function Newsletter({ locale: _locale }: { locale?: Locale }) {
             {feedback ? (
               <p
                 role={feedback.kind === "err" ? "alert" : "status"}
-                className={`mt-3 text-[13px] ${feedback.kind === "ok" ? "text-[var(--color-ink)]" : "text-red-800"}`}
+                className={`mt-2 text-[13px] ${feedback.kind === "ok" ? "text-[var(--color-ink)]" : "text-red-600 font-semibold"}`}
               >
                 {feedback.text}
               </p>

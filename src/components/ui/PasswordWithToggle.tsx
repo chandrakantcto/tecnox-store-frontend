@@ -15,6 +15,7 @@ type PasswordWithToggleProps = {
   className?: string;
   showLabel: string;
   hideLabel: string;
+  placeholder?: string;
 };
 
 export function PasswordWithToggle({
@@ -29,6 +30,7 @@ export function PasswordWithToggle({
   className = "",
   showLabel,
   hideLabel,
+  placeholder,
 }: PasswordWithToggleProps) {
   const [visible, setVisible] = useState(false);
 
@@ -44,6 +46,7 @@ export function PasswordWithToggle({
         disabled={disabled}
         maxLength={maxLength}
         autoComplete={autoComplete}
+        placeholder={placeholder}
         className={className}
       />
       <button

@@ -19,7 +19,7 @@ import { PasswordRequirementsHint } from "@/components/account/PasswordRequireme
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
 import { requiredCurrentPasswordMessage } from "@/lib/auth/auth-messages";
 import { isBlankInput } from "@/lib/auth/email-validation";
-import { firstFieldError } from "@/lib/auth/field-errors";
+import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
 import { validatePasswordComplexity } from "@/lib/auth/validate";
 import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
 
@@ -198,7 +198,7 @@ export function AccountProfilePanel() {
         {tr(lc, "Kontodetaljer", "Account details")}
       </h2>
 
-      <form onSubmit={(e) => void save(e)} className="mt-6 w-full space-y-4 sm:mt-8">
+      <form onSubmit={(e) => void save(e)} noValidate className="mt-6 w-full space-y-4 sm:mt-8">
         <div className={ACCOUNT_FORM_GRID}>
           <label className={ACCOUNT_FIELD_LABEL}>
             {tr(lc, "Fornavn", "First name")} *
@@ -331,7 +331,7 @@ function AccountAddressEditForm({
   };
 
   return (
-    <form onSubmit={(e) => void save(e)} className="mt-8 w-full space-y-4 border-t border-[var(--color-divider)] pt-8">
+    <form onSubmit={(e) => void save(e)} noValidate className="mt-8 w-full space-y-4 border-t border-[var(--color-divider)] pt-8">
       <h3 className="text-[14px] font-bold uppercase tracking-[0.08em] text-[var(--color-ink)]">{title}</h3>
       <div className={ACCOUNT_FORM_GRID}>
         <label className={ACCOUNT_FIELD_LABEL}>
@@ -535,7 +535,7 @@ export function AccountPasswordPanel() {
     setFieldErrors({});
 
     const pwdErr = validatePasswordComplexity(next, lc);
-    const errors = firstFieldError<PasswordFieldKey>([
+    const errors = allFieldErrors<PasswordFieldKey>([
       { field: "current", message: isBlankInput(current) ? requiredCurrentPasswordMessage(lc) : null },
       { field: "next", message: pwdErr },
       {
@@ -596,7 +596,7 @@ export function AccountPasswordPanel() {
     {tr(lc, "Passord", "Password")}
   </h2>
 
-  <form onSubmit={(e) => void submit(e)} className="mt-4 sm:mt-6 w-full space-y-4">
+  <form onSubmit={(e) => void submit(e)} noValidate className="mt-4 sm:mt-6 w-full space-y-4">
     <div className={ACCOUNT_FORM_GRID}>
       <AuthFieldGroup
         label={tr(lc, "Nåværende passord", "Current password")}

@@ -13,20 +13,26 @@ import type { Locale } from "@/lib/locale";
  */
 export function validatePasswordComplexity(password: string, locale: Locale | string): string | null {
   const l = locale as Locale;
+  const errors: string[] = [];
+
   if (password.length < 8) {
-    return tr(l, "Passord må være minst 8 tegn.", "Password must be at least 8 characters.");
+    errors.push(tr(l, "Passordet må være minst 8 tegn.", "Password must be at least 8 characters."));
   }
-  if (!/[A-Z]/.test(password)) {
-    return tr(l, "Passordet må inneholde minst én stor bokstav.", "Password must contain at least one uppercase letter.");
+
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+    errors.push(
+      tr(
+        l,
+        "Passordet må inneholde stor og liten bokstav, tall og spesialtegn.",
+        "Password must include uppercase, lowercase, number and special character.",
+      )
+    );
   }
-  if (!/[a-z]/.test(password)) {
-    return tr(l, "Passordet må inneholde minst én liten bokstav.", "Password must contain at least one lowercase letter.");
-  }
-  if (!/[0-9]/.test(password)) {
-    return tr(l, "Passordet må inneholde minst ett tall.", "Password must contain at least one number.");
-  }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    return tr(l, "Passordet må inneholde minst ett spesialtegn.", "Password must contain at least one special character.");
-  }
-  return null;
+
+  return errors.length > 0 ? errors.join("\n") : null;
 }

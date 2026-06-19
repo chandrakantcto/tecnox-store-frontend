@@ -19,7 +19,7 @@ export function AuthFieldGroup({
       {label ? <div className={labelClassName}>{label}</div> : null}
       {children}
       {error ? (
-        <div className="mt-2">
+        <div className="mt-1">
           <AuthValidationAlert>{error}</AuthValidationAlert>
         </div>
       ) : null}

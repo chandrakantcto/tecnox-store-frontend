@@ -25,6 +25,9 @@ import {
   requiredPasswordMessage,
   termsNotAcceptedMessage,
   passwordsDoNotMatchMessage,
+  requiredConfirmPasswordMessage,
+  lettersOnlyFirstNameMessage,
+  lettersOnlyLastNameMessage,
 } from "@/lib/auth/auth-messages";
 import {
   isBlankInput,
@@ -36,10 +39,11 @@ import { shopLoginEmailPassword, shopRegisterAccount } from "@/lib/auth/shop-ses
 import { useLocale } from "@/contexts/LocaleContext";
 import { tr } from "@/lib/locale";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
-import { firstFieldError } from "@/lib/auth/field-errors";
+import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
 import { validatePasswordComplexity } from "@/lib/auth/validate";
 import heroImg from "@/assets/hero-combi.jpg";
 import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
+import { parseStoredPhone } from "@/lib/phone/phone-format";
 
 const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
 
@@ -109,7 +113,7 @@ function LoginPanel() {
     const trimmedEmail = email.trim();
     setEmail(trimmedEmail);
 
-    const errors = firstFieldError<LoginFieldKey>([
+    const errors = allFieldErrors<LoginFieldKey>([
       {
         field: "email",
         message: isBlankInput(trimmedEmail)
@@ -169,7 +173,7 @@ function LoginPanel() {
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="space-y-5">
+    <form onSubmit={(e) => void submit(e)} noValidate className="space-y-5">
       <AuthFieldGroup
         label={tr(lc, "E-post", "Email")}
         error={fieldErrors.email}
@@ -260,25 +264,48 @@ function RegisterPanel() {
     const trimmedPhone = phone.trim();
     const pwdErr = isBlankInput(password) ? null : validatePasswordComplexity(password, lc);
 
-    return firstFieldError<RegisterFieldKey>([
-      { field: "firstName", message: isBlankInput(trimmedFirst) ? requiredFirstNameMessage(lc) : null },
-      { field: "lastName", message: isBlankInput(trimmedLast) ? requiredLastNameMessage(lc) : null },
+    const LETTERS_ONLY = /^[a-zA-ZæøåÆØÅ\s-]+$/;
+    const nationalPhone = parseStoredPhone(trimmedPhone).nationalNumber;
+    const isValidContactNumber = /^\d{10}$/.test(nationalPhone);
+
+    return allFieldErrors<RegisterFieldKey>([
       {
-        field: "email",
-        message: isBlankInput(trimmedEmail)
-          ? requiredEmailMessage(lc)
-          : !isValidEmail(trimmedEmail)
-            ? invalidEmailFormatMessage(lc)
+        field: "firstName",
+        message: isBlankInput(trimmedFirst)
+          ? requiredFirstNameMessage(lc)
+          : !LETTERS_ONLY.test(trimmedFirst)
+            ? lettersOnlyFirstNameMessage(lc)
             : null,
       },
-      { field: "phone", message: !isValidPhoneDigits(trimmedPhone) ? invalidPhoneNumberMessage(lc) : null },
+      {
+        field: "lastName",
+        message: isBlankInput(trimmedLast)
+          ? requiredLastNameMessage(lc)
+          : !LETTERS_ONLY.test(trimmedLast)
+            ? lettersOnlyLastNameMessage(lc)
+            : null,
+      },
+      {
+        field: "email",
+        message: isBlankInput(trimmedEmail) || !isValidEmail(trimmedEmail)
+          ? invalidEmailFormatMessage(lc)
+          : null,
+      },
+      {
+        field: "phone",
+        message: !isValidContactNumber ? invalidPhoneNumberMessage(lc) : null,
+      },
       {
         field: "password",
         message: isBlankInput(password) ? requiredPasswordMessage(lc) : pwdErr,
       },
       {
         field: "confirmPassword",
-        message: password !== confirmPassword ? passwordsDoNotMatchMessage(lc) : null,
+        message: isBlankInput(confirmPassword)
+          ? requiredConfirmPasswordMessage(lc)
+          : password !== confirmPassword
+            ? passwordsDoNotMatchMessage(lc)
+            : null,
       },
       { field: "terms", message: !termsAccepted ? termsNotAcceptedMessage(lc) : null },
     ]);
@@ -371,7 +398,7 @@ function RegisterPanel() {
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="space-y-4">
+    <form onSubmit={(e) => void submit(e)} noValidate className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <RegisterField
           label={tr(lc, "Fornavn", "First name")}
@@ -384,6 +411,7 @@ function RegisterPanel() {
           onBlurTrim
           required
           maxLength={100}
+          placeholder={tr(lc, "Skriv inn fornavn", "Enter first name")}
         />
         <RegisterField
           label={tr(lc, "Etternavn", "Last name")}
@@ -396,10 +424,11 @@ function RegisterPanel() {
           onBlurTrim
           required
           maxLength={100}
+          placeholder={tr(lc, "Skriv inn etternavn", "Enter last name")}
         />
       </div>
       <RegisterField
-        label={tr(lc, "E-post", "Email")}
+        label={tr(lc, "E-postadresse", "Email Address")}
         type="email"
         value={email}
         error={fieldErrors.email}
@@ -410,9 +439,14 @@ function RegisterPanel() {
         onBlurTrim
         required
         maxLength={255}
+        placeholder={tr(lc, "Skriv inn e-postadresse", "Enter email address")}
       />
       <AuthFieldGroup
-        label={tr(lc, "Telefon (valgfritt)", "Phone (optional)")}
+        label={
+          <span>
+            {tr(lc, "Kontaktnummer", "Contact Number")} <span className="text-red-500 font-bold">*</span>
+          </span>
+        }
         error={fieldErrors.phone}
         labelClassName="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1"
       >
@@ -422,7 +456,9 @@ function RegisterPanel() {
             setPhone(v);
             clearFieldError("phone");
           }}
+          required={true}
           hasError={Boolean(fieldErrors.phone)}
+          placeholder={tr(lc, "Skriv inn 10-sifret mobilnummer", "Enter 10 digit mobile number")}
           className="mt-2"
         />
       </AuthFieldGroup>
@@ -439,6 +475,7 @@ function RegisterPanel() {
           }}
           required
           maxLength={255}
+          placeholder={tr(lc, "Skriv inn passord", "Enter password")}
         />
         <PasswordRequirementsHint />
       </div>
@@ -454,6 +491,7 @@ function RegisterPanel() {
           }}
           required
           maxLength={255}
+          placeholder={tr(lc, "Bekreft passord", "Confirm password")}
         />
       </div>
       <AuthFieldGroup error={fieldErrors.terms}>
@@ -482,8 +520,9 @@ function RegisterField({
   maxLength,
   onBlurTrim,
   inputMode,
+  placeholder,
 }: {
-  label: string;
+  label: React.ReactNode;
   value: string;
   onChange: (v: string) => void;
   error?: string | null;
@@ -492,11 +531,20 @@ function RegisterField({
   maxLength?: number;
   onBlurTrim?: boolean;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  placeholder?: string;
 }) {
   const { locale: lc } = useLocale();
   const baseInputClass = "mt-2 w-full rounded-[2px] border border-[var(--color-divider)] px-4 py-3 text-[14px]";
+  const displayLabel = required ? (
+    <span>
+      {label} <span className="text-red-500 font-bold">*</span>
+    </span>
+  ) : (
+    label
+  );
+
   return (
-    <AuthFieldGroup label={label} error={error} labelClassName="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1">
+    <AuthFieldGroup label={displayLabel} error={error} labelClassName="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1">
       {type === "password" ? (
         <PasswordWithToggle
           value={value}
@@ -506,6 +554,7 @@ function RegisterField({
           autoComplete="new-password"
           showLabel={tr(lc, "Vis passord", "Show password")}
           hideLabel={tr(lc, "Skjul passord", "Hide password")}
+          placeholder={placeholder}
           className={`${baseInputClass} pr-11`}
         />
       ) : (
@@ -515,6 +564,7 @@ function RegisterField({
           required={required}
           maxLength={maxLength}
           inputMode={inputMode}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlurTrim ? () => onChange(value.trim()) : undefined}
           className={baseInputClass}
