@@ -249,6 +249,12 @@ export const GQL_STOREFRONT_PRODUCT_PDP_EXTRA = /* GraphQL */ `
         storefrontServiceBulletsJson
         storefrontQuoteBulletsJson
         modelNumber
+        specifications
+        oilCapacity
+        capacity
+        dimensions
+        power
+        weight
         status
         type
         tags

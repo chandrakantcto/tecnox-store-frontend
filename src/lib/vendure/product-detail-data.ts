@@ -487,6 +487,12 @@ export const getStorefrontProductDetail = cache(
         );
 
       const modelNumber = readCustomFieldString(pdpCf, "modelNumber");
+      const specifications = readCustomFieldString(pdpCf, "specifications");
+      const oilCapacity = readCustomFieldString(pdpCf, "oilCapacity");
+      const capacity = readCustomFieldString(pdpCf, "capacity");
+      const dimensions = readCustomFieldString(pdpCf, "dimensions");
+      const power = readCustomFieldString(pdpCf, "power");
+      const weight = readCustomFieldString(pdpCf, "weight");
       const productStatus = readCustomFieldString(pdpCf, "status");
       const productType = readCustomFieldString(pdpCf, "type");
       const tags = readCustomFieldTags(pdpCf, "tags");
@@ -700,6 +706,12 @@ export const getStorefrontProductDetail = cache(
         serviceBulletsLocalized: serviceBulletsLocalized ?? undefined,
         quoteBulletsLocalized: quoteBulletsLocalized ?? undefined,
         modelNumber,
+        specifications,
+        oilCapacity,
+        capacity,
+        dimensions,
+        power,
+        weight,
         productStatus,
         productType,
         tags: tags.length ? tags : undefined,

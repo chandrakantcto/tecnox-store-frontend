@@ -84,6 +84,12 @@ export type Product = {
   quoteBulletsLocalized?: LocalizedBulletBundle | null;
   /** Product.customFields — model, status, type, tags from Vendure admin */
   modelNumber?: string | null;
+  specifications?: string | null;
+  oilCapacity?: string | null;
+  capacity?: string | null;
+  dimensions?: string | null;
+  power?: string | null;
+  weight?: string | null;
   productStatus?: string | null;
   productType?: string | null;
   tags?: string[];
