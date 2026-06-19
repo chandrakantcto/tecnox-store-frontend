@@ -105,34 +105,82 @@ export function ProductPageTemplate({
   const displayDescriptionPlain = productLocalizedPlainDescription(product, locale);
   const displayPrice = productLocalizedPriceLabel(product, locale, effectiveVariant);
 
-  const productMetaRows = useMemo(() => {
-    const rows: { label: string; value: string }[] = [];
+  const pdpCustomFields = useMemo(() => {
+    const fields: { label: string; value: string }[] = [];
     if (product.modelNumber?.trim()) {
-      rows.push({
-        label: tr(locale, "Modellnummer", "Model number"),
+      fields.push({
+        label: tr(locale, "Modellnummer", "Model Number"),
         value: product.modelNumber.trim(),
       });
     }
+    if (product.specifications?.trim()) {
+      fields.push({
+        label: tr(locale, "Spesifikasjoner", "Specifications"),
+        value: product.specifications.trim(),
+      });
+    }
+    if (product.oilCapacity?.trim()) {
+      fields.push({
+        label: tr(locale, "Oljekapasitet", "Oil Capacity"),
+        value: product.oilCapacity.trim(),
+      });
+    }
+    if (product.capacity?.trim()) {
+      fields.push({
+        label: tr(locale, "Kapasitet", "Capacity"),
+        value: product.capacity.trim(),
+      });
+    }
+    if (product.dimensions?.trim()) {
+      fields.push({
+        label: tr(locale, "Dimensjoner", "Dimensions"),
+        value: product.dimensions.trim(),
+      });
+    }
+    if (product.power?.trim()) {
+      fields.push({
+        label: tr(locale, "Effekt", "Power"),
+        value: product.power.trim(),
+      });
+    }
+    if (product.weight?.trim()) {
+      fields.push({
+        label: tr(locale, "Vekt", "Weight"),
+        value: product.weight.trim(),
+      });
+    }
     if (product.productStatus?.trim()) {
-      rows.push({
-        label: tr(locale, "Produktstatus", "Product status"),
+      fields.push({
+        label: tr(locale, "Produktstatus", "Product Status"),
         value: product.productStatus.trim(),
       });
     }
     if (product.productType?.trim()) {
-      rows.push({
-        label: tr(locale, "Produkttype", "Product type"),
+      fields.push({
+        label: tr(locale, "Produkttype", "Product Type"),
         value: product.productType.trim(),
       });
     }
     if (product.tags?.length) {
-      rows.push({
+      fields.push({
         label: tr(locale, "Tagger", "Tags"),
         value: product.tags.join(", "),
       });
     }
-    return rows;
-  }, [locale, product.modelNumber, product.productStatus, product.productType, product.tags]);
+    return fields;
+  }, [
+    locale,
+    product.modelNumber,
+    product.specifications,
+    product.oilCapacity,
+    product.capacity,
+    product.dimensions,
+    product.power,
+    product.weight,
+    product.productStatus,
+    product.productType,
+    product.tags,
+  ]);
 
   const pickVariant = (id: string) => {
     setSelectedVid(id);
@@ -286,19 +334,6 @@ export function ProductPageTemplate({
                 {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated at checkout/order")}
               </p>
 
-              {productMetaRows.length > 0 ? (
-                <dl className="mt-4 space-y-1.5 border-t border-[var(--color-divider)] pt-4">
-                  {productMetaRows.map((row) => (
-                    <div key={row.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
-                      <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                        {row.label}:
-                      </dt>
-                      <dd className="text-[var(--color-ink)]">{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-
               {displayDescriptionHtml.trim() ? (
                 <div
                   className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
@@ -307,6 +342,19 @@ export function ProductPageTemplate({
               ) : (
                 <p className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85">{displayDescriptionPlain}</p>
               )}
+
+              {pdpCustomFields.length > 0 ? (
+                <dl className="mt-6 space-y-1.5 border-t border-[var(--color-divider)] pt-6">
+                  {pdpCustomFields.map((field) => (
+                    <div key={field.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
+                      <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
+                        {field.label}:
+                      </dt>
+                      <dd className="text-[var(--color-ink)]">{field.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <div className="inline-flex items-stretch border border-[var(--color-ink)] rounded-[2px] overflow-hidden">
