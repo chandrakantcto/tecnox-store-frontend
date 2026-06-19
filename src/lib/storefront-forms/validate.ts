@@ -57,7 +57,7 @@ export function parseContactPayload(raw: Record<string, unknown>, localeInput?: 
   const locale = resolveLocale(raw, localeInput);
   const email = requireString(raw.email, MAX.email, "E-post", "Email", locale);
   if (!EMAIL_RE.test(email)) {
-    throw new ValidationError(tr(locale, "Ugyldig e-postformat.", "Email is invalid."));
+    throw new ValidationError(tr(locale, "Vennligst oppgi en gyldig e-postadresse.", "Please enter a valid email address."));
   }
   return {
     name: requireString(raw.name, MAX.name, "Navn", "Name", locale),
@@ -89,7 +89,7 @@ export function parseNewsletterEmailPayload(raw: Record<string, unknown>, locale
   const locale = resolveLocale(raw, localeInput);
   const email = requireString(raw.email, MAX.email, "E-post", "Email", locale);
   if (!EMAIL_RE.test(email)) {
-    throw new ValidationError(tr(locale, "Ugyldig e-postformat.", "Email is invalid."));
+    throw new ValidationError(tr(locale, "Vennligst oppgi en gyldig e-postadresse.", "Please enter a valid email address."));
   }
   return email.trim();
 }

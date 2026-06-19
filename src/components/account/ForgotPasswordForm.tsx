@@ -16,7 +16,7 @@ import {
 } from "@/lib/auth/auth-messages";
 import { isBlankInput, isValidEmail, normalizeAuthEmail } from "@/lib/auth/email-validation";
 import { OTP_VALIDITY_SECONDS } from "@/lib/auth/otp-store";
-import { firstFieldError } from "@/lib/auth/field-errors";
+import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
 import { validatePasswordComplexity } from "@/lib/auth/validate";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useShopAuth } from "@/contexts/ShopAuthContext";
@@ -243,7 +243,7 @@ export function ForgotPasswordForm() {
     setInfo(null);
 
     const pwdErr = isBlankInput(password) ? null : validatePasswordComplexity(password, lc);
-    const errors = firstFieldError<ForgotFieldKey>([
+    const errors = allFieldErrors<ForgotFieldKey>([
       {
         field: "password",
         message: isBlankInput(password) ? requiredPasswordMessage(lc) : pwdErr,
@@ -305,7 +305,7 @@ export function ForgotPasswordForm() {
         <p className="mb-6 text-[14px] text-[var(--color-muted)]">
           {tr(lc, "Velg et nytt passord for kontoen din.", "Choose a new password for your account.")}
         </p>
-        <form onSubmit={(e) => void handleResetPassword(e)} className="space-y-5">
+        <form onSubmit={(e) => void handleResetPassword(e)} noValidate className="space-y-5">
           <div>
             <AuthFieldGroup
               label={tr(lc, "Nytt passord", "New password")}
@@ -374,7 +374,7 @@ export function ForgotPasswordForm() {
         {devOtp ? (
           <p className="mb-4 rounded-[2px] bg-amber-50 px-3 py-2 font-mono text-[12px] text-amber-900">Dev OTP: {devOtp}</p>
         ) : null}
-        <form onSubmit={(e) => void handleVerifyOtp(e)} className="space-y-5">
+        <form onSubmit={(e) => void handleVerifyOtp(e)} noValidate className="space-y-5">
           <AuthFieldGroup error={fieldErrors.otp}>
             <div className="flex justify-between gap-2">
             {otpDigits.map((digit, index) => (
@@ -423,7 +423,7 @@ export function ForgotPasswordForm() {
         {tr(lc, "Skriv inn e-postadressen din for å tilbakestille passordet.", "Enter your email address to reset your password.")}
       </p>
       {info ? <p className="mb-4 text-[13px] text-[var(--color-muted)]">{info}</p> : null}
-      <form onSubmit={(e) => void handleSendOtp(e)} className="space-y-5">
+      <form onSubmit={(e) => void handleSendOtp(e)} noValidate className="space-y-5">
         <AuthFieldGroup
           label={tr(lc, "E-post", "Email")}
           error={fieldErrors.email}

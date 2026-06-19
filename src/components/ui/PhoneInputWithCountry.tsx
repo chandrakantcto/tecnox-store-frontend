@@ -23,6 +23,7 @@ export type PhoneInputWithCountryProps = {
   className?: string;
   inputClassName?: string;
   hasError?: boolean;
+  placeholder?: string;
 };
 
 export function PhoneInputWithCountry({
@@ -34,6 +35,7 @@ export function PhoneInputWithCountry({
   className = "",
   inputClassName = "",
   hasError,
+  placeholder,
 }: PhoneInputWithCountryProps) {
   const { locale } = useLocale();
   const lc = locale === "en" ? "en" : "nb";
@@ -116,7 +118,7 @@ export function PhoneInputWithCountry({
           disabled={disabled}
           required={required}
           maxLength={15}
-          placeholder={country.iso === DEFAULT_PHONE_COUNTRY_ISO ? "1234567890" : ""}
+          placeholder={placeholder !== undefined ? placeholder : (country.iso === DEFAULT_PHONE_COUNTRY_ISO ? "1234567890" : "")}
           className={`min-w-0 flex-1 border-0 px-3 py-3 text-[13px] text-[var(--color-ink)] focus:outline-none disabled:opacity-60 sm:px-4 sm:text-[14px] ${inputClassName}`}
           aria-label={tr(lc, "Telefonnummer", "Phone number")}
         />

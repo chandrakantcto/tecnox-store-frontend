@@ -14,7 +14,7 @@ export function incorrectPasswordMessage(locale: Locale | string): string {
 }
 
 export function invalidEmailFormatMessage(locale: Locale | string): string {
-  return tr(locale as Locale, "Ugyldig e-postformat.", "Invalid email format.");
+  return tr(locale as Locale, "Vennligst oppgi en gyldig e-postadresse.", "Please enter a valid email address.");
 }
 
 export function invalidOtpMessage(locale: Locale | string): string {
@@ -52,21 +52,21 @@ export function termsNotAcceptedMessage(locale: Locale | string): string {
 export function invalidPhoneNumberMessage(locale: Locale | string): string {
   return tr(
     locale as Locale,
-    "Telefonnummer kan kun inneholde tall.",
-    "Phone number can only contain numbers.",
+    "Vennligst oppgi et gyldig 10-sifret mobilnummer.",
+    "Please enter a valid 10 digit mobile number.",
   );
 }
 
 export function requiredFirstNameMessage(locale: Locale | string): string {
-  return tr(locale as Locale, "Fornavn er påkrevd.", "First name is required.");
+  return tr(locale as Locale, "Vennligst oppgi fornavn.", "Please enter first name.");
 }
 
 export function requiredLastNameMessage(locale: Locale | string): string {
-  return tr(locale as Locale, "Etternavn er påkrevd.", "Last name is required.");
+  return tr(locale as Locale, "Vennligst oppgi etternavn.", "Please enter last name.");
 }
 
 export function requiredEmailMessage(locale: Locale | string): string {
-  return tr(locale as Locale, "E-post er påkrevd.", "Email is required.");
+  return tr(locale as Locale, "Vennligst oppgi en gyldig e-postadresse.", "Please enter a valid email address.");
 }
 
 export function requiredPasswordMessage(locale: Locale | string): string {
@@ -123,4 +123,16 @@ export function loginFailedGenericMessage(locale: Locale | string): string {
 
 export function requiredCurrentPasswordMessage(locale: Locale | string): string {
   return tr(locale as Locale, "Nåværende passord er påkrevd.", "Current password is required.");
+}
+
+export function requiredConfirmPasswordMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Vennligst bekreft passordet ditt.", "Please confirm your password.");
+}
+
+export function lettersOnlyFirstNameMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Fornavn kan kun inneholde bokstaver.", "First name can only contain letters.");
+}
+
+export function lettersOnlyLastNameMessage(locale: Locale | string): string {
+  return tr(locale as Locale, "Etternavn kan kun inneholde bokstaver.", "Last name can only contain letters.");
 }

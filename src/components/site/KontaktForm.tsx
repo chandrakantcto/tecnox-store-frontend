@@ -15,7 +15,7 @@ import {
   normalizeAuthEmail,
 } from "@/lib/auth/email-validation";
 import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
-import { firstFieldError } from "@/lib/auth/field-errors";
+import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 
@@ -65,7 +65,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
     const trimmedPhone = phone.trim();
     const trimmedMessage = message.trim();
 
-    return firstFieldError<ContactFieldKey>([
+    return allFieldErrors<ContactFieldKey>([
       { field: "name", message: isBlankInput(trimmedName) ? requiredNameMessage(locale) : null },
       {
         field: "email",
@@ -150,6 +150,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
           setSubmitting(false);
         }
       }}
+      noValidate
       className="mt-10 space-y-5 max-w-xl"
     >
       <div className="grid sm:grid-cols-2 gap-4">
