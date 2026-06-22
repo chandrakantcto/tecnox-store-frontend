@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveRequestLocale } from "@/lib/email/email-locale";
 import { getVendureServerConfigOrNull } from "@/lib/vendure/env";
+import { shopNetworkErrorSummary, shopUpstreamFetch } from "@/lib/vendure/shop-upstream-fetch";
 
 type Body = {
   query?: unknown;
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const upstream = await fetch(cfg.shopApiUrl, {
+    const upstream = await shopUpstreamFetch(cfg.shopApiUrl, {
       method: "POST",
       headers,
       body: JSON.stringify({ query, variables }),
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
 
     return res;
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
+    const msg = shopNetworkErrorSummary(e);
     return NextResponse.json({ errors: [{ message: msg }] }, { status: 502 });
   }
 }

@@ -1,6 +1,7 @@
 import { vendureLikelyWrongApiEndpointHint, vendureShopEnvVarName } from "@/config/vendure";
 import { getVendureServerConfigOrNull, vendureLanguageCode } from "@/lib/vendure/env";
 import { graphqlMessagesFromParsedBody } from "@/lib/vendure/shop-banner-error";
+import { shopNetworkErrorSummary, shopUpstreamFetch } from "@/lib/vendure/shop-upstream-fetch";
 
 type GraphQlResponse<T> = { data?: T; errors?: Array<{ message: string }> };
 
@@ -39,7 +40,7 @@ export async function vendureShopQuery<T>(
       ...(isMutation ? { cache: "no-store" } : { next: { revalidate: 60 } })
     };
 
-    const res = await fetch(cfg.shopApiUrl, fetchOptions);
+    const res = await shopUpstreamFetch(cfg.shopApiUrl, fetchOptions);
 
     const json = (await res.json()) as GraphQlResponse<T>;
     if (!res.ok) {
@@ -72,7 +73,6 @@ export async function vendureShopQuery<T>(
     }
     return { data: json.data ?? null, error: null };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return { data: null, error: msg };
+    return { data: null, error: `[vendure] ${shopNetworkErrorSummary(e)}` };
   }
 }

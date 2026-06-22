@@ -1,5 +1,31 @@
 type GraphQlErrorShape = { errors?: Array<{ message: string }> };
 
+const TRANSIENT_NETWORK =
+  /ECONNRESET|ETIMEDOUT|ECONNREFUSED|EPIPE|ENOTFOUND|socket hang up|fetch failed|network/i;
+
+function dedupeSemicolonParts(text: string): string {
+  const parts = text
+    .split(";")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length <= 1) return text.trim();
+  return [...new Set(parts)].join("; ");
+}
+
+function friendlyConnectionMessage(text: string): string {
+  const low = text.toLowerCase();
+  const looksLikeNetwork =
+    TRANSIENT_NETWORK.test(text) ||
+    low.includes("network reset") ||
+    low.includes("connection failed") ||
+    low.includes("shop api connection");
+  if (!looksLikeNetwork) return text;
+  return (
+    "Kunne ikke nå Shop API (nettverksfeil). Prøv å laste siden på nytt. " +
+    "Vedvarende feil: sjekk at Vendure-backend kjører og at storefront peker på riktig API-adresse."
+  );
+}
+
 /** Extract messages from a parsed GraphQL error body `{ errors:[…] }` or `[{ message, … }, …]` */
 export function graphqlMessagesFromParsedBody(parsed: unknown): string[] {
   if (!parsed || typeof parsed !== "object") return [];
@@ -26,5 +52,7 @@ export function formatShopBannerError(raw: string | null | undefined): string | 
   } catch {
     /* not JSON */
   }
-  return t.replace(/^\[vendure\]\s*/i, "").trim();
+  const stripped = t.replace(/^\[vendure\]\s*/i, "").trim();
+  const deduped = dedupeSemicolonParts(stripped);
+  return friendlyConnectionMessage(deduped);
 }

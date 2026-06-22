@@ -3,10 +3,12 @@
  * Set values per deployment in `.env.local`, `.env.production`, CI secrets, etc. (never hardcode URLs or ports).
  *
  * Required for catalog features:
- * - `NEXT_PUBLIC_VENDURE_SHOP_API_URL` — full URL to the Shop API, including protocol, host, port (if non-default),
- *   and path, e.g. `{protocol}://{host}:{optionalPort}/shop-api`.
+ * - `NEXT_PUBLIC_VENDURE_SHOP_API_URL` — public Shop API URL (browser asset URLs + build-time image hosts).
+ * - `VENDURE_SHOP_API_URL` — optional server-only override for SSR / route handlers. On CapRover, point this
+ *   at the internal Docker service (e.g. `http://srv-captain--gastro-backend:3002/shop-api`) to avoid
+ *   intermittent `ECONNRESET` when the storefront loops back through the public nginx proxy.
  *
- * Asset previews that are relative (`/assets/...`) use the origin of this URL as the base.
+ * Asset previews that are relative (`/assets/...`) use the origin of the **public** URL as the base.
  */
 
 export type VendurePublicConfig = {
@@ -16,6 +18,7 @@ export type VendurePublicConfig = {
 };
 
 const SHOP_ENV = "NEXT_PUBLIC_VENDURE_SHOP_API_URL" as const;
+const SERVER_SHOP_ENV = "VENDURE_SHOP_API_URL" as const;
 
 function stripTrailingSlashes(url: string) {
   return url.replace(/\/+$/, "");
@@ -25,12 +28,21 @@ function stripTrailingSlashes(url: string) {
  * Parses and normalizes the vendor Shop GraphQL endpoint from env.
  * Returns `null` when unset — callers must degrade gracefully or surface a setup error.
  */
+function parseShopApiUrl(raw: string): string | null {
+  if (!raw.length) return null;
+  try {
+    return stripTrailingSlashes(raw);
+  } catch {
+    return null;
+  }
+}
+
 export function resolveVendureShopConfig(): VendurePublicConfig | null {
   const raw = typeof process.env[SHOP_ENV] === "string" ? process.env[SHOP_ENV]!.trim() : "";
-  if (!raw.length) return null;
+  const shopApiUrl = parseShopApiUrl(raw);
+  if (!shopApiUrl) return null;
 
   try {
-    const shopApiUrl = stripTrailingSlashes(raw);
     const u = new URL(shopApiUrl);
     const assetBaseUrl = stripTrailingSlashes(`${u.origin}`);
     return { shopApiUrl, assetBaseUrl };
@@ -39,8 +51,21 @@ export function resolveVendureShopConfig(): VendurePublicConfig | null {
   }
 }
 
+/** Server-side Shop GraphQL endpoint — prefers `VENDURE_SHOP_API_URL`, then the public env var. */
+export function resolveServerShopApiUrl(): string | null {
+  const serverRaw =
+    typeof process.env[SERVER_SHOP_ENV] === "string" ? process.env[SERVER_SHOP_ENV]!.trim() : "";
+  const fromServer = parseShopApiUrl(serverRaw);
+  if (fromServer) return fromServer;
+  return resolveVendureShopConfig()?.shopApiUrl ?? null;
+}
+
 export function vendureShopEnvVarName(): typeof SHOP_ENV {
   return SHOP_ENV;
+}
+
+export function vendureServerShopEnvVarName(): typeof SERVER_SHOP_ENV {
+  return SERVER_SHOP_ENV;
 }
 
 /**
