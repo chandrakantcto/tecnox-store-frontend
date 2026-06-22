@@ -149,24 +149,7 @@ export function ProductPageTemplate({
         value: product.weight.trim(),
       });
     }
-    if (product.productStatus?.trim()) {
-      fields.push({
-        label: tr(locale, "Produktstatus", "Product Status"),
-        value: product.productStatus.trim(),
-      });
-    }
-    if (product.productType?.trim()) {
-      fields.push({
-        label: tr(locale, "Produkttype", "Product Type"),
-        value: product.productType.trim(),
-      });
-    }
-    if (product.tags?.length) {
-      fields.push({
-        label: tr(locale, "Tagger", "Tags"),
-        value: product.tags.join(", "),
-      });
-    }
+
     return fields;
   }, [
     locale,
@@ -177,9 +160,7 @@ export function ProductPageTemplate({
     product.dimensions,
     product.power,
     product.weight,
-    product.productStatus,
-    product.productType,
-    product.tags,
+
   ]);
 
   const pickVariant = (id: string) => {
