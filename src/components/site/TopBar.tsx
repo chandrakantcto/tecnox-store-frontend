@@ -2,6 +2,7 @@
 
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import { tr } from "@/lib/locale";
+import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
 
 export function TopBar({
   catalogError,
@@ -13,15 +14,16 @@ export function TopBar({
   const delivery = tr(locale, "Levering til hele Norge", "Delivery across Norway");
   const prices = tr(locale, "Alle priser inkl. MVA", "All prices incl. VAT");
   const callUs = tr(locale, "Ring oss:", "Call us:");
+  const apiMsg = catalogError ? formatShopBannerError(catalogError) : null;
 
   return (
     <>
-      {catalogError && (
+      {apiMsg && (
         <div
           className="bg-amber-900/95 text-amber-50 text-[11px] px-3 py-1 text-center border-b border-amber-800/80"
           role="status"
         >
-          {catalogError}
+          {apiMsg}
         </div>
       )}
       <div className="bg-[var(--dark-bg)] text-[var(--stone)]">
