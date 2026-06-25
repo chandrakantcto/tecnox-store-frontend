@@ -675,6 +675,14 @@ export const getStorefrontProductDetail = cache(
       const galleryImageUrls = collectGalleryUrls(productFeaturedRel, assetsList, variantPreviewRels);
       const heroImg = chosen.imageSrc ?? galleryImageUrls[0]!;
 
+      const downloadsRaw = Array.isArray(pdpCf.downloads) ? pdpCf.downloads : [];
+      const parsedDownloads = downloadsRaw.filter((x) => x && typeof x === "object").map((d: any) => ({
+        id: String(d.id || ""),
+        name: typeof d.name === "string" ? d.name : "",
+        source: typeof d.source === "string" ? d.source : "",
+        preview: typeof d.preview === "string" ? d.preview : "",
+      }));
+
       const productRecord: Product = {
         slug: productSlug,
         name,
@@ -715,6 +723,7 @@ export const getStorefrontProductDetail = cache(
         productStatus,
         productType,
         tags: tags.length ? tags : undefined,
+        downloads: parsedDownloads.length ? parsedDownloads : undefined,
       };
 
       const relatedProducts = await fetchRelatedProductsForPdp(

@@ -26,20 +26,21 @@ import {
   type Product,
   type StorefrontVariantDetail,
 } from "@/lib/catalog/storefront-product";
-import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
+import type { MegaMenuLocales, SidebarTreeNode } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import { displayBrandName } from "@/lib/brand";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { isMissingStorefrontImageSource } from "@/lib/storefront-image";
 import { useCart } from "@/contexts/CartContext";
-import { Check, ChevronDown, Minus, Plus, ShoppingBag, Star, ShieldCheck, Truck, Wrench } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Home, Minus, Plus, ShoppingBag, Star, ShieldCheck, Truck, Wrench, FileText, Printer, FileDown, Mail } from "lucide-react";
 
 export type ProductPageTemplateProps = {
   product: Product;
   relatedProducts?: Product[];
   locale?: Locale;
   megaMenuByLocale?: MegaMenuLocales;
+  sidebarTree?: SidebarTreeNode[];
 };
 
 export function ProductPageTemplate({
@@ -47,6 +48,7 @@ export function ProductPageTemplate({
   relatedProducts = [],
   locale: _locale,
   megaMenuByLocale,
+  sidebarTree = [],
 }: ProductPageTemplateProps) {
   const locale = useActiveLocale();
   const router = useRouter();
@@ -60,6 +62,8 @@ export function ProductPageTemplate({
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
   const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("description");
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const effectiveVariant = useMemo((): StorefrontVariantDetail | null => {
     if (!variants.length) return null;
@@ -75,6 +79,77 @@ export function ProductPageTemplate({
       "";
     if (v) setSelectedVid(v);
   }, [product.slug, product.hydratedVariantId, product.defaultVariantId, product.variants]);
+
+
+  const toggleCategory = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpandedCategories((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const renderSidebarTree = (nodes: SidebarTreeNode[], depth = 0) => {
+    return nodes.map((node) => {
+      const isExpanded = expandedCategories.includes(node.id);
+      const isSubActive = false;
+      
+      if (depth === 0) {
+        return (
+          <div key={node.id} className="group border-b border-gray-50 last:border-0">
+            <div className="flex items-center justify-between hover:bg-[#f8f8f8] transition-colors">
+              <Link
+                href={`/produkter?cat=${encodeURIComponent(node.slug)}`}
+                className="flex-1 block px-4 py-3"
+              >
+                <span className="text-[13px] font-medium min-w-0 truncate text-[var(--color-ink)]">
+                  {locale === "en" ? node.nameEn || node.name : node.nameNb || node.name}
+                  <span className="ml-2 tabular-nums text-[11px] text-[var(--color-muted)] font-normal">
+                    ({node.count})
+                  </span>
+                </span>
+              </Link>
+              {node.children && node.children.length > 0 && (
+                <div
+                  className="p-3 cursor-pointer"
+                  onClick={(e) => toggleCategory(e, node.id)}
+                >
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform text-[var(--color-muted)] ${!isExpanded ? "-rotate-90" : ""}`}
+                    strokeWidth={2}
+                  />
+                </div>
+              )}
+            </div>
+            {isExpanded && node.children && node.children.length > 0 && (
+              <div className="bg-[#fbfbfb] py-1">
+                {renderSidebarTree(node.children, depth + 1)}
+              </div>
+            )}
+          </div>
+        );
+      }
+      return (
+        <div key={node.id}>
+          <Link
+            href={`/produkter?cat=${encodeURIComponent(node.slug)}`}
+            className={`flex items-center gap-3 py-2 text-[12px] font-medium transition-colors ${isSubActive ? "text-[var(--color-copper)]" : "text-[var(--color-muted)] hover:text-[var(--color-ink)]"}`}
+            style={{ paddingLeft: `${16 + depth * 16}px`, paddingRight: '16px' }}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isSubActive ? "bg-[var(--color-copper)]" : "bg-[var(--color-divider)]"}`} />
+            <span className="flex-1 truncate">
+              {locale === "en" ? node.nameEn || node.name : node.nameNb || node.name}
+            </span>
+          </Link>
+          {isExpanded && node.children && node.children.length > 0 && (
+            <div className="bg-white/10 border-l border-[var(--color-divider)] ml-4">
+              {renderSidebarTree(node.children, depth + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
 
   const gallery = useMemo(() => product.galleryImageUrls?.length ? product.galleryImageUrls : [product.img], [product.galleryImageUrls, product.img]);
 
@@ -197,6 +272,12 @@ export function ProductPageTemplate({
   const quoteAsideLines = bulletsForLocale(product.quoteBulletsLocalized, locale);
   const svcIcons = [Truck, Wrench, ShieldCheck];
 
+  const handleDownloadPdf = () => {
+    // html2canvas (used by html2pdf.js) crashes when parsing modern oklch() colors from Tailwind v4.
+    // The native browser print dialog is the only reliable way to generate PDFs with modern CSS features.
+    window.print();
+  };
+
   const reviews = product.reviews ?? [];
 
   return (
@@ -206,19 +287,32 @@ export function ProductPageTemplate({
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
 
-      <PageHero
-        label={displayCategory}
-        title={displayName}
-        crumbs={[
-          { label: tr(locale, "Produkter", "Products"), to: "/produkter" },
-          { label: displayName },
-        ]}
-        bgImage={mainImageSrc}
-        locale={locale}
-      />
+      
+      <div className="bg-[#f6f5f3] py-4 border-b border-[var(--color-divider)]">
+        <div className="container-x">
+           <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
+             <Link href="/" className="hover:text-[var(--color-copper)] flex items-center justify-center"><Home className="h-3.5 w-3.5" /></Link>
+             <ChevronRight className="h-3.5 w-3.5" />
+             <Link href="/produkter" className="hover:text-[var(--color-copper)]">{tr(locale, "Products", "Produkter")}</Link>
+             <ChevronRight className="h-3.5 w-3.5" />
+             <span className="font-semibold text-[var(--color-ink)] truncate">{displayName}</span>
+           </div>
+        </div>
+      </div>
+
 
       <section className="bg-[var(--color-stone)] py-12 lg:py-16">
-        <div className="container-x grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16">
+        <div className="container-x grid lg:grid-cols-[280px_1fr] gap-8 lg:gap-10">
+          <aside className="hidden lg:block shrink-0">
+             <div className="bg-[#3eb1f0] text-white font-bold px-4 py-3.5 text-[15px]">
+               {tr(locale, "Produkter", "Products")}
+             </div>
+             <nav className="bg-white border border-t-0 border-[var(--color-divider)]">
+                {sidebarTree.length > 0 ? renderSidebarTree(sidebarTree) : null}
+             </nav>
+          </aside>
+          <div className="min-w-0">
+            <div className="grid lg:grid-cols-2 gap-10">
           <Reveal>
             <div>
               <div className="aspect-[4/3] bg-white border border-[var(--color-divider)] rounded-[3px] overflow-hidden relative">
@@ -294,10 +388,32 @@ export function ProductPageTemplate({
                 </p>
               ) : null}
 
+
+
+              <p className="mt-6 text-[28px] font-bold text-[#3baaf2] tracking-[-0.02em]">{displayPrice}</p>
+              <p className="text-[12px] text-[var(--color-muted)]">
+                {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated at checkout/order")}
+              </p>
+
+              
+
+              {pdpCustomFields.length > 0 ? (
+                <dl className="mt-6 space-y-1.5 border-t border-[var(--color-divider)] pt-6">
+                  {pdpCustomFields.map((field) => (
+                    <div key={field.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
+                      <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
+                        {field.label}:
+                      </dt>
+                      <dd className="text-[var(--color-ink)]">{field.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+
               {variants.length > 1 ? (
                 <div className="mt-6">
                   <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2">
-                    {tr(locale, "Velg variant", "Choose configuration")}
+                    VARIATION :
                   </label>
                   <div className="relative max-w-md">
                     <select
@@ -317,65 +433,25 @@ export function ProductPageTemplate({
                 </div>
               ) : null}
 
-              <p className="mt-6 text-[28px] font-bold text-[var(--color-copper)] tracking-[-0.02em]">{displayPrice}</p>
-              <p className="text-[12px] text-[var(--color-muted)]">
-                {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated at checkout/order")}
-              </p>
-
-              {displayDescriptionHtml.trim() ? (
-                <div
-                  className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
-                  dangerouslySetInnerHTML={{ __html: displayDescriptionHtml }}
-                />
-              ) : (
-                <p className="mt-6 text-[15px] leading-[1.7] text-[var(--color-ink)]/85">{displayDescriptionPlain}</p>
-              )}
-
-              {pdpCustomFields.length > 0 ? (
-                <dl className="mt-6 space-y-1.5 border-t border-[var(--color-divider)] pt-6">
-                  {pdpCustomFields.map((field) => (
-                    <div key={field.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
-                      <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                        {field.label}:
-                      </dt>
-                      <dd className="text-[var(--color-ink)]">{field.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-stretch border border-[var(--color-ink)] rounded-[2px] overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    className="px-3 hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] transition-colors cursor-pointer"
-                    aria-label={tr(locale, "Reduser antall", "Decrease quantity")}
-                  >
-                    <Minus className="h-4 w-4" />
+                <div className="inline-flex items-stretch border border-[var(--color-divider)] rounded-[2px] overflow-hidden bg-white">
+                  <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="px-3 hover:bg-[#f8f8f8] transition-colors"><Minus className="h-4 w-4" /></button>
+                  <span className="px-4 py-2.5 min-w-10 text-center font-bold text-[14px]">{qty}</span>
+                  <button type="button" onClick={() => setQty((q) => q + 1)} className="px-3 hover:bg-[#f8f8f8] transition-colors"><Plus className="h-4 w-4" /></button>
+                </div>
+                <button type="button" onClick={() => void handleAdd()} disabled={syncing || effectiveVariant?.stockLevel === "OUT_OF_STOCK"} className="bg-[#3eb1f0] hover:bg-[#32a0db] text-white px-6 py-2.5 font-bold text-[14px] rounded-[2px] flex items-center gap-2 transition-colors disabled:opacity-60">
+                  <ShoppingBag className="h-4 w-4" />
+                  {effectiveVariant?.stockLevel === "OUT_OF_STOCK" ? tr(locale, "Utsolgt", "Out of stock") : added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
+                </button>
+                <div className="flex items-center ml-2">
+                  <button onClick={handleDownloadPdf} type="button" className="p-3 bg-[#f8f8f8] hover:bg-[#eaeaea] text-[var(--color-ink)] transition-colors rounded-[2px] ml-4" aria-label="Last ned PDF">
+                    <FileDown className="h-5 w-5" />
                   </button>
-                  <span className="px-5 py-2.5 min-w-12 text-center font-bold text-[14px]">{qty}</span>
-                  <button
-                    type="button"
-                    onClick={() => setQty((q) => q + 1)}
-                    className="px-3 hover:bg-[var(--color-ink)] hover:text-[var(--color-stone)] transition-colors cursor-pointer"
-                    aria-label={tr(locale, "Øk antall", "Increase quantity")}
-                  >
-                    <Plus className="h-4 w-4" />
+                  <button onClick={() => window.print()} type="button" className="p-3 bg-[#f8f8f8] hover:bg-[#eaeaea] text-[var(--color-ink)] transition-colors rounded-[2px]" aria-label="Skriv ut side">
+                    <Printer className="h-5 w-5" />
                   </button>
                 </div>
-
-                <button type="button" onClick={() => void handleAdd()} disabled={syncing || effectiveVariant?.stockLevel === "OUT_OF_STOCK"} className="btn-primary disabled:opacity-60 disabled:cursor-not-allowed">
-                  <ShoppingBag className="h-4 w-4" />
-                  {effectiveVariant?.stockLevel === "OUT_OF_STOCK" 
-                    ? tr(locale, "Utsolgt", "Out of stock") 
-                    : added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
-                </button>
-                <Link href="/kontakt" className="btn-outline-dark">
-                  {tr(locale, "Kontakt meg", "Contact me")}
-                </Link> 
               </div>
-
               {added && (
                 <p className="mt-3 flex items-center gap-2 text-[13px] text-[var(--color-copper)]">
                   <Check className="h-4 w-4" /> {tr(locale, "Produktet er lagt i handlekurven.", "Product added to cart.")}
@@ -387,49 +463,99 @@ export function ProductPageTemplate({
                 </p>
               )}
 
-              <ul className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-[var(--color-divider)] pt-6">
-                {serviceLines.map((line, i) => {
-                  const Icon = svcIcons[i % svcIcons.length]!;
-                  return (
-                    <li key={i} className="flex items-start gap-2 text-[12px] text-[var(--color-muted)]">
-                      <Icon className="h-4 w-4 text-[var(--color-copper)] mt-0.5 shrink-0" strokeWidth={1.5} />
-                      {line}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+              <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-[var(--color-divider)] pt-6">
+                <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
+                  <Truck className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
+                  {tr(locale, "Delivery across Norway", "Levering hele Norge")}
+                </div>
+                <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
+                  <Wrench className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
+                  {tr(locale, "Installation and training", "Montering og opplæring")}
+                </div>
+              </div>
+            </div> {/* End of right col content */}
           </Reveal>
+          </div> {/* End of grid-cols-2 */}
+            
+            {/* Tabs Area */}
+            <div className="mt-12">
+               <div className="flex items-end gap-0 border-b border-[var(--color-divider)]">
+                 <button 
+                   onClick={() => setActiveTab("description")}
+                   className={`px-6 py-3 text-[14px] font-bold transition-colors ${activeTab === "description" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] border-b-0"}`}
+                 >
+                   {tr(locale, "Description", "Beskrivelse")}
+                 </button>
+                 <button 
+                   onClick={() => setActiveTab("downloads")}
+                   className={`px-6 py-3 text-[14px] font-bold transition-colors ${activeTab === "downloads" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] border-b-0 ml-2"}`}
+                 >
+                   {tr(locale, "Downloads", "Nedlastinger")}
+                 </button>
+                 <button 
+                   onClick={() => setActiveTab("contact")}
+                   className={`px-6 py-3 text-[14px] font-bold transition-colors ${activeTab === "contact" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] border-b-0 ml-2"}`}
+                 >
+                   {tr(locale, "Contact Us", "Kontakt Oss")}
+                 </button>
+               </div>
+               
+               <div className="bg-white border border-t-0 border-[var(--color-divider)] p-6 lg:p-8">
+                 {activeTab === "description" && (
+                   <div>
+                     {displayDescriptionHtml.trim() ? (
+                        <div
+                          className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
+                          dangerouslySetInnerHTML={{ __html: displayDescriptionHtml }}
+                        />
+                      ) : (
+                        <p className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90">{displayDescriptionPlain}</p>
+                      )}
+                      
+                      {displayHighlights.length > 0 && (
+                        <ul className="mt-6 space-y-3">
+                          {displayHighlights.map((h, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--color-ink)] shrink-0" />
+                              <span className="text-[14px] text-[var(--color-ink)] leading-[1.6]">{h}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                   </div>
+                 )}
+                 {activeTab === "downloads" && (
+                    <div className="py-8">
+                      {product.downloads && product.downloads.length > 0 ? (
+                        <div className="flex flex-col gap-3">
+                          {product.downloads.map(d => (
+                            <a key={d.id} href={d.source} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 border border-[var(--color-divider)] rounded hover:border-[var(--color-copper)] transition-colors group">
+                              <div className="bg-[#f8f8f8] p-2 rounded group-hover:bg-[#ebf5ff] transition-colors">
+                                <FileDown className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[#3baaf2]" />
+                              </div>
+                              <span className="text-[14px] font-medium text-[var(--color-ink)] group-hover:text-[#3baaf2] transition-colors">{d.name}</span>
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[var(--color-muted)]">{tr(locale, "No downloads available for this product.", "Ingen nedlastinger tilgjengelig for dette produktet.")}</p>
+                      )}
+                    </div>
+                 )}
+                 {activeTab === "contact" && (
+                   <div className="py-10 text-center text-[var(--color-muted)] flex flex-col items-center">
+                     <Mail className="h-10 w-10 mb-3 opacity-20" />
+                     <p>{tr(locale, "Please reach out to our sales team for more information.", "Ta kontakt med vårt salgsteam for mer informasjon.")}</p>
+                     <Link href="/kontakt" className="mt-4 btn-primary">{tr(locale, "Contact Us", "Kontakt Oss")}</Link>
+                   </div>
+                 )}
+               </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="bg-[var(--color-stone)] pb-12 lg:pb-20">
-        <div className="container-x grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-16">
-          <Reveal>
-            <div>
-              <span className="label-tag inline-flex items-center gap-2">
-                <span className="h-px w-8 bg-[var(--color-copper)] inline-block" />
-                {tr(locale, "Høydepunkter", "Highlights")}
-              </span>
-              <h2 className="mt-5 display-h3 text-[var(--color-ink)]">
-                {tr(locale, "Hvorfor fagfolk velger denne.", "Why professionals choose this model.")}
-              </h2>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <ul className="space-y-4">
-              {displayHighlights.map((h, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="mt-1 h-5 w-5 shrink-0 rounded-full bg-[var(--color-copper)] text-white inline-flex items-center justify-center">
-                    <Check className="h-3 w-3" strokeWidth={3} />
-                  </span>
-                  <span className="text-[15px] text-[var(--color-ink)] leading-[1.6]">{h}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </div>
-      </section>
+      
 
       <section className="bg-[var(--color-dark-bg)] text-[var(--color-stone)] py-16 lg:py-24">
         <div className="container-x">
@@ -568,6 +694,64 @@ export function ProductPageTemplate({
       )}
 
       <Footer locale={locale} />
+
+      {/* Hidden PDF Template */}
+      <div id="pdf-content" style={{ display: "none", padding: "10px", color: "#000", backgroundColor: "#fff", fontFamily: "sans-serif" }}>
+        {/* Header */}
+        <div style={{ borderBottom: "2px solid #3baaf2", paddingBottom: "15px", marginBottom: "25px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div>
+            <h1 style={{ fontSize: "28px", fontWeight: "900", margin: 0, color: "#111", letterSpacing: "-1px" }}>TECNO X</h1>
+            <p style={{ fontSize: "10px", margin: 0, color: "#666", textTransform: "uppercase", letterSpacing: "1px" }}>Professional Gastro Equipment</p>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ margin: 0, fontSize: "12px", color: "#3baaf2", fontWeight: "bold" }}>gastroline.no</p>
+            <p style={{ margin: 0, fontSize: "10px", color: "#666" }}>Ring oss: 411 90 600</p>
+          </div>
+        </div>
+
+        {/* Product Hero */}
+        <div style={{ display: "flex", gap: "30px", marginBottom: "40px" }}>
+          <div style={{ width: "50%", flexShrink: 0 }}>
+            {mainImageSrc && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={typeof mainImageSrc === 'string' ? mainImageSrc : (mainImageSrc as any).src} alt={displayName} crossOrigin="anonymous" style={{ width: "100%", height: "auto", objectFit: "contain", borderRadius: "4px", border: "1px solid #eaeaea", padding: "10px" }} />
+            )}
+          </div>
+          <div style={{ width: "50%" }}>
+            <h2 style={{ fontSize: "24px", margin: "0 0 15px 0", lineHeight: "1.2", color: "#111" }}>{displayName}</h2>
+            <div style={{ fontSize: "26px", fontWeight: "bold", color: "#3baaf2", marginBottom: "20px" }}>{displayPrice}</div>
+            
+            <div style={{ backgroundColor: "#f8f8f8", padding: "15px", borderRadius: "4px" }}>
+              <h3 style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", color: "#888", margin: "0 0 10px 0" }}>Specifications</h3>
+              {pdpCustomFields.length > 0 ? (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "8px" }}>
+                  {pdpCustomFields.map(f => (
+                    <div key={f.label} style={{ fontSize: "13px", display: "flex", borderBottom: "1px solid #eaeaea", paddingBottom: "4px" }}>
+                      <span style={{ fontWeight: "600", width: "140px", color: "#444" }}>{f.label}:</span>
+                      <span style={{ color: "#111" }}>{f.value}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: "13px", color: "#666", margin: 0 }}>{specLineBelowTitle}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
+        {displayDescriptionHtml && (
+          <div style={{ marginBottom: "30px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#111", borderBottom: "1px solid #eaeaea", paddingBottom: "8px", marginBottom: "15px" }}>Description</h3>
+            <div style={{ fontSize: "13px", lineHeight: "1.6", color: "#444" }} dangerouslySetInnerHTML={{ __html: displayDescriptionHtml }} />
+          </div>
+        )}
+
+        {/* Footer Note */}
+        <div style={{ marginTop: "40px", paddingTop: "20px", borderTop: "1px solid #eaeaea", textAlign: "center", fontSize: "10px", color: "#999" }}>
+          © TECNO X AS • Alle priser inkl. MVA • Levering til hele Norge • Utstyret skal monteres av autorisert personell
+        </div>
+      </div>
     </main>
   );
 }

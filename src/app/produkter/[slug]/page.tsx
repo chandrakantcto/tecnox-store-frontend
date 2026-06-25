@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SingleProductPage } from "@/components/site/SingleProductPage";
-import { getMegaMenuBothLocales } from "@/lib/vendure/catalog-data";
+import { getMegaMenuBothLocales, getProductsListingCatalog } from "@/lib/vendure/catalog-data";
 import { getStorefrontProductDetail } from "@/lib/vendure/product-detail-data";
 import { staticSrc } from "@/lib/static-asset";
 import { getServerLocale } from "@/lib/locale.server";
@@ -39,6 +39,7 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
   if (!product) notFound();
 
   const { data: megaMenuByLocale } = await getMegaMenuBothLocales();
+  const { catalog } = await getProductsListingCatalog(locale, null);
 
   return (
     <SingleProductPage
@@ -47,6 +48,7 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
       relatedProducts={relatedProducts}
       locale={locale}
       megaMenuByLocale={megaMenuByLocale}
+      sidebarTree={catalog.sidebarTree || []}
     />
   );
 }

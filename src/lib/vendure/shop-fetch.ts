@@ -28,7 +28,7 @@ export async function vendureShopQuery<T>(
   }
   try {
     const isMutation = query.trim().startsWith("mutation");
-    
+
     const fetchOptions: RequestInit = {
       method: "POST",
       headers: {

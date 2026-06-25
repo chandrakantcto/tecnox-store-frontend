@@ -248,16 +248,15 @@ export const GQL_STOREFRONT_PRODUCT_PDP_EXTRA = /* GraphQL */ `
         storefrontReviewsJson
         storefrontServiceBulletsJson
         storefrontQuoteBulletsJson
-        modelNumber
-        specifications
-        oilCapacity
-        capacity
-        dimensions
-        power
-        weight
-        status
-        type
-        tags
+        attributes
+        seoTitle
+        seoDescription
+        downloads {
+          id
+          name
+          source
+          preview
+        }
       }
     }
   }

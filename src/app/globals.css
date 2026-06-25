@@ -384,3 +384,64 @@
     background: oklch(0.18 0.01 80 / 0.52);
   }
 }
+
+@media print {
+  header, footer, nav, aside, .btn-primary, button[aria-label="Last ned PDF"], button[aria-label="Skriv ut side"] {
+    display: none !important;
+  }
+  
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .container-x {
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  main {
+    background-color: white !important;
+  }
+
+  section {
+    padding-top: 0 !important;
+  }
+  
+  .lg\:grid-cols-\[280px_1fr\] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .lg\:grid-cols-2 {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
+  
+  /* Make images smaller and ensure they fit */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+  
+  /* Tabs Area for print */
+  .mt-12 > div {
+    display: block !important;
+    border-bottom: none !important;
+  }
+  .mt-12 button {
+    display: none !important;
+  }
+  /* Show all tab content basically */
+  .mt-12 > div.py-8 {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Add a simple header for print */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+}
