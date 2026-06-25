@@ -284,7 +284,13 @@ export function ProductPageTemplate({
               {effectiveVariant?.stockLevel?.trim() ? (
                 <p className="mt-2 text-[12px] text-[var(--color-muted)]">
                   {tr(locale, "Beholdningsstatus:", "Availability:")}{" "}
-                  <span className="font-mono text-[var(--color-ink)]">{effectiveVariant.stockLevel}</span>
+                  <span className={`font-mono font-bold ${effectiveVariant.stockLevel === "OUT_OF_STOCK" ? "text-red-600" : "text-[var(--color-ink)]"}`}>
+                    {effectiveVariant.stockLevel === "IN_STOCK" 
+                      ? tr(locale, "På lager", "In stock") 
+                      : effectiveVariant.stockLevel === "OUT_OF_STOCK" 
+                      ? tr(locale, "Utsolgt", "Out of stock")
+                      : effectiveVariant.stockLevel}
+                  </span>
                 </p>
               ) : null}
 
@@ -302,6 +308,7 @@ export function ProductPageTemplate({
                       {variants.map((v) => (
                         <option key={v.id} value={v.id}>
                           {variantLabelOption(v)} — {productLocalizedPriceLabel(product, locale, v)}
+                          {v.stockLevel === "OUT_OF_STOCK" ? ` (${tr(locale, "Utsolgt", "Out of stock")})` : ""}
                         </option>
                       ))}
                     </select>
@@ -358,9 +365,11 @@ export function ProductPageTemplate({
                   </button>
                 </div>
 
-                <button type="button" onClick={() => void handleAdd()} disabled={syncing} className="btn-primary disabled:opacity-60">
+                <button type="button" onClick={() => void handleAdd()} disabled={syncing || effectiveVariant?.stockLevel === "OUT_OF_STOCK"} className="btn-primary disabled:opacity-60 disabled:cursor-not-allowed">
                   <ShoppingBag className="h-4 w-4" />
-                  {added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
+                  {effectiveVariant?.stockLevel === "OUT_OF_STOCK" 
+                    ? tr(locale, "Utsolgt", "Out of stock") 
+                    : added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
                 </button>
                 <Link href="/kontakt" className="btn-outline-dark">
                   {tr(locale, "Kontakt meg", "Contact me")}
