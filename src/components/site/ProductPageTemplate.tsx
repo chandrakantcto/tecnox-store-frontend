@@ -33,7 +33,7 @@ import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { isMissingStorefrontImageSource } from "@/lib/storefront-image";
 import { useCart } from "@/contexts/CartContext";
-import { Check, ChevronDown, ChevronRight, Home, Minus, Plus, ShoppingBag, Star, ShieldCheck, Truck, Wrench, FileText, Printer, FileDown, Mail } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Home, Minus, Plus, ShoppingBag, Star, ShieldCheck, Truck, Wrench, FileText, Printer, FileDown } from "lucide-react";
 
 export type ProductPageTemplateProps = {
   product: Product;
@@ -93,7 +93,7 @@ export function ProductPageTemplate({
     return nodes.map((node) => {
       const isExpanded = expandedCategories.includes(node.id);
       const isSubActive = false;
-      
+
       if (depth === 0) {
         return (
           <div key={node.id} className="group border-b border-gray-50 last:border-0">
@@ -248,7 +248,7 @@ export function ProductPageTemplate({
   const variantLabelOption = (v: StorefrontVariantDetail) =>
     v.options?.length
       ? v.options.map((o) => localizedOptionName(o)).join(" · ") ||
-        tr(locale, v.nameNb ?? v.name, v.nameEn ?? v.name)
+      tr(locale, v.nameNb ?? v.name, v.nameEn ?? v.name)
       : tr(locale, v.nameNb ?? v.name, v.nameEn ?? v.name) || v.sku;
 
   const handleAdd = async () => {
@@ -287,277 +287,275 @@ export function ProductPageTemplate({
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
 
-      
-      <div className="bg-[#f6f5f3] py-4 border-b border-[var(--color-divider)]">
+
+      <div className=" py-4 border-[var(--color-divider)] mt-[20px]">
         <div className="container-x">
-           <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
-             <Link href="/" className="hover:text-[var(--color-copper)] flex items-center justify-center"><Home className="h-3.5 w-3.5" /></Link>
-             <ChevronRight className="h-3.5 w-3.5" />
-             <Link href="/produkter" className="hover:text-[var(--color-copper)]">{tr(locale, "Products", "Produkter")}</Link>
-             <ChevronRight className="h-3.5 w-3.5" />
-             <span className="font-semibold text-[var(--color-ink)] truncate">{displayName}</span>
-           </div>
+          <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
+            <Link href="/" className="hover:text-[var(--color-copper)] flex items-center justify-center"><Home className="h-3.5 w-3.5" /></Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <Link href="/produkter" className="hover:text-[var(--color-copper)]">{tr(locale, "Products", "Produkter")}</Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="font-semibold text-[var(--color-ink)] truncate">{displayName}</span>
+          </div>
         </div>
       </div>
 
 
-      <section className="bg-[var(--color-stone)] py-12 lg:py-16">
+      <section className="bg-[var(--color-stone)] ">
         <div className="container-x grid lg:grid-cols-[280px_1fr] gap-8 lg:gap-10">
-          <aside className="hidden lg:block shrink-0">
-             <div className="bg-[#3eb1f0] text-white font-bold px-4 py-3.5 text-[15px]">
-               {tr(locale, "Produkter", "Products")}
-             </div>
-             <nav className="bg-white border border-t-0 border-[var(--color-divider)]">
-                {sidebarTree.length > 0 ? renderSidebarTree(sidebarTree) : null}
-             </nav>
+          <aside className="hidden lg:block shrink-0 sticky top-[100px] h-max mb-10">
+            <div className="bg-[#3eb1f0] text-white font-bold px-4 py-3.5 text-[15px]">
+              {tr(locale, "Produkter", "Products")}
+            </div>
+            <nav className="bg-white border border-t-0 border-[var(--color-divider)]">
+              {sidebarTree.length > 0 ? renderSidebarTree(sidebarTree) : null}
+            </nav>
           </aside>
           <div className="min-w-0">
-            <div className="grid lg:grid-cols-2 gap-10">
-          <Reveal>
-            <div>
-              <div className="aspect-[4/3] bg-white border border-[var(--color-divider)] rounded-[3px] overflow-hidden relative">
-                {product.badge && (
-                  <span className="absolute top-3 left-3 z-10 bg-[var(--color-copper)] text-white text-[10px] font-bold tracking-[0.14em] px-2 py-1 rounded-[2px] shadow-sm">
-                    {product.badge}
-                  </span>
-                )}
-                {isMissingStorefrontImageSource(mainImageSrc) ? (
-                  <ImageUnavailablePlaceholder locale={locale} className="min-h-full" />
-                ) : (
-                  <Image
-                    src={mainImageSrc}
-                    alt={displayName}
-                    width={1024}
-                    height={768}
-                    className="h-full w-full object-cover transition-all duration-500"
-                    sizes="(max-width: 1024px) 100vw, 55vw"
-                    priority
-                  />
-                )}
-              </div>
-              {gallery.length > 1 ? (
-                <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                  {gallery.slice(0, 10).map((src, i) => (
-                    <button
-                      key={`${src}-${i}`}
-                      type="button"
-                      onClick={() => setActiveImg(i)}
-                      className={`aspect-[4/3] bg-white border rounded-[2px] overflow-hidden transition-all ${
-                        activeImg === i
-                          ? "border-[var(--color-copper)] ring-1 ring-[var(--color-copper)]"
-                          : "border-[var(--color-divider)] hover:border-[var(--color-ink)]"
-                      }`}
-                      aria-label={tr(locale, `Bilde ${i + 1}`, `Image ${i + 1}`)}
-                    >
-                      {isMissingStorefrontImageSource(src) ? (
-                        <ImageUnavailablePlaceholder locale={locale} className="min-h-full" />
-                      ) : (
-                        <Image
-                          src={src}
-                          alt=""
-                          width={320}
-                          height={240}
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.15}>
-            <div className="lg:sticky lg:top-28">
-              <p className="text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] font-semibold">{displayBrandName(product.brand)}</p>
-              <h1 className="mt-3 text-[26px] lg:text-[32px] font-bold text-[var(--color-ink)] tracking-[-0.025em] leading-[1.1]">
-                {displayName}
-              </h1>
-             {/*  <p className="mt-3 font-mono text-[13px] text-[var(--color-muted)]">{specLineBelowTitle}</p> */}
-
-              {effectiveVariant?.stockLevel?.trim() ? (
-                <p className="mt-2 text-[12px] text-[var(--color-muted)]">
-                  {tr(locale, "Beholdningsstatus:", "Availability:")}{" "}
-                  <span className={`font-mono font-bold ${effectiveVariant.stockLevel === "OUT_OF_STOCK" ? "text-red-600" : "text-[var(--color-ink)]"}`}>
-                    {effectiveVariant.stockLevel === "IN_STOCK" 
-                      ? tr(locale, "På lager", "In stock") 
-                      : effectiveVariant.stockLevel === "OUT_OF_STOCK" 
-                      ? tr(locale, "Utsolgt", "Out of stock")
-                      : effectiveVariant.stockLevel}
-                  </span>
-                </p>
-              ) : null}
-
-
-
-              <p className="mt-6 text-[28px] font-bold text-[#3baaf2] tracking-[-0.02em]">{displayPrice}</p>
-              <p className="text-[12px] text-[var(--color-muted)]">
-                {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated at checkout/order")}
-              </p>
-
-              
-
-              {pdpCustomFields.length > 0 ? (
-                <dl className="mt-6 space-y-1.5 border-t border-[var(--color-divider)] pt-6">
-                  {pdpCustomFields.map((field) => (
-                    <div key={field.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
-                      <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                        {field.label}:
-                      </dt>
-                      <dd className="text-[var(--color-ink)]">{field.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null}
-
-              {variants.length > 1 ? (
-                <div className="mt-6">
-                  <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2">
-                    VARIATION :
-                  </label>
-                  <div className="relative max-w-md">
-                    <select
-                      value={selectedVid}
-                      onChange={(e) => pickVariant(e.target.value)}
-                      className="w-full appearance-none bg-white border border-[var(--color-divider)] rounded-[2px] px-4 py-3 pr-10 text-[14px] font-medium text-[var(--color-ink)] cursor-pointer hover:border-[var(--color-copper)] focus:outline-none focus:border-[var(--color-copper)]"
-                    >
-                      {variants.map((v) => (
-                        <option key={v.id} value={v.id}>
-                          {variantLabelOption(v)} — {productLocalizedPriceLabel(product, locale, v)}
-                          {v.stockLevel === "OUT_OF_STOCK" ? ` (${tr(locale, "Utsolgt", "Out of stock")})` : ""}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted)]" />
+            <div className="grid lg:grid-cols-2 gap-10 bg-[#fbf9f7] p-[20px]">
+              <Reveal>
+                <div>
+                  <div className="aspect-[4/3] bg-white border border-[var(--color-divider)] rounded-[3px] overflow-hidden relative">
+                    {product.badge && (
+                      <span className="absolute top-3 left-3 z-10 bg-[var(--color-copper)] text-white text-[10px] font-bold tracking-[0.14em] px-2 py-1 rounded-[2px] shadow-sm">
+                        {product.badge}
+                      </span>
+                    )}
+                    {isMissingStorefrontImageSource(mainImageSrc) ? (
+                      <ImageUnavailablePlaceholder locale={locale} className="min-h-full" />
+                    ) : (
+                      <Image
+                        src={mainImageSrc}
+                        alt={displayName}
+                        width={1024}
+                        height={768}
+                        className="h-full w-full object-cover transition-all duration-500"
+                        sizes="(max-width: 1024px) 100vw, 55vw"
+                        priority
+                      />
+                    )}
                   </div>
-                </div>
-              ) : null}
-
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-stretch border border-[var(--color-divider)] rounded-[2px] overflow-hidden bg-white">
-                  <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="px-3 hover:bg-[#f8f8f8] transition-colors"><Minus className="h-4 w-4" /></button>
-                  <span className="px-4 py-2.5 min-w-10 text-center font-bold text-[14px]">{qty}</span>
-                  <button type="button" onClick={() => setQty((q) => q + 1)} className="px-3 hover:bg-[#f8f8f8] transition-colors"><Plus className="h-4 w-4" /></button>
-                </div>
-                <button type="button" onClick={() => void handleAdd()} disabled={syncing || effectiveVariant?.stockLevel === "OUT_OF_STOCK"} className="bg-[#3eb1f0] hover:bg-[#32a0db] text-white px-6 py-2.5 font-bold text-[14px] rounded-[2px] flex items-center gap-2 transition-colors disabled:opacity-60">
-                  <ShoppingBag className="h-4 w-4" />
-                  {effectiveVariant?.stockLevel === "OUT_OF_STOCK" ? tr(locale, "Utsolgt", "Out of stock") : added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
-                </button>
-                <div className="flex items-center ml-2">
-                  <button onClick={handleDownloadPdf} type="button" className="p-3 bg-[#f8f8f8] hover:bg-[#eaeaea] text-[var(--color-ink)] transition-colors rounded-[2px] ml-4" aria-label="Last ned PDF">
-                    <FileDown className="h-5 w-5" />
-                  </button>
-                  <button onClick={() => window.print()} type="button" className="p-3 bg-[#f8f8f8] hover:bg-[#eaeaea] text-[var(--color-ink)] transition-colors rounded-[2px]" aria-label="Skriv ut side">
-                    <Printer className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-              {added && (
-                <p className="mt-3 flex items-center gap-2 text-[13px] text-[var(--color-copper)]">
-                  <Check className="h-4 w-4" /> {tr(locale, "Produktet er lagt i handlekurven.", "Product added to cart.")}
-                </p>
-              )}
-              {(cartMessage || lastActionError) && (
-                <p className="mt-3 text-[13px] text-red-700" role="alert">
-                  {cartMessage ?? lastActionError}
-                </p>
-              )}
-
-              <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-[var(--color-divider)] pt-6">
-                <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
-                  <Truck className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
-                  {tr(locale, "Delivery across Norway", "Levering hele Norge")}
-                </div>
-                <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
-                  <Wrench className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
-                  {tr(locale, "Installation and training", "Montering og opplæring")}
-                </div>
-              </div>
-            </div> {/* End of right col content */}
-          </Reveal>
-          </div> {/* End of grid-cols-2 */}
-            
-            {/* Tabs Area */}
-            <div className="mt-12">
-               <div className="flex items-end gap-0 border-b border-[var(--color-divider)]">
-                 <button 
-                   onClick={() => setActiveTab("description")}
-                   className={`px-6 py-3 text-[14px] font-bold transition-colors ${activeTab === "description" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] border-b-0"}`}
-                 >
-                   {tr(locale, "Description", "Beskrivelse")}
-                 </button>
-                 <button 
-                   onClick={() => setActiveTab("downloads")}
-                   className={`px-6 py-3 text-[14px] font-bold transition-colors ${activeTab === "downloads" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] border-b-0 ml-2"}`}
-                 >
-                   {tr(locale, "Downloads", "Nedlastinger")}
-                 </button>
-                 <button 
-                   onClick={() => setActiveTab("contact")}
-                   className={`px-6 py-3 text-[14px] font-bold transition-colors ${activeTab === "contact" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] border-b-0 ml-2"}`}
-                 >
-                   {tr(locale, "Contact Us", "Kontakt Oss")}
-                 </button>
-               </div>
-               
-               <div className="bg-white border border-t-0 border-[var(--color-divider)] p-6 lg:p-8">
-                 {activeTab === "description" && (
-                   <div>
-                     {displayDescriptionHtml.trim() ? (
-                        <div
-                          className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
-                          dangerouslySetInnerHTML={{ __html: displayDescriptionHtml }}
-                        />
-                      ) : (
-                        <p className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90">{displayDescriptionPlain}</p>
-                      )}
-                      
-                      {displayHighlights.length > 0 && (
-                        <ul className="mt-6 space-y-3">
-                          {displayHighlights.map((h, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--color-ink)] shrink-0" />
-                              <span className="text-[14px] text-[var(--color-ink)] leading-[1.6]">{h}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                   </div>
-                 )}
-                 {activeTab === "downloads" && (
-                    <div className="py-8">
-                      {product.downloads && product.downloads.length > 0 ? (
-                        <div className="flex flex-col gap-3">
-                          {product.downloads.map(d => (
-                            <a key={d.id} href={d.source} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 border border-[var(--color-divider)] rounded hover:border-[var(--color-copper)] transition-colors group">
-                              <div className="bg-[#f8f8f8] p-2 rounded group-hover:bg-[#ebf5ff] transition-colors">
-                                <FileDown className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[#3baaf2]" />
-                              </div>
-                              <span className="text-[14px] font-medium text-[var(--color-ink)] group-hover:text-[#3baaf2] transition-colors">{d.name}</span>
-                            </a>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-[var(--color-muted)]">{tr(locale, "No downloads available for this product.", "Ingen nedlastinger tilgjengelig for dette produktet.")}</p>
-                      )}
+                  {gallery.length > 1 ? (
+                    <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                      {gallery.slice(0, 10).map((src, i) => (
+                        <button
+                          key={`${src}-${i}`}
+                          type="button"
+                          onClick={() => setActiveImg(i)}
+                          className={`aspect-[4/3] bg-white border rounded-[2px] overflow-hidden transition-all ${activeImg === i
+                            ? "border-[var(--color-copper)] ring-1 ring-[var(--color-copper)]"
+                            : "border-[var(--color-divider)] hover:border-[var(--color-ink)]"
+                            }`}
+                          aria-label={tr(locale, `Bilde ${i + 1}`, `Image ${i + 1}`)}
+                        >
+                          {isMissingStorefrontImageSource(src) ? (
+                            <ImageUnavailablePlaceholder locale={locale} className="min-h-full" />
+                          ) : (
+                            <Image
+                              src={src}
+                              alt=""
+                              width={320}
+                              height={240}
+                              className="h-full w-full object-cover"
+                            />
+                          )}
+                        </button>
+                      ))}
                     </div>
-                 )}
-                 {activeTab === "contact" && (
-                   <div className="py-10 text-center text-[var(--color-muted)] flex flex-col items-center">
-                     <Mail className="h-10 w-10 mb-3 opacity-20" />
-                     <p>{tr(locale, "Please reach out to our sales team for more information.", "Ta kontakt med vårt salgsteam for mer informasjon.")}</p>
-                     <Link href="/kontakt" className="mt-4 btn-primary">{tr(locale, "Contact Us", "Kontakt Oss")}</Link>
-                   </div>
-                 )}
-               </div>
+                  ) : null}
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.15}>
+                <div className="lg:sticky lg:top-28">
+                  <p className="text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] font-semibold">Tecno X</p>
+                  <h1
+                    className="mt-3 text-[26px] lg:text-[32px] font-bold text-[var(--color-ink)] tracking-[-0.025em] leading-[1.1]"
+                    dangerouslySetInnerHTML={{
+                      __html: displayName || "",
+                    }}
+                  />
+                  {/*  <p className="mt-3 font-mono text-[13px] text-[var(--color-muted)]">{specLineBelowTitle}</p> */}
+
+                  {effectiveVariant?.stockLevel?.trim() ? (
+                    <p className="mt-2 text-[12px] text-[var(--color-muted)]">
+                      {tr(locale, "Beholdningsstatus:", "Availability:")}{" "}
+                      <span className={`font-mono font-bold ${effectiveVariant.stockLevel === "OUT_OF_STOCK" ? "text-red-600" : "text-[var(--color-ink)]"}`}>
+                        {effectiveVariant.stockLevel === "IN_STOCK"
+                          ? tr(locale, "På lager", "In stock")
+                          : effectiveVariant.stockLevel === "OUT_OF_STOCK"
+                            ? tr(locale, "Utsolgt", "Out of stock")
+                            : effectiveVariant.stockLevel}
+                      </span>
+                    </p>
+                  ) : null}
+
+
+
+                  <p className="mt-6 text-[28px] font-bold text-[#3baaf2] tracking-[-0.02em]">{displayPrice}</p>
+                  <p className="text-[12px] text-[var(--color-muted)]">
+                    {tr(locale, "Frakt beregnes ved tilbud", "Shipping calculated at checkout/order")}
+                  </p>
+
+
+
+                  {pdpCustomFields.length > 0 ? (
+                    <dl className="mt-6 space-y-1.5 border-t border-[var(--color-divider)] pt-6">
+                      {pdpCustomFields.map((field) => (
+                        <div key={field.label} className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px]">
+                          <dt className="font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">
+                            {field.label}:
+                          </dt>
+                          <dd className="text-[var(--color-ink)]">{field.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+
+                  {variants.length > 1 ? (
+                    <div className="mt-6">
+                      <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)] mb-2">
+                        VARIATION :
+                      </label>
+                      <div className="relative max-w-md">
+                        <select
+                          value={selectedVid}
+                          onChange={(e) => pickVariant(e.target.value)}
+                          className="w-full appearance-none bg-white border border-[var(--color-divider)] rounded-[2px] px-4 py-3 pr-10 text-[14px] font-medium text-[var(--color-ink)] cursor-pointer hover:border-[var(--color-copper)] focus:outline-none focus:border-[var(--color-copper)]"
+                        >
+                          {variants.map((v) => (
+                            <option key={v.id} value={v.id}>
+                              {variantLabelOption(v)}
+                              {v.stockLevel === "OUT_OF_STOCK" ? ` (${tr(locale, "Utsolgt", "Out of stock")})` : ""}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted)]" />
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <div className="inline-flex items-stretch border border-[var(--color-divider)] rounded-[2px] overflow-hidden bg-white">
+                      <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="px-3 hover:bg-[#f8f8f8] transition-colors"><Minus className="h-4 w-4" /></button>
+                      <span className="px-4 py-2.5 min-w-10 text-center font-bold text-[14px]">{qty}</span>
+                      <button type="button" onClick={() => setQty((q) => q + 1)} className="px-3 hover:bg-[#f8f8f8] transition-colors"><Plus className="h-4 w-4" /></button>
+                    </div>
+                    <button type="button" onClick={() => void handleAdd()} disabled={syncing || effectiveVariant?.stockLevel === "OUT_OF_STOCK"} className="bg-[#3eb1f0] hover:bg-[#32a0db] text-white px-6 py-2.5 font-bold text-[14px] rounded-[2px] flex items-center gap-2 transition-colors disabled:opacity-60">
+                      <ShoppingBag className="h-4 w-4" />
+                      {effectiveVariant?.stockLevel === "OUT_OF_STOCK" ? tr(locale, "Utsolgt", "Out of stock") : added ? tr(locale, "Lagt til", "Added") : syncing ? tr(locale, "Legger til …", "Adding …") : tr(locale, "Legg i kurv", "Add to cart")}
+                    </button>
+                    <div className="flex items-center ml-2">
+                      <button onClick={handleDownloadPdf} type="button" className="p-3 bg-[#f8f8f8] hover:bg-[#eaeaea] text-[var(--color-ink)] transition-colors rounded-[2px] ml-4" aria-label="Last ned PDF">
+                        <FileDown className="h-5 w-5" />
+                      </button>
+                      <button onClick={() => window.print()} type="button" className="p-3 bg-[#f8f8f8] hover:bg-[#eaeaea] text-[var(--color-ink)] transition-colors rounded-[2px]" aria-label="Skriv ut side">
+                        <Printer className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                  {added && (
+                    <p className="mt-3 flex items-center gap-2 text-[13px] text-[var(--color-copper)]">
+                      <Check className="h-4 w-4" /> {tr(locale, "Produktet er lagt i handlekurven.", "Product added to cart.")}
+                    </p>
+                  )}
+                  {(cartMessage || lastActionError) && (
+                    <p className="mt-3 text-[13px] text-red-700" role="alert">
+                      {cartMessage ?? lastActionError}
+                    </p>
+                  )}
+
+                  <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-[var(--color-divider)] pt-6">
+                    <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
+                      <Truck className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
+                      {tr(locale, "Delivery across Norway", "Levering hele Norge")}
+                    </div>
+                    <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
+                      <Wrench className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
+                      {tr(locale, "Installation and training", "Montering og opplæring")}
+                    </div>
+                  </div>
+                </div> {/* End of right col content */}
+              </Reveal>
+            </div> {/* End of grid-cols-2 */}
+
+            {/* Tabs Area */}
+            <div className="mt-12  bg-[#FBF9F7] p-[30px] rounded-[10px] mb-[50px]">
+              <div className="inline-block items-end gap-6 ">
+                <button
+                  onClick={() => setActiveTab("description")}
+                  className={`px-6 py-3 text-[14px] pr-20 font-bold transition-colors mr-6  mb-2 cursor-pointer ${activeTab === "description" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] "}`}
+                >
+                  {tr(locale, "Beskrivelse", "Description")}
+                </button>
+                <button
+                  onClick={() => setActiveTab("downloads")}
+                  className={`px-6 py-3 text-[14px]  pr-20  font-bold transition-colors  mr-6  mb-2  cursor-pointer ${activeTab === "downloads" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)] "}`}
+                >
+                  {tr(locale, "Nedlastinger", "Downloads")}
+                </button>
+                <button
+                  onClick={() => setActiveTab("contact")}
+                  className={`px-6 py-3 text-[14px]  pr-20  font-bold transition-colors mr-6 mb-2 cursor-pointer ${activeTab === "contact" ? "bg-[#3eb1f0] text-white" : "bg-white text-[var(--color-ink)] border border-[var(--color-divider)]  "}`}
+                >
+                  {tr(locale, "Kontakt Oss", "Contact Us")}
+                </button>
+              </div>
+
+              <div className="bg-trnsparent rounded-[10px] border-[var(--color-divider)] p-6 lg:p-8">
+                {activeTab === "description" && (
+                  <div>
+                    {displayDescriptionHtml.trim() ? (
+                      <div
+                        className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
+                       
+                      />
+                    ) : (
+                      <p className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90">{displayDescriptionPlain}</p>
+                    )}
+
+                    {displayHighlights.length > 0 && (
+                      <ul className="mt-6 space-y-3">
+                        {displayHighlights.map((h, i) => (
+                          <li key={i} className="flex items-start gap-3">
+                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--color-ink)] shrink-0" />
+                            <span className="text-[14px] text-[var(--color-ink)] leading-[1.6]">{h}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+                {activeTab === "downloads" && (
+                  <div className="py-8">
+                    {product.downloads && product.downloads.length > 0 ? (
+                      <div className="flex flex-col gap-3">
+                        {product.downloads.map(d => (
+                          <a key={d.id} href={d.source} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 border border-[var(--color-divider)] rounded hover:border-[var(--color-copper)] transition-colors group">
+                            <div className="bg-[#f8f8f8] p-2 rounded group-hover:bg-[#ebf5ff] transition-colors">
+                              <FileDown className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[#3baaf2]" />
+                            </div>
+                            <span className="text-[14px] font-medium text-[var(--color-ink)] group-hover:text-[#3baaf2] transition-colors">{d.name}</span>
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[var(--color-muted)]">{tr(locale, "No downloads available for this product.", "Ingen nedlastinger tilgjengelig for dette produktet.")}</p>
+                    )}
+                  </div>
+                )}
+                {activeTab === "contact" && (
+                  <ProductQuoteForm productSlug={product.slug} productName={displayName} locale={locale} />
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      
 
-      <section className="bg-[var(--color-dark-bg)] text-[var(--color-stone)] py-16 lg:py-24">
+
+      {/*    <section className="bg-[var(--color-dark-bg)] text-[var(--color-stone)] py-16 lg:py-24">
         <div className="container-x">
           <Reveal>
             <div className="max-w-3xl mb-10">
@@ -591,7 +589,7 @@ export function ProductPageTemplate({
             </div>
           </Reveal>
         </div>
-      </section>
+      </section> */}
 
       {reviews.length > 0 ? (
         <section className="bg-[var(--color-stone)] py-16 lg:py-24 border-y border-[var(--color-divider)]">
@@ -636,7 +634,7 @@ export function ProductPageTemplate({
         </section>
       ) : null}
 
-      <ProductQuoteSection productSlug={product.slug} productName={displayName} locale={locale} quoteLines={quoteAsideLines} />
+      {/*  <ProductQuoteSection productSlug={product.slug} productName={displayName} locale={locale} quoteLines={quoteAsideLines} /> */}
 
       {relatedProducts.length > 0 && (
         <section className="bg-[var(--color-stone)] py-16 lg:py-24">
@@ -657,35 +655,35 @@ export function ProductPageTemplate({
                 const relatedName = productLocalizedName(p, locale);
                 const relatedPrice = productLocalizedPriceLabel(p, locale);
                 return (
-                <Reveal key={p.slug} delay={i * 0.06} className="h-full min-h-0">
-                  <Link href={`/produkter/${p.slug}`} className="group card-elevated flex h-full min-h-0 flex-col">
-                    <div className="aspect-[4/3] overflow-hidden bg-[var(--color-stone)]">
-                      {typeof p.img === "string" ? (
-                        <StorefrontRemoteImage
-                          src={p.img}
-                          alt={relatedName}
-                          locale={locale}
-                          className="transition-transform duration-700 group-hover:scale-[1.05]"
-                        />
-                      ) : (
-                        <Image
-                          src={p.img}
-                          alt={relatedName}
-                          loading="lazy"
-                          width={1024}
-                          height={768}
-                          sizes="(max-width: 1024px) 50vw, 25vw"
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-                        />
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-[14px] font-bold text-[var(--color-ink)] leading-snug">{relatedName}</h3>
-                      <p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] font-medium">{displayBrandName(p.brand)}</p>
-                      <p className="mt-2 text-[13px] font-bold text-[var(--color-copper)]">{relatedPrice}</p>
-                    </div>
-                  </Link>
-                </Reveal>
+                  <Reveal key={p.slug} delay={i * 0.06} className="h-full min-h-0">
+                    <Link href={`/produkter/${p.slug}`} className="group card-elevated flex h-full min-h-0 flex-col">
+                      <div className="aspect-[4/3] overflow-hidden bg-[var(--color-stone)]">
+                        {typeof p.img === "string" ? (
+                          <StorefrontRemoteImage
+                            src={p.img}
+                            alt={relatedName}
+                            locale={locale}
+                            className="transition-transform duration-700 group-hover:scale-[1.05]"
+                          />
+                        ) : (
+                          <Image
+                            src={p.img}
+                            alt={relatedName}
+                            loading="lazy"
+                            width={1024}
+                            height={768}
+                            sizes="(max-width: 1024px) 50vw, 25vw"
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+                          />
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-[14px] font-bold text-[var(--color-ink)] leading-snug">{relatedName}</h3>
+                        <p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] font-medium">{displayBrandName(p.brand)}</p>
+                        <p className="mt-2 text-[13px] font-bold text-[var(--color-copper)]">{relatedPrice}</p>
+                      </div>
+                    </Link>
+                  </Reveal>
                 );
               })}
             </div>
@@ -720,7 +718,7 @@ export function ProductPageTemplate({
           <div style={{ width: "50%" }}>
             <h2 style={{ fontSize: "24px", margin: "0 0 15px 0", lineHeight: "1.2", color: "#111" }}>{displayName}</h2>
             <div style={{ fontSize: "26px", fontWeight: "bold", color: "#3baaf2", marginBottom: "20px" }}>{displayPrice}</div>
-            
+
             <div style={{ backgroundColor: "#f8f8f8", padding: "15px", borderRadius: "4px" }}>
               <h3 style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", color: "#888", margin: "0 0 10px 0" }}>Specifications</h3>
               {pdpCustomFields.length > 0 ? (
@@ -797,6 +795,103 @@ function formatIsoShortEn(iso: string): string {
   }).format(d);
 }
 
+function ProductQuoteForm({
+  productSlug,
+  productName,
+  locale,
+}: {
+  productSlug: string;
+  productName: string;
+  locale: Locale;
+}) {
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  if (submitted) {
+    return (
+      <div className="bg-white border border-[var(--color-divider)] p-10 rounded-[3px] text-center">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-copper)] text-white">
+          <Check className="h-6 w-6" />
+        </div>
+        <h3 className="mt-5 text-[20px] font-bold text-[var(--color-ink)] tracking-[-0.02em]">
+          {tr(locale, "Takk! Vi er på saken.", "Thanks! We are on it.")}
+        </h3>
+        <p className="mt-3 text-[14px] text-[var(--color-muted)]">
+          {tr(locale, "En av våre fagfolk tar kontakt innen 24 timer.", "One of our specialists will contact you within 24 hours.")}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="bg-white border border-[var(--color-divider)] p-6 lg:p-8 rounded-[3px] space-y-5"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setError(null);
+        const fd = new FormData(e.currentTarget);
+        const body = {
+          name: fd.get("name"),
+          company: fd.get("company"),
+          email: fd.get("email"),
+          phone: fd.get("phone"),
+          message: fd.get("message"),
+          productSlug,
+          productName,
+          locale,
+        };
+        setSubmitting(true);
+        try {
+          const res = await fetch("/api/storefront/quote-request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const json = (await res.json()) as { ok?: boolean; error?: string };
+          if (!res.ok || !json.ok) {
+            setError(json.error ?? tr(locale, "Kunne ikke sende forespørselen.", "Could not send your request."));
+            return;
+          }
+          setSubmitted(true);
+        } catch {
+          setError(tr(locale, "Nettverksfeil — prøv igjen.", "Network error — please try again."));
+        } finally {
+          setSubmitting(false);
+        }
+      }}
+    >
+      <div className="grid sm:grid-cols-2 gap-4">
+        <QuoteField label={tr(locale, "Navn", "Name")} required type="text" name="name" disabled={submitting} />
+        <QuoteField label={tr(locale, "Bedrift", "Company")} type="text" name="company" disabled={submitting} />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <QuoteField label={tr(locale, "E-post", "Email")} required type="email" name="email" disabled={submitting} />
+        <QuoteField label={tr(locale, "Telefon", "Phone")} type="tel" name="phone" disabled={submitting} />
+      </div>
+      <div>
+        <label className="block text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] mb-2">
+          {tr(locale, "Melding", "Message")}
+        </label>
+        <textarea
+          name="message"
+          rows={4}
+          required
+          disabled={submitting}
+          defaultValue={tr(locale, `Forespørsel om tilbud på: ${productName}`, `Quote request for: ${productName}`)}
+          className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors resize-none disabled:opacity-60"
+        />
+      </div>
+      {error ? <p className="text-[13px] text-red-700">{error}</p> : null}
+      <button type="submit" disabled={submitting} className="btn-primary w-full sm:w-auto disabled:opacity-60">
+        {submitting
+          ? tr(locale, "Sender…", "Sending…")
+          : tr(locale, "Send tilbudsforespørsel", "Send quote request")}
+      </button>
+    </form>
+  );
+}
+
 function ProductQuoteSection({
   productSlug,
   productName,
@@ -808,10 +903,6 @@ function ProductQuoteSection({
   locale: Locale;
   quoteLines: string[];
 }) {
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
   return (
     <section className="bg-[var(--color-stone)] py-16 lg:py-20 border-t border-[var(--color-divider)]">
       <div className="container-x grid lg:grid-cols-[1fr_1.2fr] gap-10 lg:gap-16">
@@ -839,87 +930,6 @@ function ProductQuoteSection({
               ))}
             </ul>
           </div>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          {submitted ? (
-            <div className="bg-white border border-[var(--color-divider)] p-10 rounded-[3px] text-center">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-copper)] text-white">
-                <Check className="h-6 w-6" />
-              </div>
-              <h3 className="mt-5 text-[20px] font-bold text-[var(--color-ink)] tracking-[-0.02em]">
-                {tr(locale, "Takk! Vi er på saken.", "Thanks! We are on it.")}
-              </h3>
-              <p className="mt-3 text-[14px] text-[var(--color-muted)]">
-                {tr(locale, "En av våre fagfolk tar kontakt innen 24 timer.", "One of our specialists will contact you within 24 hours.")}
-              </p>
-            </div>
-          ) : (
-            <form
-              className="bg-white border border-[var(--color-divider)] p-6 lg:p-8 rounded-[3px] space-y-5"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setError(null);
-                const fd = new FormData(e.currentTarget);
-                const body = {
-                  name: fd.get("name"),
-                  company: fd.get("company"),
-                  email: fd.get("email"),
-                  phone: fd.get("phone"),
-                  message: fd.get("message"),
-                  productSlug,
-                  productName,
-                  locale,
-                };
-                setSubmitting(true);
-                try {
-                  const res = await fetch("/api/storefront/quote-request", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body),
-                  });
-                  const json = (await res.json()) as { ok?: boolean; error?: string };
-                  if (!res.ok || !json.ok) {
-                    setError(json.error ?? tr(locale, "Kunne ikke sende forespørselen.", "Could not send your request."));
-                    return;
-                  }
-                  setSubmitted(true);
-                } catch {
-                  setError(tr(locale, "Nettverksfeil — prøv igjen.", "Network error — please try again."));
-                } finally {
-                  setSubmitting(false);
-                }
-              }}
-            >
-              <div className="grid sm:grid-cols-2 gap-4">
-                <QuoteField label={tr(locale, "Navn", "Name")} required type="text" name="name" disabled={submitting} />
-                <QuoteField label={tr(locale, "Bedrift", "Company")} type="text" name="company" disabled={submitting} />
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <QuoteField label={tr(locale, "E-post", "Email")} required type="email" name="email" disabled={submitting} />
-                <QuoteField label={tr(locale, "Telefon", "Phone")} type="tel" name="phone" disabled={submitting} />
-              </div>
-              <div>
-                <label className="block text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)] mb-2">
-                  {tr(locale, "Melding", "Message")}
-                </label>
-                <textarea
-                  name="message"
-                  rows={4}
-                  required
-                  disabled={submitting}
-                  defaultValue={tr(locale, `Forespørsel om tilbud på: ${productName}`, `Quote request for: ${productName}`)}
-                  className="w-full bg-white border border-[var(--color-divider)] px-4 py-3 text-[14px] rounded-[2px] focus:outline-none focus:border-[var(--color-copper)] transition-colors resize-none disabled:opacity-60"
-                />
-              </div>
-              {error ? <p className="text-[13px] text-red-700">{error}</p> : null}
-              <button type="submit" disabled={submitting} className="btn-primary w-full sm:w-auto disabled:opacity-60">
-                {submitting
-                  ? tr(locale, "Sender…", "Sending…")
-                  : tr(locale, "Send tilbudsforespørsel", "Send quote request")}
-              </button>
-            </form>
-          )}
         </Reveal>
       </div>
     </section>
