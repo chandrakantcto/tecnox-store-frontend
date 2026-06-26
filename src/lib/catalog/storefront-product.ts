@@ -93,6 +93,7 @@ export type Product = {
   productStatus?: string | null;
   productType?: string | null;
   tags?: string[];
+  downloads?: { id: string; name: string; source: string; preview: string; }[];
 };
 
 /** Persisted alongside cart rows so totals stay accurate offline from API. */
