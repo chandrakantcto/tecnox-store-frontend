@@ -57,7 +57,7 @@ export default async function ProdukterPage(props: PageProps) {
   const rawQ = typeof sp.q === "string" ? sp.q.trim() : "";
   const searchQuery = rawQ.length > 0 ? rawQ : null;
   const cat = searchQuery ? null : rawCat.length > 0 ? rawCat : null;
-  const { listing: lp, catalog, validatedCatSlug } = await getProductsListingCatalog(
+  const { listing: lp, catalog, validatedCatSlug, categoryBreadcrumbs } = await getProductsListingCatalog(
     locale,
     cat,
     searchQuery,
@@ -79,6 +79,17 @@ export default async function ProdukterPage(props: PageProps) {
     );
   const heroBg = lp.heroBgImageSrc?.trim() ? lp.heroBgImageSrc.trim() : heroImg;
 
+  const crumbs =
+    categoryBreadcrumbs.length > 0
+      ? categoryBreadcrumbs.map((b, i) => ({
+          label: b.label,
+          to:
+            i < categoryBreadcrumbs.length - 1
+              ? `/produkter?cat=${encodeURIComponent(b.slug)}`
+              : undefined,
+        }))
+      : [{ label: heroLabel }];
+
   return (
     <main className=" bg-[var(--color-stone)]">
       <SiteHeader locale={locale} />
@@ -86,7 +97,7 @@ export default async function ProdukterPage(props: PageProps) {
         label={heroLabel}
         title={<>{heroTitle}</>}
         description={heroDescription}
-        crumbs={[{ label: heroLabel }]}
+        crumbs={crumbs}
         bgImage={heroBg}
         locale={locale}
       />

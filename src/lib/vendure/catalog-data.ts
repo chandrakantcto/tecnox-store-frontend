@@ -4,6 +4,7 @@ import type {
   CatalogProductCard,
   CategoriesListingPageCopy,
   CategoriesSectionCopy,
+  CategoryBreadcrumb,
   HomepageCategoryTile,
   MegaMenuLocales,
   ProductsListingCatalogPayload,
@@ -714,6 +715,18 @@ function findNavNodeBySlug(roots: VCollectionNav[], targetSlug: string): VCollec
   return null;
 }
 
+/** Ancestor chain from a nav root down to `targetSlug` (inclusive). */
+function findNavPathBySlug(roots: VCollectionNav[], targetSlug: string): VCollectionNav[] | null {
+  for (const node of roots) {
+    if (node.slug === targetSlug) return [node];
+    if (node.children?.length) {
+      const childPath = findNavPathBySlug(node.children, targetSlug);
+      if (childPath) return [node, ...childPath];
+    }
+  }
+  return null;
+}
+
 function extractAllDescendantIds(node: VCollectionNav): string[] {
   const ids: string[] = [node.id];
   for (const child of node.children ?? []) {
@@ -853,6 +866,7 @@ export const getProductsListingCatalog = cache(
         return {
           listing: nav.productsListingPage,
           validatedCatSlug: null,
+          categoryBreadcrumbs: [],
           catalog: emptySection(megaErr ?? nav.error ?? "[catalog] No collections returned."),
         };
       }
@@ -868,6 +882,17 @@ export const getProductsListingCatalog = cache(
         navNb.roots,
         navEn.roots,
       );
+
+      const categoryBreadcrumbs: CategoryBreadcrumb[] = (() => {
+        if (!activeNode) return [];
+        const path = findNavPathBySlug(nav.roots, activeNode.slug);
+        if (!path?.length) return [];
+        const nameMap = locale === "en" ? slugToCategoryNameEn : slugToCategoryNameNb;
+        return path.map((node) => ({
+          slug: node.slug,
+          label: nameMap.get(node.slug) ?? node.name,
+        }));
+      })();
 
       const baseHits = locale === "en" ? dualSearch.en : dualSearch.nb;
       const nbBySlug = searchHitsBySlug(dualSearch.nb);
@@ -912,6 +937,7 @@ export const getProductsListingCatalog = cache(
       return {
         listing: nav.productsListingPage,
         validatedCatSlug,
+        categoryBreadcrumbs,
         catalog: {
           filters: locale === "en" ? filtersEn : filtersNb,
           filtersNb,
@@ -930,6 +956,7 @@ export const getProductsListingCatalog = cache(
       return {
         listing: { ...EMPTY_LISTING_PAGE },
         validatedCatSlug: null,
+        categoryBreadcrumbs: [],
         catalog: emptySection(msg),
       };
     }
@@ -949,5 +976,6 @@ export type {
   ProductsListingPageCopy,
   ProductsListingCatalogPayload,
   ProductsSectionPayload,
+  CategoryBreadcrumb,
   MegaMenuLocales,
 } from "./catalog-types";

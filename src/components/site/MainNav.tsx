@@ -250,21 +250,25 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                     <ul className="py-2 max-h-[min(320px,50vh)] overflow-y-auto overscroll-contain">
                       {megaMenuTree.map((main) => (
                         <li key={main.collectionId}>
-                          <button
-                            type="button"
+                          <Link
+                            href={catHref(main.id)}
+                            onMouseEnter={() => onMainEnter(main.collectionId)}
+                            onClick={() => {
+                              closeMega();
+                              refreshProdukterListing(pathname, router);
+                            }}
                             className={`w-full text-left flex items-center cursor-pointer justify-between gap-2 px-4 py-3 text-[13.5px] font-medium transition-colors border-l-[3px] ${
                               megaMainId === main.collectionId
                                 ? "border-[var(--color-copper)] bg-white text-[var(--color-copper)]"
                                 : "border-transparent text-[var(--color-ink)] hover:bg-white/80 hover:text-[var(--color-copper)]"
                             }`}
-                            onMouseEnter={() => onMainEnter(main.collectionId)}
                           >
                             <span className="min-w-0 truncate">{main.label}</span>
                             <span className="flex items-center gap-1 shrink-0">
                               <span className="text-[11px] text-[var(--color-muted)] tabular-nums">{main.count}</span>
                               <ChevronRight className="h-3.5 w-3.5 opacity-50" strokeWidth={2} />
                             </span>
-                          </button>
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -273,28 +277,33 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                   {/* Kolonne 2 — underkategorier */}
                   <div className="border-r border-[var(--color-divider)] bg-white pl-5">
                     <ul className="py-2 max-h-[min(320px,50vh)] overflow-y-auto overscroll-contain">
-                      {activeMain?.subs.map((sub) => (
-                        <li key={sub.collectionId}>
-                          <Link
-                            href={catHref(sub.id)}
-                            onMouseEnter={() => setMegaSubId(sub.collectionId)}
-                            onClick={() => {
-                              closeMega();
-                              refreshProdukterListing(pathname, router);
-                            }}
-                            className={`flex  cursor-pointer items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
-                              megaSubId === sub.collectionId
-                                ? "border-[var(--color-copper)] bg-[var(--color-stone)]/35 text-[var(--color-copper)] font-medium"
-                                : "border-transparent text-[var(--color-ink)] hover:bg-[var(--color-stone)]/50 hover:text-[var(--color-copper)]"
-                            }`}
-                          >
-                            <span className="min-w-0 truncate">{sub.label}</span>
-                            {sub.children && sub.children.length > 0 && (
-                              <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-45" strokeWidth={2} />
-                            )}
-                          </Link>
-                        </li>
-                      ))}
+                      {activeMain?.subs.map((sub) => {
+                        const hasChildren = Boolean(sub.children && sub.children.length > 0);
+                        const rowClass = `flex w-full items-center justify-between gap-2 px-4 py-2.5 text-[13px] transition-colors border-l-[3px] ${
+                          megaSubId === sub.collectionId
+                            ? "border-[var(--color-copper)] bg-[var(--color-stone)]/35 text-[var(--color-copper)] font-medium"
+                            : "border-transparent text-[var(--color-ink)] hover:bg-[var(--color-stone)]/50 hover:text-[var(--color-copper)]"
+                        }`;
+
+                        return (
+                          <li key={sub.collectionId}>
+                            <Link
+                              href={catHref(sub.id)}
+                              onMouseEnter={() => setMegaSubId(sub.collectionId)}
+                              onClick={() => {
+                                closeMega();
+                                refreshProdukterListing(pathname, router);
+                              }}
+                              className={`${rowClass} cursor-pointer`}
+                            >
+                              <span className="min-w-0 truncate">{sub.label}</span>
+                              {hasChildren ? (
+                                <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-45" strokeWidth={2} />
+                              ) : null}
+                            </Link>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
 
@@ -436,27 +445,46 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                               const mainOpen = mobileMegaMainId === main.collectionId;
                               return (
                                 <div key={main.collectionId}>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setMobileMegaMainId((id) => (id === main.collectionId ? null : main.collectionId));
-                                      setMobileMegaSubId(null);
-                                    }}
-                                    className={`flex w-full items-center justify-between  cursor-pointer gap-2 rounded-[3px] border px-3 py-2.5 text-left text-[13px] font-medium transition-colors ${
+                                  <div
+                                    className={`flex items-center gap-1 rounded-[3px] border transition-colors ${
                                       mainOpen
-                                        ? "border-[var(--color-divider)] border-l-[3px] border-l-[var(--color-copper)] bg-white text-[var(--color-ink)] shadow-sm"
-                                        : "border-transparent text-[var(--color-muted)] hover:bg-white/70 hover:text-[var(--color-ink)]"
+                                        ? "border-[var(--color-divider)] border-l-[3px] border-l-[var(--color-copper)] bg-white shadow-sm"
+                                        : "border-transparent"
                                     }`}
                                   >
-                                    <span className="min-w-0 truncate">{main.label}</span>
-                                    <span className="flex shrink-0 items-center gap-1 tabular-nums text-[11px] font-normal text-[var(--color-muted)]">
-                                      ({main.count})
+                                    <Link
+                                      href={catHref(main.id)}
+                                      onClick={() => {
+                                        setOpen(false);
+                                        refreshProdukterListing(pathname, router);
+                                      }}
+                                      className={`min-w-0 flex-1 truncate rounded-[3px] px-3 py-2.5 text-[13px] font-medium transition-colors ${
+                                        mainOpen
+                                          ? "text-[var(--color-ink)]"
+                                          : "text-[var(--color-muted)] hover:bg-white/70 hover:text-[var(--color-ink)]"
+                                      }`}
+                                    >
+                                      {main.label}
+                                    </Link>
+                                    <button
+                                      type="button"
+                                      aria-expanded={mainOpen}
+                                      aria-label={tr(locale, "Vis underkategorier", "Show subcategories")}
+                                      onClick={() => {
+                                        setMobileMegaMainId((id) =>
+                                          id === main.collectionId ? null : main.collectionId,
+                                        );
+                                        setMobileMegaSubId(null);
+                                      }}
+                                      className="flex shrink-0 cursor-pointer items-center gap-1 px-2 py-2.5 text-[var(--color-muted)] hover:text-[var(--color-copper)]"
+                                    >
+                                      <span className="tabular-nums text-[11px] font-normal">({main.count})</span>
                                       <ChevronRight
                                         className={`h-3.5 w-3.5 opacity-50 transition-transform ${mainOpen ? "rotate-90" : ""}`}
                                         strokeWidth={2}
                                       />
-                                    </span>
-                                  </button>
+                                    </button>
+                                  </div>
 
                                   {mainOpen ? (
                                     <ul className="mt-0.5 flex flex-col gap-0.5 border-l border-[var(--color-divider)] py-1 pl-2 ml-2">
@@ -467,23 +495,38 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                                           <li key={sub.collectionId}>
                                             {hasChildren ? (
                                               <>
-                                                <button
-                                                  type="button"
-                                                  onClick={() =>
-                                                    setMobileMegaSubId((id) => (id === sub.collectionId ? null : sub.collectionId))
-                                                  }
-                                                  className={`flex w-full items-center justify-between  cursor-pointer gap-2 rounded-[3px] px-3 py-2 text-left text-[13px] transition-colors ${
-                                                    subOpen
-                                                      ? "bg-white/90 font-medium text-[var(--color-copper)]"
-                                                      : "text-[var(--color-ink)] hover:bg-white/70 hover:text-[var(--color-copper)]"
-                                                  }`}
-                                                >
-                                                  <span className="min-w-0 truncate">{sub.label}</span>
-                                                  <ChevronRight
-                                                    className={`h-3.5 w-3.5 shrink-0 opacity-45 transition-transform ${subOpen ? "rotate-90" : ""}`}
-                                                    strokeWidth={2}
-                                                  />
-                                                </button>
+                                                <div className="flex items-center gap-1">
+                                                  <Link
+                                                    href={catHref(sub.id)}
+                                                    onClick={() => {
+                                                      setOpen(false);
+                                                      refreshProdukterListing(pathname, router);
+                                                    }}
+                                                    className={`min-w-0 flex-1 truncate rounded-[3px] px-3 py-2 text-[13px] transition-colors ${
+                                                      subOpen
+                                                        ? "bg-white/90 font-medium text-[var(--color-copper)]"
+                                                        : "text-[var(--color-ink)] hover:bg-white/70 hover:text-[var(--color-copper)]"
+                                                    }`}
+                                                  >
+                                                    {sub.label}
+                                                  </Link>
+                                                  <button
+                                                    type="button"
+                                                    aria-expanded={subOpen}
+                                                    aria-label={tr(locale, "Vis underkategorier", "Show subcategories")}
+                                                    onClick={() =>
+                                                      setMobileMegaSubId((id) =>
+                                                        id === sub.collectionId ? null : sub.collectionId,
+                                                      )
+                                                    }
+                                                    className="shrink-0 cursor-pointer px-2 py-2 text-[var(--color-muted)] hover:text-[var(--color-copper)]"
+                                                  >
+                                                    <ChevronRight
+                                                      className={`h-3.5 w-3.5 opacity-45 transition-transform ${subOpen ? "rotate-90" : ""}`}
+                                                      strokeWidth={2}
+                                                    />
+                                                  </button>
+                                                </div>
                                                 {subOpen ? (
                                                   <ul className="flex flex-col gap-0.5 py-1 pl-2">
                                                     {sub.children!.map((leaf) => (

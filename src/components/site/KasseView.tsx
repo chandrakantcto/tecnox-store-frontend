@@ -606,13 +606,13 @@ export function KasseView({
                     {submitting ? tr(locale, "Sender bestilling …", "Placing order …") : authInitializing ? tr(locale, "Laster …", "Loading …") : tr(locale, "Fullfør bestilling", "Complete order")}
                   </button>
 
-                  <p className="text-[12px] text-[var(--color-muted)]">
+                  {/* <p className="text-[12px] text-[var(--color-muted)]">
                     {tr(
                       locale,
                       "Ingen ekstern betalingsleverandør er tilkoblet. Betaling bekreftes som test/manuelt i Vendure (dummy-payment-handler).",
                       "No external PSP is wired in; payment settles via Vendure’s configured manual/dummy handler.",
                     )}
-                  </p>
+                  </p> */}
                 </form>
               </Reveal>
 
@@ -666,7 +666,7 @@ export function KasseView({
                       <ShieldCheck className="h-4 w-4 text-[var(--color-copper)]" /> {tr(locale, "Profesjonell support", "Professional support")}
                     </li>
                     <li className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-[var(--color-copper)]" /> {tr(locale, "Admin / Vendure", "Admin / Vendure")}
+                      <Phone className="h-4 w-4 text-[var(--color-copper)]" /> {'411 90 600'}
                     </li>
                   </ul>
                 </aside>

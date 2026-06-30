@@ -94,4 +94,11 @@ export type ProductsListingCatalogPayload = {
   catalog: ProductsSectionPayload;
   /** Resolved root collection slug (`null` = all products); use for canonical `?cat=` */
   validatedCatSlug: string | null;
+  /** Breadcrumb trail for active `?cat=` (root → … → selected), localized labels */
+  categoryBreadcrumbs: CategoryBreadcrumb[];
+};
+
+export type CategoryBreadcrumb = {
+  slug: string;
+  label: string;
 };
