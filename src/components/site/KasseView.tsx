@@ -7,9 +7,11 @@ import { useEffect, useRef, useState } from "react";
 import { TopBar } from "@/components/site/TopBar";
 import { MainNav } from "@/components/site/MainNav";
 import { Footer } from "@/components/site/Footer";
+import { megaMenuToFooterRoots } from "@/lib/vendure/catalog-data";
 import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/site/Reveal";
-import { formatNOK, useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
+import { useStorefrontPrice } from "@/hooks/use-storefront-price";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
@@ -24,7 +26,7 @@ import { useShopAuth } from "@/contexts/ShopAuthContext";
 import { Check, ShieldCheck, Truck, Phone } from "lucide-react";
 import heroImg from "@/assets/hero-combi.jpg";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
-import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
+import { parseStoredPhone } from "@/lib/phone/phone-format";
 
 const emptyForm: CheckoutFormValues = {
   firstName: "",
@@ -70,6 +72,13 @@ export function KasseView({
     clearLastActionError,
     clearCartOptimistic,
   } = useCart();
+  const {
+    formatMajorKr,
+    checkoutAmountLabel,
+    subtotalLabel: checkoutSubtotalLabel,
+    displayMajorKr,
+  } = useStorefrontPrice();
+  const displaySubtotal = displayMajorKr(subtotal);
   const [form, setForm] = useState<CheckoutFormValues>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -102,7 +111,9 @@ export function KasseView({
         firstName: customer.firstName || prev.firstName,
         lastName: customer.lastName || prev.lastName,
         email: customer.emailAddress,
-        phone: customer.phoneNumber ?? prev.phone,
+        phone: customer.phoneNumber
+          ? parseStoredPhone(customer.phoneNumber).nationalNumber || customer.phoneNumber
+          : prev.phone,
       };
     });
   }, [authInitializing, customer]);
@@ -281,10 +292,10 @@ export function KasseView({
                   ) : null}
                   <div>
                     <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-muted)]">
-                      {tr(locale, "Totalbeløp (inkl. MVA)", "Total amount (incl. VAT)")}
+                      {checkoutAmountLabel}
                     </dt>
                     <dd className="mt-1 font-mono text-[18px] font-bold text-[var(--color-copper)]">
-                      kr {formatNOK(placedTotalKr)}
+                      kr {formatMajorKr(placedTotalKr)}
                     </dd>
                   </div>
                 </dl>
@@ -337,7 +348,7 @@ export function KasseView({
             </div>
           </Reveal>
         </section>
-        <Footer locale={locale} />
+        <Footer locale={locale} rootCategories={megaMenuToFooterRoots(megaMenuByLocale ?? { nb: [], en: [] })} />
       </main>
     );
   }
@@ -434,21 +445,16 @@ export function KasseView({
                         disabled={submitting || isLoggedIn}
                         maxLength={255}
                       />
-                      <div>
-                        <label className="mb-2 block text-[12px] uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                          {tr(locale, "Telefon", "Phone")} *
-                        </label>
-                        <PhoneInputWithCountry
-                          value={form.phone}
-                          onChange={(v) => update({ phone: v })}
-                          disabled={submitting}
-                          required
-                          hasError={Boolean(fieldErrors.phone)}
-                        />
-                        {fieldErrors.phone ? (
-                          <p className="mt-2 text-[12px] text-red-700">{fieldErrors.phone}</p>
-                        ) : null}
-                      </div>
+                      <FieldInput
+                        label={tr(locale, "Telefon", "Phone")}
+                        required
+                        type="tel"
+                        value={form.phone}
+                        onChange={(v) => update({ phone: v })}
+                        error={fieldErrors.phone}
+                        disabled={submitting}
+                        maxLength={40}
+                      />
                     </div>
                   </Section>
 
@@ -641,7 +647,7 @@ export function KasseView({
                           </p>
                         </div>
                         <p className="whitespace-nowrap font-mono text-[13px] text-[var(--color-copper)]">
-                          kr {formatNOK(Math.round(line.lineTotalKr))}
+                          kr {formatMajorKr(line.lineTotalKr)}
                         </p>
                       </li>
                     ))}
@@ -653,8 +659,8 @@ export function KasseView({
                       <dd>{itemCount}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum inkl. MVA", "Total incl. VAT")}</dt>
-                      <dd className="font-mono">kr {formatNOK(Math.round(subtotal))}</dd>
+                      <dt className="text-[var(--color-dark-muted)]">{checkoutSubtotalLabel}</dt>
+                      <dd className="font-mono">kr {formatMajorKr(displaySubtotal)}</dd>
                     </div>
                   </dl>
 

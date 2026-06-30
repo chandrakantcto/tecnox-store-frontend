@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SingleProductPage } from "@/components/site/SingleProductPage";
-import { getMegaMenuBothLocales, getProductsListingCatalog } from "@/lib/vendure/catalog-data";
+import { getMegaMenuBothLocales, getProductPageSidebarTree } from "@/lib/vendure/catalog-data";
 import { getStorefrontProductDetail } from "@/lib/vendure/product-detail-data";
 import { staticSrc } from "@/lib/static-asset";
 import { getServerLocale } from "@/lib/locale.server";
-
-export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -35,11 +33,14 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
   const sp = await searchParams;
   const locale = await getServerLocale();
   const variantParam = typeof sp.v === "string" ? sp.v.trim() : "";
-  const { product, relatedProducts } = await getStorefrontProductDetail(locale, slug, variantParam || null);
-  if (!product) notFound();
 
-  const { data: megaMenuByLocale } = await getMegaMenuBothLocales();
-  const { catalog } = await getProductsListingCatalog(locale, null);
+  const [{ product, relatedProducts }, { data: megaMenuByLocale }, sidebarTree] = await Promise.all([
+    getStorefrontProductDetail(locale, slug, variantParam || null),
+    getMegaMenuBothLocales(),
+    getProductPageSidebarTree(locale),
+  ]);
+
+  if (!product) notFound();
 
   return (
     <SingleProductPage
@@ -48,7 +49,7 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
       relatedProducts={relatedProducts}
       locale={locale}
       megaMenuByLocale={megaMenuByLocale}
-      sidebarTree={catalog.sidebarTree || []}
+      sidebarTree={sidebarTree}
     />
   );
 }

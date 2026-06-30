@@ -3,7 +3,7 @@ import { tr } from "@/lib/locale";
 
 /** Root collection slugs — same targets as /produkter sidebar and footer links. */
 export const ROOT_CATEGORY_LABELS = [
-  { slug: "kaffe", nameNb: "kaffitraktar", nameEn: "Coffee and bar" },
+  { slug: "kaffe", nameNb: "Kaffemaskin og bar", nameEn: "Coffee and bar" },
   { slug: "kjolerom", nameNb: "Kjølerom og fryserom", nameEn: "Cold rooms and freezer rooms" },
   { slug: "kjoling", nameNb: "Kjøle- og frysutstyr", nameEn: "Cooling and freezing" },
   { slug: "kok-stek", nameNb: "Kok og stek", nameEn: "Cook and fry" },

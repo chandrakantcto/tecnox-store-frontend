@@ -2,15 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { MegaMain } from "@/data/megaMenu";
+import { useVatDisplay } from "@/contexts/VatDisplayContext";
 import { GQL_SEARCH_PRODUCTS } from "@/lib/vendure/queries";
 import {
-  formatNOKExclVatFromMinor,
   priceMinorFromHit,
   validateSearchPayload,
   type SearchHitRaw,
 } from "@/lib/vendure/normalize";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { formatStorefrontMinorPrice } from "@/lib/vat-display";
 import { resolveProductDisplayNames } from "@/data/productLabels";
 
 export type CategorySearchHit = {
@@ -69,6 +70,7 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 
 export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
   const lc = locale === "en" ? "en" : "nb";
+  const { vatIncluded } = useVatDisplay();
   const [query, setQuery] = useState("");
   const debounced = useDebouncedValue(query, DEBOUNCE_MS);
   const flatCategories = useMemo(() => flattenMegaMenuForSearch(megaTree), [megaTree]);
@@ -141,10 +143,10 @@ export function useStorefrontSearch(locale: Locale, megaTree: MegaMain[]) {
     setError(null);
   };
 
-  /** Price label for dropdown rows (incl. VAT, consistent with catalog cards). */
+  /** Price label for dropdown rows (respects VAT toggle). */
   const formatHitPrice = (hit: SearchHitRaw) => {
     const inc = priceMinorFromHit(hit.priceWithTax);
-    return formatNOKExclVatFromMinor(lc, inc);
+    return formatStorefrontMinorPrice(lc, inc, vatIncluded);
   };
 
   const formatHitName = (hit: SearchHitRaw) => {

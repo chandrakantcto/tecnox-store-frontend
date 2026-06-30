@@ -13,8 +13,8 @@ import {
   isValidEmail,
   isValidPhoneDigits,
   normalizeAuthEmail,
+  sanitizePhoneInput,
 } from "@/lib/auth/email-validation";
-import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
 import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
@@ -62,7 +62,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
   const collectFieldErrors = (): Partial<Record<ContactFieldKey, string>> => {
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
-    const trimmedPhone = phone.trim();
+    const trimmedPhone = sanitizePhoneInput(phone.trim());
     const trimmedMessage = message.trim();
 
     return allFieldErrors<ContactFieldKey>([
@@ -109,7 +109,7 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
         const trimmedName = name.trim();
         const trimmedCompany = company.trim();
         const trimmedEmail = normalizeAuthEmail(email);
-        const trimmedPhone = phone.trim();
+        const trimmedPhone = sanitizePhoneInput(phone.trim());
         const trimmedMessage = message.trim();
 
         setName(trimmedName);
@@ -211,14 +211,19 @@ export function KontaktForm({ locale: _locale }: { locale?: Locale }) {
           error={fieldErrors.phone}
           labelClassName={CONTACT_LABEL}
         >
-          <PhoneInputWithCountry
+          <input
+            type="tel"
+            name="phone"
             value={phone}
-            onChange={(v) => {
-              setPhone(v);
+            onChange={(e) => {
+              setPhone(sanitizePhoneInput(e.target.value));
               clearFieldError("phone");
             }}
+            onBlur={() => setPhone((v) => v.trim())}
             disabled={submitting}
-            hasError={Boolean(fieldErrors.phone)}
+            inputMode="numeric"
+            maxLength={40}
+            className={CONTACT_INPUT}
           />
         </AuthFieldGroup>
       </div>

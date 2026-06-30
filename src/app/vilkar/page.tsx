@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import bgImg from "@/assets/ref-restaurant.jpg";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { LegalContent } from "@/components/site/LegalContent";
 import { PageHero } from "@/components/site/PageHero";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -46,7 +46,7 @@ export default async function VilkarPage() {
         lastUpdatedNb="Sist oppdatert: 1. juni 2026"
         lastUpdatedEn="Last updated: 1 June 2026"
       />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

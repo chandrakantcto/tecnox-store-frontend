@@ -2,14 +2,18 @@ import { tr } from "@/lib/locale";
 import type { Locale } from "@/lib/locale";
 
 /**
- * Validates a password for complexity requirements:
- * - Minimum 8 characters
- * - At least one uppercase letter
- * - At least one lowercase letter
- * - At least one number
- * - At least one special character
- * 
- * Returns an error message if invalid, or null if valid.
+ * Basic password rules for checkout and registration: minimum length only.
+ */
+export function validatePasswordBasic(password: string, locale: Locale | string): string | null {
+  const l = locale as Locale;
+  if (password.length < 8) {
+    return tr(l, "Passordet må være minst 8 tegn.", "Password must be at least 8 characters.");
+  }
+  return null;
+}
+
+/**
+ * Strong password rules (account password change, forgot-password reset).
  */
 export function validatePasswordComplexity(password: string, locale: Locale | string): string | null {
   const l = locale as Locale;

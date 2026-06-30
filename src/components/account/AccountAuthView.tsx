@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Footer } from "@/components/site/Footer";
+import { megaMenuToFooterRoots } from "@/lib/vendure/catalog-data";
 import { MainNav } from "@/components/site/MainNav";
 import { PageHero } from "@/components/site/PageHero";
 import { TopBar } from "@/components/site/TopBar";
@@ -32,18 +33,16 @@ import {
 import {
   isBlankInput,
   isValidEmail,
-  isValidPhoneDigits,
   normalizeAuthEmail,
+  sanitizePhoneInput,
 } from "@/lib/auth/email-validation";
 import { shopLoginEmailPassword, shopRegisterAccount } from "@/lib/auth/shop-session-auth";
 import { useLocale } from "@/contexts/LocaleContext";
 import { tr } from "@/lib/locale";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
-import { validatePasswordComplexity } from "@/lib/auth/validate";
+import { validatePasswordBasic } from "@/lib/auth/validate";
 import heroImg from "@/assets/hero-combi.jpg";
-import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
-import { parseStoredPhone } from "@/lib/phone/phone-format";
 
 const EMPTY_MEGA: MegaMenuLocales = { nb: [], en: [] };
 
@@ -261,11 +260,11 @@ function RegisterPanel() {
     const trimmedFirst = firstName.trim();
     const trimmedLast = lastName.trim();
     const trimmedEmail = email.trim();
-    const trimmedPhone = phone.trim();
-    const pwdErr = isBlankInput(password) ? null : validatePasswordComplexity(password, lc);
+    const trimmedPhone = sanitizePhoneInput(phone.trim());
+    const pwdErr = isBlankInput(password) ? null : validatePasswordBasic(password, lc);
 
     const LETTERS_ONLY = /^[a-zA-ZæøåÆØÅ\s-]+$/;
-    const nationalPhone = parseStoredPhone(trimmedPhone).nationalNumber;
+    const nationalPhone = sanitizePhoneInput(trimmedPhone);
     const isValidContactNumber = /^\d{10}$/.test(nationalPhone);
 
     return allFieldErrors<RegisterFieldKey>([
@@ -323,7 +322,7 @@ function RegisterPanel() {
     const trimmedFirst = firstName.trim();
     const trimmedLast = lastName.trim();
     const trimmedEmail = normalizeAuthEmail(email);
-    const trimmedPhone = phone.trim();
+    const trimmedPhone = sanitizePhoneInput(phone.trim());
 
     setFirstName(trimmedFirst);
     setLastName(trimmedLast);
@@ -441,27 +440,20 @@ function RegisterPanel() {
         maxLength={255}
         placeholder={tr(lc, "Skriv inn e-postadresse", "Enter email address")}
       />
-      <AuthFieldGroup
-        label={
-          <span>
-            {tr(lc, "Kontaktnummer", "Contact Number")} <span className="text-red-500 font-bold">*</span>
-          </span>
-        }
+      <RegisterField
+        label={tr(lc, "Kontaktnummer", "Contact Number")}
+        type="tel"
+        value={phone}
         error={fieldErrors.phone}
-        labelClassName="block text-[12px] uppercase tracking-[0.14em] text-[var(--color-muted)] sm:col-span-1"
-      >
-        <PhoneInputWithCountry
-          value={phone}
-          onChange={(v) => {
-            setPhone(v);
-            clearFieldError("phone");
-          }}
-          required={true}
-          hasError={Boolean(fieldErrors.phone)}
-          placeholder={tr(lc, "Skriv inn 10-sifret mobilnummer", "Enter 10 digit mobile number")}
-          className="mt-2"
-        />
-      </AuthFieldGroup>
+        onChange={(v) => {
+          setPhone(sanitizePhoneInput(v));
+          clearFieldError("phone");
+        }}
+        required
+        maxLength={10}
+        inputMode="numeric"
+        placeholder={tr(lc, "Skriv inn 10-sifret mobilnummer", "Enter 10 digit mobile number")}
+      />
       <div>
         <RegisterField
           label={tr(lc, "Passord", "Password")}
@@ -477,7 +469,7 @@ function RegisterPanel() {
           maxLength={255}
           placeholder={tr(lc, "Skriv inn passord", "Enter password")}
         />
-        <PasswordRequirementsHint />
+        <PasswordRequirementsHint basic />
       </div>
       <div>
         <RegisterField
@@ -618,7 +610,7 @@ function AccountAuthContent({
           )}
         </div>
       </section>
-      <Footer locale={lc} />
+      <Footer locale={lc} rootCategories={megaMenuToFooterRoots(megaMenuByLocale)} />
     </main>
   );
 }

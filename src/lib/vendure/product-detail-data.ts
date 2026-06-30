@@ -1,3 +1,4 @@
+import { catalogCache } from "@/lib/vendure/catalog-cache";
 import { cache } from "react";
 import {
   selectCheapestVariant,
@@ -10,10 +11,8 @@ import type { Locale } from "@/lib/locale";
 import { staticSrc } from "@/lib/static-asset";
 import type { CatalogProductCard } from "@/lib/vendure/catalog-types";
 import {
-  applyLocaleToSearchHit,
   buildLocalizedCategoryNameMapsBoth,
   fetchNavRoots,
-  getGlobalProductSearchHitsDual,
   pickLocalizedText,
   searchHitToCatalogCard,
 } from "@/lib/vendure/catalog-data";
@@ -40,22 +39,68 @@ function stripHtmlMarkup(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+type ProductTranslationFields = { name: string; description: string };
+
+function readProductTranslations(raw: Record<string, unknown>): Map<string, ProductTranslationFields> {
+  const out = new Map<string, ProductTranslationFields>();
+  const rows = raw.translations;
+  if (!Array.isArray(rows)) return out;
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    const t = row as Record<string, unknown>;
+    const languageCode = typeof t.languageCode === "string" ? t.languageCode.toLowerCase() : "";
+    if (!languageCode) continue;
+    out.set(languageCode, {
+      name: typeof t.name === "string" ? t.name : "",
+      description: typeof t.description === "string" ? t.description : "",
+    });
+  }
+  return out;
+}
+
+/** Use Vendure `translations` so admin edits match the storefront locale (not stale search / wrong fallback). */
+function productFieldsForStorefrontLocale(
+  raw: Record<string, unknown>,
+  locale: Locale,
+): ProductTranslationFields {
+  const fallbackName = typeof raw.name === "string" ? raw.name : "";
+  const fallbackDescription = typeof raw.description === "string" ? raw.description : "";
+  const byLang = readProductTranslations(raw);
+
+  if (locale === "en") {
+    const en = byLang.get("en");
+    if (en) {
+      return {
+        name: en.name.trim() || fallbackName,
+        description: en.description.trim() || fallbackDescription,
+      };
+    }
+  }
+
+  const nb = byLang.get("nb") ?? byLang.get("nn");
+  if (nb) {
+    return {
+      name: nb.name.trim() || fallbackName,
+      description: nb.description.trim() || fallbackDescription,
+    };
+  }
+
+  const en = byLang.get("en");
+  if (en) {
+    return {
+      name: en.name.trim() || fallbackName,
+      description: en.description.trim() || fallbackDescription,
+    };
+  }
+
+  return { name: fallbackName, description: fallbackDescription };
+}
+
 function bulletsFromRichDescription(html: string, max = 6): string[] {
   const lis = [...html.matchAll(/<li[^>]*>\s*([^<]+)/gi)]
     .map((m) => stripHtmlMarkup(String(m[1] ?? "").trim()))
     .filter(Boolean);
-  if (lis.length) return lis.slice(0, max);
-
-  const plain = stripHtmlMarkup(html);
-  if (!plain) return [];
-
-  const parts = plain
-    .split(/(?<=[.!?])\s+/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 12);
-  if (parts.length) return parts.slice(0, max);
-
-  return plain.length > 140 ? [`${plain.slice(0, 137)}…`] : plain ? [plain] : [];
+  return lis.slice(0, max);
 }
 
 function exVatMinorFromInclusiveMinor(minorInclusive: number | null): number | null {
@@ -264,22 +309,20 @@ async function fetchRelatedProductsForPdp(
   slugToCategoryNameNb: Map<string, string>,
   slugToCategoryNameEn: Map<string, string>,
 ): Promise<Product[]> {
-  const dualSearch = await getGlobalProductSearchHitsDual();
-  const nbBySlug = new Map(dualSearch.nb.map((h) => [h.slug, h]));
-  const enBySlug = new Map(dualSearch.en.map((h) => [h.slug, h]));
-
-  const toCard = (h: SearchHitRaw) =>
-    catalogCardToProductStub(
+  const toCard = (h: SearchHitRaw) => {
+    const selfBySlug = new Map([[h.slug, h]] as const);
+    return catalogCardToProductStub(
       searchHitToCatalogCard(
         locale,
         h,
         idToRoot,
         slugToCategoryNameNb,
         slugToCategoryNameEn,
-        nbBySlug,
-        enBySlug,
+        selfBySlug,
+        selfBySlug,
       ),
     );
+  };
 
   const seen = new Set<string>();
   const out: Product[] = [];
@@ -339,7 +382,7 @@ export type StorefrontProductDetailPayload = {
 };
 
 /** PDP payload — relies only on Shop API (navigation cache is shared via `fetchNavRoots`). */
-export const getStorefrontProductDetail = cache(
+const loadStorefrontProductDetail = catalogCache(
   async (
     locale: Locale,
     slug: string,
@@ -349,15 +392,14 @@ export const getStorefrontProductDetail = cache(
     const altLc = lc === "en" ? "nb" : "en";
 
     try {
-      const [{ roots }, navNb, navEn, productRes, productResAlt, pdpExtrasRes, dualSearch] = await Promise.all([
-        fetchNavRoots(lc),
+      const [navNb, navEn, productRes, productResAlt, pdpExtrasRes] = await Promise.all([
         fetchNavRoots("nb"),
         fetchNavRoots("en"),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, lc),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, altLc),
         vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT_PDP_EXTRA, { slug }, lc),
-        getGlobalProductSearchHitsDual(),
       ]);
+      const roots = lc === "en" ? navEn.roots : navNb.roots;
 
       const err = productRes.error;
       const rawRoot = productRes.data?.product;
@@ -391,54 +433,25 @@ export const getStorefrontProductDetail = cache(
           : null;
 
       const productSlug = typeof p.slug === "string" ? p.slug : slug;
-      const namePrimary = typeof p.name === "string" ? p.name : "";
-      const nameAlternate = typeof pAlt?.name === "string" ? pAlt.name : "";
-      const descriptionPrimary = typeof p.description === "string" ? p.description : "";
-      const descriptionAlternate = typeof pAlt?.description === "string" ? pAlt.description : "";
+      const fieldsNb = productFieldsForStorefrontLocale(p, "nb");
+      const fieldsEn = productFieldsForStorefrontLocale(p, "en");
+      const namePrimary = fieldsNb.name;
+      const nameAlternate = fieldsEn.name;
+      const descriptionPrimary = fieldsNb.description;
+      const descriptionAlternate = fieldsEn.description;
 
-      const nbBySlug = new Map(dualSearch.nb.map((h) => [h.slug, h]));
-      const enBySlug = new Map(dualSearch.en.map((h) => [h.slug, h]));
-      const searchBase: SearchHitRaw = {
-        slug: productSlug,
-        sku: "",
-        productId: "",
-        productName: namePrimary || nameAlternate,
-        description: descriptionPrimary || descriptionAlternate,
-      };
-      const nbOverlay = applyLocaleToSearchHit(
-        {
-          ...searchBase,
-          productName: pickLocalizedText(namePrimary, nameAlternate, "nb"),
-          description: pickLocalizedText(descriptionPrimary, descriptionAlternate, "nb"),
-        },
-        "nb",
-        nbBySlug,
-        enBySlug,
-      );
-      const enOverlay = applyLocaleToSearchHit(
-        {
-          ...searchBase,
-          productName: pickLocalizedText(namePrimary, nameAlternate, "en"),
-          description: pickLocalizedText(descriptionPrimary, descriptionAlternate, "en"),
-        },
-        "en",
-        nbBySlug,
-        enBySlug,
-      );
       const nameResolved = resolveProductDisplayNames(
         productSlug,
-        nbOverlay.productName?.trim() || pickLocalizedText(namePrimary, nameAlternate, "nb"),
-        enOverlay.productName?.trim() || pickLocalizedText(namePrimary, nameAlternate, "en"),
+        namePrimary,
+        nameAlternate,
         namePrimary || nameAlternate,
       );
       const nameNb = nameResolved.nb;
       const nameEn = nameResolved.en;
       const descResolved = resolveProductDescriptions(
         productSlug,
-        String(nbOverlay.description ?? "").trim() ||
-          pickLocalizedText(descriptionPrimary, descriptionAlternate, "nb"),
-        String(enOverlay.description ?? "").trim() ||
-          pickLocalizedText(descriptionPrimary, descriptionAlternate, "en"),
+        descriptionPrimary,
+        descriptionAlternate,
         descriptionPrimary || descriptionAlternate,
       );
       const descriptionHtmlNb = descResolved.nb;
@@ -744,4 +757,8 @@ export const getStorefrontProductDetail = cache(
       return { product: null, relatedProducts: [], error: msg };
     }
   },
+  ["getStorefrontProductDetail"],
 );
+
+/** Dedupe metadata + page loader within the same request. */
+export const getStorefrontProductDetail = cache(loadStorefrontProductDetail);

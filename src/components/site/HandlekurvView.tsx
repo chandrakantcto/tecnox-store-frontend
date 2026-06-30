@@ -4,11 +4,13 @@ import { useState } from "react";
 import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import Link from "next/link";
 import { Footer } from "@/components/site/Footer";
+import { megaMenuToFooterRoots } from "@/lib/vendure/catalog-data";
 import { MainNav } from "@/components/site/MainNav";
 import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/site/Reveal";
 import { TopBar } from "@/components/site/TopBar";
-import { formatNOK, useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
+import { useStorefrontPrice } from "@/hooks/use-storefront-price";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
@@ -39,7 +41,14 @@ export function HandlekurvView({
     emptyCart,
     clearLastActionError,
   } = useCart();
-
+  const {
+    formatMajorKr,
+    vatNote,
+    subtotalLabel: cartSubtotalLabelText,
+    checkoutTotalLabel: cartTotalLabelText,
+    displayMajorKr,
+  } = useStorefrontPrice();
+  const displaySubtotal = displayMajorKr(subtotal);
   const [emptyCartConfirmOpen, setEmptyCartConfirmOpen] = useState(false);
   const itemLabel = itemCount === 1 ? tr(locale, "vare", "item") : tr(locale, "varer", "items");
 
@@ -193,10 +202,10 @@ export function HandlekurvView({
 
                       <div className="col-span-2 text-right sm:col-span-1">
                         <p className="text-[12px] text-[var(--color-muted)]">
-                          kr {formatNOK(Math.round(line.unitPriceKr))} {tr(locale, "inkl. MVA", "incl. VAT")}
+                          kr {formatMajorKr(line.unitPriceKr)} {vatNote}
                         </p>
                         <p className="mt-1 text-[18px] font-bold tracking-[-0.015em] text-[var(--color-copper)]">
-                          kr {formatNOK(Math.round(line.lineTotalKr))}
+                          kr {formatMajorKr(line.lineTotalKr)}
                         </p>
                       </div>
                     </div>
@@ -245,17 +254,17 @@ export function HandlekurvView({
                       <dd>{itemCount}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-[var(--color-dark-muted)]">{tr(locale, "Sum (inkl. MVA)", "Subtotal (incl. VAT)")}</dt>
-                      <dd className="font-mono">kr {formatNOK(Math.round(subtotal))}</dd>
+                      <dt className="text-[var(--color-dark-muted)]">{cartSubtotalLabelText}</dt>
+                      <dd className="font-mono">kr {formatMajorKr(displaySubtotal)}</dd>
                     </div>
                   </dl>
 
                   <div className="mt-6 flex items-baseline justify-between border-t border-[var(--color-dark-border)] pt-5">
                     <span className="text-[12px] uppercase tracking-[0.14em] text-[var(--color-dark-muted)]">
-                      {tr(locale, "Total inkl. MVA", "Total incl. VAT")}
+                      {cartTotalLabelText}
                     </span>
                     <span className="text-[24px] font-bold tracking-[-0.02em] text-[var(--color-copper)]">
-                      kr {formatNOK(Math.round(subtotal))}
+                      kr {formatMajorKr(displaySubtotal)}
                     </span>
                   </div>
 
@@ -278,7 +287,10 @@ export function HandlekurvView({
         </div>
       </section>
 
-      <Footer locale={locale} />
+      <Footer
+        locale={locale}
+        rootCategories={megaMenuToFooterRoots(megaMenuByLocale ?? { nb: [], en: [] })}
+      />
     </main>
   );
 }

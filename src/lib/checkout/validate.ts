@@ -1,5 +1,5 @@
 import { passwordsDoNotMatchMessage } from "@/lib/auth/auth-messages";
-import { validatePasswordComplexity } from "@/lib/auth/validate";
+import { validatePasswordBasic } from "@/lib/auth/validate";
 import { CHECKOUT_ALLOWED_COUNTRY_CODES } from "@/lib/checkout/countries";
 import { pickLocale, tr, type Locale } from "@/lib/locale";
 
@@ -53,12 +53,18 @@ export function validateCheckoutForm(values: CheckoutFormValues, options?: Valid
 
   if (!skipPassword) {
     const pw = values.password.trim();
-    const pwdErr = validatePasswordComplexity(pw, lc);
-    if (pwdErr) {
-      errs.password = pwdErr;
+    if (!pw.length) {
+      errs.password = tr(lc, "Passord må fylles ut.", "Password is required.");
+    } else {
+      const pwdErr = validatePasswordBasic(pw, lc);
+      if (pwdErr) errs.password = pwdErr;
     }
     const cp = values.confirmPassword.trim();
-    if (pw !== cp) errs.confirmPassword = passwordsDoNotMatchMessage(lc);
+    if (!cp.length) {
+      errs.confirmPassword = tr(lc, "Bekreft passord.", "Please confirm your password.");
+    } else if (pw !== cp) {
+      errs.confirmPassword = passwordsDoNotMatchMessage(lc);
+    }
   }
 
   const phone = values.phone.trim().replace(/\s+/g, "");

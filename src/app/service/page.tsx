@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import bgImg from "@/assets/ref-restaurant.jpg";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Newsletter } from "@/components/site/Newsletter";
 import { PageHero } from "@/components/site/PageHero";
 import { References } from "@/components/site/References";
@@ -113,7 +113,7 @@ export default async function ServicePage() {
       <Service hideReadMore locale={locale} />
       <References locale={locale} />
       <Newsletter locale={locale} />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

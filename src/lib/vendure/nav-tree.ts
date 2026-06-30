@@ -1,11 +1,11 @@
 import type { MegaLeaf, MegaMain, MegaSub } from "@/data/megaMenu";
-import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
+import { storefrontNorwegianCategoryName } from "@/data/collectionLabels";
 import type { DirectVariantCounts } from "@/lib/vendure/collection-variant-counts";
-import type { VCollectionNav } from "@/lib/vendure/normalize";
+import { buildNorwegianCategoryNameMap, sortNavCollections, type VCollectionNav } from "@/lib/vendure/normalize";
 import { tr, type Locale } from "@/lib/locale";
 
 function branchToMegaSub(mid: VCollectionNav): MegaSub {
-  const leaves = mid.children ?? [];
+  const leaves = sortNavCollections(mid.children ?? []);
   if (leaves.length === 0) {
     return { collectionId: mid.id, id: mid.slug, label: mid.name };
   }
@@ -26,8 +26,8 @@ export function navCollectionsToMegaMains(
   navRoots: VCollectionNav[],
   _directCounts: DirectVariantCounts,
 ): MegaMain[] {
-  return navRoots.map((root) => {
-    const subs: MegaSub[] = (root.children ?? []).map((mid) => branchToMegaSub(mid));
+  return sortNavCollections(navRoots).map((root) => {
+    const subs: MegaSub[] = sortNavCollections(root.children ?? []).map((mid) => branchToMegaSub(mid));
     return {
       collectionId: root.id,
       id: root.slug,
@@ -39,26 +39,18 @@ export function navCollectionsToMegaMains(
 }
 
 function flattenCollectionNames(roots: VCollectionNav[]): Map<string, string> {
-  const map = new Map<string, string>();
-  const walk = (node: VCollectionNav) => {
-    map.set(node.slug, node.name);
-    for (const child of node.children ?? []) walk(child);
-  };
-  for (const root of roots) walk(root);
-  return map;
+  return buildNorwegianCategoryNameMap(roots);
 }
 
 function megaMenuLabel(
   slug: string,
-  fallback: string,
+  nodeName: string,
   nbNames: Map<string, string>,
-  enNames: Map<string, string>,
+  _enNames: Map<string, string>,
   locale: Locale,
 ): string {
-  const storeNb = nbNames.get(slug)?.trim() || "";
-  const storeEn = enNames.get(slug)?.trim() || "";
-  const { nb, en } = resolveCollectionDisplayNames(slug, storeNb, storeEn, fallback);
-  return tr(locale, nb, en);
+  const nb = storefrontNorwegianCategoryName(slug, nbNames, nodeName);
+  return tr(locale, nb, nb);
 }
 
 function branchToMegaSubLocalized(
@@ -67,7 +59,7 @@ function branchToMegaSubLocalized(
   enNames: Map<string, string>,
   locale: Locale,
 ): MegaSub {
-  const leaves = mid.children ?? [];
+  const leaves = sortNavCollections(mid.children ?? []);
   if (leaves.length === 0) {
     return {
       collectionId: mid.id,
@@ -97,8 +89,8 @@ export function navCollectionsToMegaMainsForLocale(
 ): MegaMain[] {
   const nbNames = flattenCollectionNames(nbRoots);
   const enNames = flattenCollectionNames(enRoots);
-  return navRoots.map((root) => {
-    const subs: MegaSub[] = (root.children ?? []).map((mid) =>
+  return sortNavCollections(navRoots).map((root) => {
+    const subs: MegaSub[] = sortNavCollections(root.children ?? []).map((mid) =>
       branchToMegaSubLocalized(mid, nbNames, enNames, locale),
     );
     return {

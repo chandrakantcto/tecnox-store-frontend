@@ -70,7 +70,7 @@ const GQL_NAV_COLLECTIONS_CORE = /* GraphQL */ `
     }
     totalItems
   }
-  collections(options: { topLevelOnly: true }) {
+  collections(options: { topLevelOnly: true, take: 100, sort: { position: ASC } }) {
     items {
       id
       slug
@@ -174,6 +174,11 @@ export const GQL_STOREFRONT_PRODUCT = /* GraphQL */ `
       slug
       name
       description
+      translations {
+        languageCode
+        name
+        description
+      }
       featuredAsset {
         preview
         source

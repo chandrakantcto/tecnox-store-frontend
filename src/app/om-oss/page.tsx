@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { OmOssView } from "@/components/site/OmOssView";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { getServerLocale } from "@/lib/locale.server";
@@ -25,7 +25,7 @@ export default async function OmOssPage() {
     <main className=" bg-[var(--color-stone)]">
       <SiteHeader locale={locale} />
       <OmOssView />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

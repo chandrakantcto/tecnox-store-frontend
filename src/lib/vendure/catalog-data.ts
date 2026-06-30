@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { catalogCache } from "@/lib/vendure/catalog-cache";
 import type { Locale } from "@/lib/locale";
 import type {
   CatalogProductCard,
@@ -20,6 +20,8 @@ import {
   inferBrandFromSku,
   priceMinorFromHit,
   dedupeNavRootsBySlug,
+  buildNorwegianCategoryNameMap,
+  sortNavCollections,
   validateFlattenedCollectionCounts,
   validateNavCollectionsPayload,
   validateSearchPayload,
@@ -30,7 +32,7 @@ import { rollupVariantTotalsFromCounts, type DirectVariantCounts } from "@/lib/v
 import { GQL_COLLECTION_COUNTS_PAGE } from "@/lib/vendure/collection-counts-query";
 import { navCollectionsToMegaMainsForLocale } from "@/lib/vendure/nav-tree";
 import { rootCategoryLabelsForSlug } from "@/data/rootCategoryLabels";
-import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
+import { storefrontNorwegianCategoryName } from "@/data/collectionLabels";
 import { resolveProductDescriptions, resolveProductDisplayNames } from "@/data/productLabels";
 
 const EMPTY_CATEGORIES_COPY: CategoriesSectionCopy = {
@@ -179,22 +181,27 @@ function parseCategoriesSectionCopy(activeChannel: unknown, requestLocale: strin
 
 const COLLECTION_COUNT_PAGE = VENDURE_SHOP_LIST_MAX_TAKE;
 
-async function accumulateDirectVariantCounts(locale: string, firstBranch: unknown): Promise<Map<string, Set<string>>> {
-  const merged = new Map<string, Set<string>>();
-  // We compute the true product counts from the global search index instead of variant counts
-  const dualSearch = await getGlobalProductSearchHitsDual();
-  const baseHits = locale === "en" ? dualSearch.en : dualSearch.nb;
-  
-  for (const hit of baseHits) {
-    if (hit.collectionIds) {
-      const uniqueIds = new Set(hit.collectionIds);
-      for (const id of uniqueIds) {
-        if (!merged.has(id)) merged.set(id, new Set());
-        merged.get(id)!.add(hit.productId);
-      }
-    }
+async function accumulateDirectVariantCounts(locale: string, firstBranch: unknown): Promise<DirectVariantCounts> {
+  const merged = new Map<string, number>();
+  const first = validateFlattenedCollectionCounts(firstBranch);
+  first.map.forEach((v, k) => merged.set(k, v));
+
+  let skip = merged.size;
+  const total = first.totalItems;
+
+  while (skip < total) {
+    const { data, error } = await vendureShopQuery<{ storefrontCollectionCounts?: unknown }>(
+      GQL_COLLECTION_COUNTS_PAGE,
+      { take: COLLECTION_COUNT_PAGE, skip },
+      locale,
+    );
+    if (error) break;
+    const page = validateFlattenedCollectionCounts(data?.storefrontCollectionCounts);
+    page.map.forEach((v, k) => merged.set(k, v));
+    if (page.map.size < COLLECTION_COUNT_PAGE) break;
+    skip += COLLECTION_COUNT_PAGE;
   }
-  
+
   return merged;
 }
 
@@ -202,7 +209,7 @@ function rootsToCategoryTiles(
   roots: VCollectionNav[],
   directVariantCounts: DirectVariantCounts,
 ): HomepageCategoryTile[] {
-  return dedupeNavRootsBySlug(roots).map((r) => {
+  return dedupeNavRootsBySlug(sortNavCollections(roots)).map((r) => {
     const preview = r.featuredAsset?.preview || r.featuredAsset?.source;
     return {
       slug: r.slug,
@@ -220,11 +227,22 @@ function buildCollectionIdToRootSlug(roots: VCollectionNav[]): Map<string, strin
     m.set(node.id, rootSlug);
     for (const ch of node.children ?? []) attach(ch, rootSlug);
   };
-  for (const r of roots) attach(r, r.slug);
+  for (const r of sortNavCollections(roots)) attach(r, r.slug);
   return m;
 }
 
-function rootSlugFromCollectionIds(hit: SearchHitRaw, idToRoot: Map<string, string>): string | null {
+function rootSlugFromCollectionIds(
+  hit: SearchHitRaw,
+  idToRoot: Map<string, string>,
+  displayRootSlugs?: Set<string>,
+): string | null {
+  const preferDisplay = displayRootSlugs && displayRootSlugs.size > 0;
+  if (preferDisplay) {
+    for (const id of hit.collectionIds ?? []) {
+      const slug = idToRoot.get(id);
+      if (slug && displayRootSlugs!.has(slug)) return slug;
+    }
+  }
   for (const id of hit.collectionIds ?? []) {
     const slug = idToRoot.get(id);
     if (slug) return slug;
@@ -252,17 +270,13 @@ function resolveRootCategoryNames(
 ): { nb: string; en: string } {
   const storeNb = nbNames.get(slug)?.trim() || "";
   const storeEn = enNames.get(slug)?.trim() || "";
-  const fb = rootCategoryLabelsForSlug(slug);
-  if (fb) {
-    return {
-      nb: fb.nameNb || storeNb || storeEn || fallbackName,
-      en: fb.nameEn || storeEn || storeNb || fallbackName,
-    };
-  }
-  return {
-    nb: storeNb || storeEn || fallbackName,
-    en: storeEn || storeNb || fallbackName,
-  };
+  const nb = storefrontNorwegianCategoryName(slug, nbNames, fallbackName);
+  const en =
+    storeEn ||
+    storeNb ||
+    rootCategoryLabelsForSlug(slug)?.nameEn ||
+    fallbackName;
+  return { nb, en };
 }
 
 function previewFromNavNode(node: VCollectionNav | undefined): string {
@@ -295,12 +309,15 @@ function hitToCard(
   slugToCategoryNameEn: Map<string, string>,
   nbBySlug: Map<string, SearchHitRaw>,
   enBySlug: Map<string, SearchHitRaw>,
+  displayRootSlugs?: Set<string>,
 ): CatalogProductCard {
   const localizedHit = applyLocaleToSearchHit(hit, locale, nbBySlug, enBySlug);
   const nbHit = nbBySlug.get(hit.slug);
   const enHit = enBySlug.get(hit.slug);
   const rootSlug =
-    rootSlugFromCollectionIds(hit, idToRoot) ?? [...slugToCategoryNameNb.keys()][0] ?? "";
+    rootSlugFromCollectionIds(hit, idToRoot, displayRootSlugs) ??
+    [...(displayRootSlugs ?? slugToCategoryNameNb.keys())][0] ??
+    "";
   const categoryNb = slugToCategoryNameNb.get(rootSlug) ?? "—";
   const categoryEn = slugToCategoryNameEn.get(rootSlug) ?? categoryNb;
 
@@ -357,8 +374,18 @@ export function searchHitToCatalogCard(
   slugToCategoryNameEn: Map<string, string>,
   nbBySlug: Map<string, SearchHitRaw>,
   enBySlug: Map<string, SearchHitRaw>,
+  displayRootSlugs?: Set<string>,
 ): CatalogProductCard {
-  return hitToCard(locale, hit, idToRoot, slugToCategoryNameNb, slugToCategoryNameEn, nbBySlug, enBySlug);
+  return hitToCard(
+    locale,
+    hit,
+    idToRoot,
+    slugToCategoryNameNb,
+    slugToCategoryNameEn,
+    nbBySlug,
+    enBySlug,
+    displayRootSlugs,
+  );
 }
 
 type NavRootsPayload = {
@@ -387,7 +414,7 @@ async function assembleNavRootsFromShopData(
     : { ...EMPTY_LISTING_PAGE };
   const directVariantCounts = await accumulateDirectVariantCounts(locale, data?.storefrontCollectionCounts);
   const validated = validateNavCollectionsPayload(data);
-  const roots = validated == null ? [] : validated;
+  const roots = validated == null ? [] : sortNavCollections(validated);
 
   return {
     roots,
@@ -399,7 +426,7 @@ async function assembleNavRootsFromShopData(
   };
 }
 
-export const fetchNavRoots = cache(async (locale: string): Promise<NavRootsPayload> => {
+export const fetchNavRoots = catalogCache(async (locale: string): Promise<NavRootsPayload> => {
   const { data, error } = await vendureShopQuery<{
     collections?: unknown;
     activeChannel?: unknown;
@@ -407,10 +434,10 @@ export const fetchNavRoots = cache(async (locale: string): Promise<NavRootsPaylo
   }>(GQL_NAV_COLLECTIONS, undefined, locale);
 
   return assembleNavRootsFromShopData(locale, data, error, true);
-});
+}, ["fetchNavRoots"]);
 
 /** Cached nav for `/kategorier` only: same tree + counts; smaller Channel fragment; no products-listing channel copy. */
-const fetchNavRootsKategorierPage = cache(async (locale: string): Promise<NavRootsPayload> => {
+const fetchNavRootsKategorierPage = catalogCache(async (locale: string): Promise<NavRootsPayload> => {
   const { data, error } = await vendureShopQuery<{
     collections?: unknown;
     activeChannel?: unknown;
@@ -418,7 +445,7 @@ const fetchNavRootsKategorierPage = cache(async (locale: string): Promise<NavRoo
   }>(GQL_NAV_COLLECTIONS_KATEGORIER, undefined, locale);
 
   return assembleNavRootsFromShopData(locale, data, error, false);
-});
+}, ["fetchNavRootsKategorierPage"]);
 
 export type CategoriesPagePayload = {
   categories: HomepageCategoryTile[];
@@ -428,7 +455,7 @@ export type CategoriesPagePayload = {
 };
 
 /** `/kategorier` — category grid + listing copy only (no global product search). */
-export const getCategoriesPagePayload = cache(async (locale: Locale): Promise<CategoriesPagePayload> => {
+export const getCategoriesPagePayload = catalogCache(async (locale: Locale): Promise<CategoriesPagePayload> => {
   const lc = locale === "en" ? "en" : "nb";
 
   try {
@@ -461,10 +488,10 @@ export const getCategoriesPagePayload = cache(async (locale: Locale): Promise<Ca
       error: msg,
     };
   }
-});
+}, ["getCategoriesPagePayload"]);
 
 /** Channel copy for /produkter hero + `<title>` (shares cached `fetchNavRoots` with the listing loader). */
-export const getProductsListingPageCopy = cache(async (locale: Locale): Promise<ProductsListingPageCopy> => {
+export const getProductsListingPageCopy = catalogCache(async (locale: Locale): Promise<ProductsListingPageCopy> => {
   const lc = locale === "en" ? "en" : "nb";
   try {
     const { productsListingPage } = await fetchNavRoots(lc);
@@ -472,7 +499,7 @@ export const getProductsListingPageCopy = cache(async (locale: Locale): Promise<
   } catch {
     return { ...EMPTY_LISTING_PAGE };
   }
-});
+}, ["getProductsListingPageCopy"]);
 
 async function searchGrouped(locale: string, input: Record<string, unknown>) {
   return vendureShopQuery<unknown>(
@@ -482,7 +509,7 @@ async function searchGrouped(locale: string, input: Record<string, unknown>) {
   );
 }
 
-export const getMegaMenuBothLocales = cache(async (): Promise<{ data: MegaMenuLocales; error?: string | null }> => {
+export const getMegaMenuBothLocales = catalogCache(async (): Promise<{ data: MegaMenuLocales; error?: string | null }> => {
   const [nbRaw, enRaw] = await Promise.all([fetchNavRoots("nb"), fetchNavRoots("en")]);
   const err = nbRaw.error ?? enRaw.error;
   const structure = nbRaw.roots.length ? dedupeNavRootsBySlug(nbRaw.roots) : [];
@@ -497,7 +524,20 @@ export const getMegaMenuBothLocales = cache(async (): Promise<{ data: MegaMenuLo
     data: { nb: nbMega, en: enMega.length ? enMega : nbMega },
     error: nbMega.length ? err : err ?? "[catalog] Empty collection tree — check Channel token & Shop API.",
   };
-});
+}, ["getMegaMenuBothLocales"]);
+
+export type FooterRootCategory = { slug: string; labelNb: string; labelEn: string };
+
+/** Root category links for footer — same order as mega menu / admin `position`. */
+export function megaMenuToFooterRoots(mega: MegaMenuLocales): FooterRootCategory[] {
+  const nbRoots = mega.nb ?? [];
+  const enBySlug = new Map((mega.en ?? []).map((r) => [r.id, r.label]));
+  return nbRoots.map((r) => ({
+    slug: r.id,
+    labelNb: r.label,
+    labelEn: enBySlug.get(r.id) ?? r.label,
+  }));
+}
 
 function buildSidebarTree(
   nodes: VCollectionNav[],
@@ -506,19 +546,19 @@ function buildSidebarTree(
   enNames: Map<string, string>,
   directVariantCounts: DirectVariantCounts,
 ): SidebarTreeNode[] {
-  return nodes.map((node) => {
-    const storeNb = nbNames.get(node.slug) || node.name;
-    const storeEn = enNames.get(node.slug) || storeNb;
-    const { nb, en } = resolveCollectionDisplayNames(node.slug, storeNb, storeEn, node.name);
+  return sortNavCollections(nodes).map((node) => {
+    const nb = storefrontNorwegianCategoryName(node.slug, nbNames, node.name);
+    const storeEn = enNames.get(node.slug)?.trim() || "";
+    const en = storeEn || nb;
     const name = locale === "en" ? en : nb;
-    
+
     return {
       id: node.id,
       slug: node.slug,
       name,
       nameNb: nb,
       nameEn: en,
-      count: (node.children ?? []).length,
+      count: rollupVariantTotalsFromCounts(node, directVariantCounts),
       children: node.children ? buildSidebarTree(node.children, locale, nbNames, enNames, directVariantCounts) : [],
     };
   });
@@ -548,17 +588,20 @@ async function accumulateSearch(locale: string, baseInput: Record<string, unknow
 }
 
 /** Shared global catalogue search for a locale (homepage + /produkter dedupe within one RSC pass). */
-export const getGlobalProductSearchHits = cache((locale: string) => accumulateSearch(locale, {}));
+export const getGlobalProductSearchHits = catalogCache(
+  (locale: string) => accumulateSearch(locale, {}),
+  ["getGlobalProductSearchHits"],
+);
 
 /** Both locales for product search — merge display fields without changing catalogue structure. */
-export const getGlobalProductSearchHitsDual = cache(async () => {
+export const getGlobalProductSearchHitsDual = catalogCache(async () => {
   const [nb, en] = await Promise.all([getGlobalProductSearchHits("nb"), getGlobalProductSearchHits("en")]);
   return {
     nb: nb.hits,
     en: en.hits,
     error: nb.error ?? en.error ?? null,
   };
-});
+}, ["getGlobalProductSearchHitsDual"]);
 
 function searchHitsBySlug(hits: SearchHitRaw[]): Map<string, SearchHitRaw> {
   return new Map(hits.map((h) => [h.slug, h]));
@@ -587,8 +630,8 @@ function categoryNameMapForLocale(
   nbRoots: VCollectionNav[],
   enRoots: VCollectionNav[],
 ): Map<string, string> {
-  const nbNames = new Map(dedupeNavRootsBySlug(nbRoots).map((r) => [r.slug, r.name] as const));
-  const enNames = new Map(dedupeNavRootsBySlug(enRoots).map((r) => [r.slug, r.name] as const));
+  const nbNames = buildNorwegianCategoryNameMap(nbRoots);
+  const enNames = buildNorwegianCategoryNameMap(enRoots);
   return new Map(
     displayRoots.map((r) => {
       const { nb, en } = resolveRootCategoryNames(r.slug, nbNames, enNames, r.name);
@@ -602,8 +645,8 @@ function categoryNameMapsBoth(
   nbRoots: VCollectionNav[],
   enRoots: VCollectionNav[],
 ): { nb: Map<string, string>; en: Map<string, string> } {
-  const nbNames = new Map(dedupeNavRootsBySlug(nbRoots).map((r) => [r.slug, r.name] as const));
-  const enNames = new Map(dedupeNavRootsBySlug(enRoots).map((r) => [r.slug, r.name] as const));
+  const nbNames = buildNorwegianCategoryNameMap(nbRoots);
+  const enNames = buildNorwegianCategoryNameMap(enRoots);
   const nb = new Map<string, string>();
   const en = new Map<string, string>();
   for (const r of displayRoots) {
@@ -621,9 +664,9 @@ function localizedCategoryTiles(
   enRoots: VCollectionNav[],
   directVariantCounts: DirectVariantCounts,
 ): HomepageCategoryTile[] {
-  const displayRoots = dedupeNavRootsBySlug(roots);
-  const nbNames = new Map(dedupeNavRootsBySlug(nbRoots).map((r) => [r.slug, r.name] as const));
-  const enNames = new Map(dedupeNavRootsBySlug(enRoots).map((r) => [r.slug, r.name] as const));
+  const displayRoots = dedupeNavRootsBySlug(nbRoots);
+  const nbNames = buildNorwegianCategoryNameMap(nbRoots);
+  const enNames = buildNorwegianCategoryNameMap(enRoots);
   return displayRoots.map((r) => {
     const { nb, en } = resolveRootCategoryNames(r.slug, nbNames, enNames, r.name);
     const preview = mergedFeaturedPreview(r.slug, r, nbRoots, enRoots);
@@ -666,14 +709,20 @@ export function buildLocalizedCategoryNameMapsBoth(
 export { pickLocalizedText };
 
 function buildFlattenedTranslations(roots: VCollectionNav[]): Map<string, string> {
-  const map = new Map<string, string>();
-  const walk = (node: VCollectionNav) => {
-    map.set(node.slug, node.name);
-    for (const child of node.children ?? []) walk(child);
-  };
-  for (const r of roots) walk(r);
-  return map;
+  return buildNorwegianCategoryNameMap(roots);
 }
+
+/** PDP sidebar only — nav tree without loading the full product search index. */
+export const getProductPageSidebarTree = catalogCache(async (locale: Locale): Promise<SidebarTreeNode[]> => {
+  const [navNb, navEn] = await Promise.all([fetchNavRoots("nb"), fetchNavRoots("en")]);
+  if (!navNb.roots.length) return [];
+
+  // Same structure/order as mega menu — always derive from NB roots, then localize labels.
+  const displayRoots = dedupeNavRootsBySlug(navNb.roots);
+  const nbNames = buildFlattenedTranslations(navNb.roots);
+  const enNames = buildFlattenedTranslations(navEn.roots);
+  return buildSidebarTree(displayRoots, locale, nbNames, enNames, navNb.directVariantCounts);
+}, ["getProductPageSidebarTree"]);
 
 function localizedCategoryTilesAnyDepth(
   nodes: VCollectionNav[],
@@ -687,9 +736,8 @@ function localizedCategoryTilesAnyDepth(
   const enNames = buildFlattenedTranslations(enRoots);
   
   return displayNodes.map((r) => {
-    const storeNb = nbNames.get(r.slug) || r.name;
-    const storeEn = enNames.get(r.slug) || storeNb;
-    const { nb, en } = resolveCollectionDisplayNames(r.slug, storeNb, storeEn, r.name);
+    const nb = storefrontNorwegianCategoryName(r.slug, nbNames, r.name);
+    const en = enNames.get(r.slug)?.trim() || nb;
     const name = locale === "en" ? en : nb;
     
     return {
@@ -705,7 +753,7 @@ function localizedCategoryTilesAnyDepth(
 }
 
 function findNavNodeBySlug(roots: VCollectionNav[], targetSlug: string): VCollectionNav | null {
-  for (const node of roots) {
+  for (const node of sortNavCollections(roots)) {
     if (node.slug === targetSlug) return node;
     if (node.children?.length) {
       const found = findNavNodeBySlug(node.children, targetSlug);
@@ -715,9 +763,21 @@ function findNavNodeBySlug(roots: VCollectionNav[], targetSlug: string): VCollec
   return null;
 }
 
+function findAllNavNodesBySlug(roots: VCollectionNav[], targetSlug: string): VCollectionNav[] {
+  const found: VCollectionNav[] = [];
+  const walk = (nodes: VCollectionNav[]) => {
+    for (const node of sortNavCollections(nodes)) {
+      if (node.slug === targetSlug) found.push(node);
+      if (node.children?.length) walk(node.children);
+    }
+  };
+  walk(roots);
+  return found;
+}
+
 /** Ancestor chain from a nav root down to `targetSlug` (inclusive). */
 function findNavPathBySlug(roots: VCollectionNav[], targetSlug: string): VCollectionNav[] | null {
-  for (const node of roots) {
+  for (const node of sortNavCollections(roots)) {
     if (node.slug === targetSlug) return [node];
     if (node.children?.length) {
       const childPath = findNavPathBySlug(node.children, targetSlug);
@@ -729,13 +789,13 @@ function findNavPathBySlug(roots: VCollectionNav[], targetSlug: string): VCollec
 
 function extractAllDescendantIds(node: VCollectionNav): string[] {
   const ids: string[] = [node.id];
-  for (const child of node.children ?? []) {
+  for (const child of sortNavCollections(node.children ?? [])) {
     ids.push(...extractAllDescendantIds(child));
   }
   return ids;
 }
 
-export const getHomepageCatalogPayload = cache(
+export const getHomepageCatalogPayload = catalogCache(
   async (locale: Locale): Promise<{
     categories: HomepageCategoryTile[];
     categoriesSectionCopy: CategoriesSectionCopy;
@@ -770,7 +830,8 @@ export const getHomepageCatalogPayload = cache(
       }
 
       const idToRoot = buildCollectionIdToRootSlug(roots);
-      const displayRoots = dedupeNavRootsBySlug(roots);
+      const displayRoots = dedupeNavRootsBySlug(navNb.roots);
+      const displayRootSlugs = new Set(displayRoots.map(r => r.slug));
       const { nb: slugToCategoryNameNb, en: slugToCategoryNameEn } = categoryNameMapsBoth(
         displayRoots,
         navNb.roots,
@@ -787,8 +848,17 @@ export const getHomepageCatalogPayload = cache(
       const nbBySlug = searchHitsBySlug(dualSearch.nb);
       const enBySlug = searchHitsBySlug(dualSearch.en);
 
-      const products = baseHits.map((h) =>
-        hitToCard(locale, h, idToRoot, slugToCategoryNameNb, slugToCategoryNameEn, nbBySlug, enBySlug),
+      const products = baseHits.map(h =>
+        hitToCard(
+          locale,
+          h,
+          idToRoot,
+          slugToCategoryNameNb,
+          slugToCategoryNameEn,
+          nbBySlug,
+          enBySlug,
+          displayRootSlugs,
+        ),
       );
 
       const filtersNb = [labelAllNb, ...displayRoots.map((r) => slugToCategoryNameNb.get(r.slug) ?? r.name)];
@@ -825,9 +895,10 @@ export const getHomepageCatalogPayload = cache(
       };
     }
   },
+  ["getHomepageCatalogPayload"],
 );
 
-export const getProductsListingCatalog = cache(
+export const getProductsListingCatalog = catalogCache(
   async (
     locale: Locale,
     requestedCatSlug: string | null,
@@ -876,7 +947,8 @@ export const getProductsListingCatalog = cache(
       const validatedCatSlug = activeNode ? activeNode.slug : null;
 
       const idToRoot = buildCollectionIdToRootSlug(nav.roots);
-      const displayRoots = dedupeNavRootsBySlug(nav.roots);
+      const displayRoots = dedupeNavRootsBySlug(navNb.roots);
+      const displayRootSlugs = new Set(displayRoots.map(r => r.slug));
       const { nb: slugToCategoryNameNb, en: slugToCategoryNameEn } = categoryNameMapsBoth(
         displayRoots,
         navNb.roots,
@@ -906,17 +978,30 @@ export const getProductsListingCatalog = cache(
       const enNamesFlattened = buildFlattenedTranslations(navEn.roots);
       const sidebarTree = buildSidebarTree(displayRoots, locale, nbNamesFlattened, enNamesFlattened, nav.directVariantCounts);
 
-      const allowedCollectionIds = activeNode ? new Set(extractAllDescendantIds(activeNode)) : null;
+      const allowedCollectionIds = cat
+        ? new Set(
+            findAllNavNodesBySlug(nav.roots, cat).flatMap(node => extractAllDescendantIds(node)),
+          )
+        : null;
 
       const visibleHits =
-        allowedCollectionIds === null
+        allowedCollectionIds === null || allowedCollectionIds.size === 0
           ? localizedHits
-          : localizedHits.filter((h) => 
-              (h.collectionIds ?? []).some(id => allowedCollectionIds.has(id))
+          : localizedHits.filter(h =>
+              (h.collectionIds ?? []).some(id => allowedCollectionIds.has(id)),
             );
 
-      const products = visibleHits.map((h) =>
-        hitToCard(locale, h, idToRoot, slugToCategoryNameNb, slugToCategoryNameEn, nbBySlug, enBySlug),
+      const products = visibleHits.map(h =>
+        hitToCard(
+          locale,
+          h,
+          idToRoot,
+          slugToCategoryNameNb,
+          slugToCategoryNameEn,
+          nbBySlug,
+          enBySlug,
+          displayRootSlugs,
+        ),
       );
       
       const labelAllNb = "Alle";
@@ -961,12 +1046,13 @@ export const getProductsListingCatalog = cache(
       };
     }
   },
+  ["getProductsListingCatalog"],
 );
 
-export const getProductsPagePayload = cache(async (locale: Locale): Promise<ProductsSectionPayload> => {
+export const getProductsPagePayload = catalogCache(async (locale: Locale): Promise<ProductsSectionPayload> => {
   const { productsBlock } = await getHomepageCatalogPayload(locale);
   return productsBlock;
-});
+}, ["getProductsPagePayload"]);
 
 export type {
   HomepageCategoryTile,

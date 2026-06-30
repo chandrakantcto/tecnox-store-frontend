@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import bgImg from "@/assets/hero-combi.jpg";
 import { Careers } from "@/components/site/Careers";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Newsletter } from "@/components/site/Newsletter";
 import { PageHero } from "@/components/site/PageHero";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -42,7 +42,7 @@ export default async function KarrierePage() {
       />
       <Careers locale={locale} />
       <Newsletter locale={locale} />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

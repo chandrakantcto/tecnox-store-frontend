@@ -24,23 +24,89 @@ export function absoluteAssetUrl(previewOrSource: string | null | undefined): st
   return `${assetBaseUrl}/${p}`;
 }
 
-function sortCollections(items: VCollectionNav[]): VCollectionNav[] {
+export function sortNavCollections(items: VCollectionNav[]): VCollectionNav[] {
   return [...items]
     .map((row) => ({
       ...row,
-      children: row.children?.length ? sortCollections(row.children) : row.children ?? [],
+      children: row.children?.length ? sortNavCollections(row.children) : row.children ?? [],
     }))
-    .sort((a, b) => Number(a.position) - Number(b.position));
+    .sort((a, b) => {
+      const byPos = Number(a.position) - Number(b.position);
+      if (byPos !== 0) return byPos;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+    });
 }
 
-/** Drop later top-level rows that share a slug (duplicate Vendure collections). */
-export function dedupeNavRootsBySlug(roots: VCollectionNav[]): VCollectionNav[] {
-  const seen = new Set<string>();
-  return roots.filter((r) => {
-    if (seen.has(r.slug)) return false;
-    seen.add(r.slug);
-    return true;
+/** Prefer the NB storefront twin (higher id) for labels/children when slugs collide. */
+function pickDisplayNavRoot(rows: VCollectionNav[]): VCollectionNav {
+  return rows.reduce((best, row) => {
+    const bestId = Number.parseInt(String(best.id), 10);
+    const rowId = Number.parseInt(String(row.id), 10);
+    if (Number.isFinite(bestId) && Number.isFinite(rowId) && rowId !== bestId) {
+      return rowId > bestId ? row : best;
+    }
+    return best;
   });
+}
+
+/** Admin panel row (lower id) — its `position` defines the order admins see when reordering. */
+function pickAdminCanonicalRoot(rows: VCollectionNav[]): VCollectionNav {
+  return rows.reduce((best, row) => {
+    const bestId = Number.parseInt(String(best.id), 10);
+    const rowId = Number.parseInt(String(row.id), 10);
+    if (Number.isFinite(bestId) && Number.isFinite(rowId) && rowId !== bestId) {
+      return rowId < bestId ? row : best;
+    }
+    return best;
+  });
+}
+
+/**
+ * One row per slug for the storefront.
+ * Order follows admin drag-and-drop (canonical lower-id row position + name tie-break).
+ * Labels/children use the NB twin (higher id) for the Norwegian storefront.
+ */
+export function dedupeNavRootsBySlug(roots: VCollectionNav[]): VCollectionNav[] {
+  const twinsBySlug = new Map<string, VCollectionNav[]>();
+  for (const row of roots) {
+    const twins = twinsBySlug.get(row.slug);
+    if (twins) twins.push(row);
+    else twinsBySlug.set(row.slug, [row]);
+  }
+
+  const sortRows = [...twinsBySlug.values()].map((twins) => {
+    const admin = pickAdminCanonicalRoot(twins);
+    return {
+      display: pickDisplayNavRoot(twins),
+      sortPos: Number(admin.position),
+      sortName: admin.name,
+    };
+  });
+
+  sortRows.sort((a, b) => {
+    const byPos = a.sortPos - b.sortPos;
+    if (byPos !== 0) return byPos;
+    return a.sortName.localeCompare(b.sortName, undefined, { sensitivity: "base" });
+  });
+
+  return sortRows.map((row) => row.display);
+}
+
+/**
+ * Slug → Norwegian name from the nav tree.
+ * When EN/NB twins share a slug, keep the higher-id (NB storefront) row's name.
+ */
+export function buildNorwegianCategoryNameMap(roots: VCollectionNav[]): Map<string, string> {
+  const bySlug = new Map<string, VCollectionNav>();
+  const walk = (node: VCollectionNav) => {
+    const prev = bySlug.get(node.slug);
+    if (!prev || Number.parseInt(String(node.id), 10) > Number.parseInt(String(prev.id), 10)) {
+      bySlug.set(node.slug, node);
+    }
+    for (const child of node.children ?? []) walk(child);
+  };
+  for (const root of roots) walk(root);
+  return new Map([...bySlug.entries()].map(([slug, node]) => [slug, node.name]));
 }
 
 /**
@@ -113,7 +179,7 @@ export function validateNavCollectionsPayload(raw: unknown): VCollectionNav[] | 
     };
   };
   const roots = items.map(walk).filter((n): n is VCollectionNav => n != null);
-  return sortCollections(roots);
+  return sortNavCollections(roots);
 }
 
 export type SearchHitRaw = {

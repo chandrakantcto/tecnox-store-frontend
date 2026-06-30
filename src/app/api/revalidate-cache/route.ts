@@ -1,9 +1,10 @@
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { STOREFRONT_CATALOG_CACHE_TAG } from '@/lib/vendure/catalog-cache';
 
-export async function POST(request: Request) {
+export async function POST() {
     try {
-        // Revalidate the entire site by revalidating the root layout
+        revalidateTag(STOREFRONT_CATALOG_CACHE_TAG);
         revalidatePath('/', 'layout');
         return NextResponse.json({ revalidated: true, now: Date.now() });
     } catch (err) {

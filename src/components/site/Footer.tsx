@@ -4,11 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { Linkedin, Instagram, Youtube } from "lucide-react";
 import { useActiveLocale } from "@/hooks/use-active-locale";
+import { useVatDisplay } from "@/contexts/VatDisplayContext";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
+import { topBarPricesLabel } from "@/lib/vat-display";
 import { ROOT_CATEGORY_LABELS } from "@/data/rootCategoryLabels";
-/** Root collection slugs — same targets as /produkter sidebar (`?cat=`). */
-const FOOTER_ROOT_CATEGORIES = ROOT_CATEGORY_LABELS;
+import type { FooterRootCategory } from "@/lib/vendure/catalog-data";
+
+/** Fallback when nav data is unavailable (client-only shells). */
+const FOOTER_ROOT_FALLBACK: FooterRootCategory[] = ROOT_CATEGORY_LABELS.map((c) => ({
+  slug: c.slug,
+  labelNb: c.nameNb,
+  labelEn: c.nameEn,
+}));
 
 function produkterCatHref(slug: string) {
   return `/produkter?cat=${encodeURIComponent(slug)}`;
@@ -20,11 +28,22 @@ const LEGAL_LINKS = [
   { labelNb: "Informasjonskapsler", labelEn: "Cookies", href: "/informasjonskapsler" },
 ] as const;
 
-export function Footer({ locale: _locale }: { locale?: Locale }) {
-  const locale = useActiveLocale();
+export function Footer({
+  locale: localeProp,
+  rootCategories,
+}: {
+  locale?: Locale;
+  /** Admin-ordered root categories from Vendure nav (mega menu). */
+  rootCategories?: FooterRootCategory[];
+}) {
+  const contextLocale = useActiveLocale();
+  const locale = localeProp ?? contextLocale;
+  const { vatIncluded } = useVatDisplay();
+  const pricesNote = topBarPricesLabel(locale, vatIncluded);
+  const roots = rootCategories?.length ? rootCategories : FOOTER_ROOT_FALLBACK;
   const colKat: { label: string; to: string }[] = [
-    ...FOOTER_ROOT_CATEGORIES.map((c) => ({
-      label: tr(locale, c.nameNb, c.nameEn),
+    ...roots.map((c) => ({
+      label: tr(locale, c.labelNb, c.labelEn),
       to: produkterCatHref(c.slug),
     })),
     { label: tr(locale, "Se alle →", "See all →"), to: "/kategorier" },
@@ -185,8 +204,8 @@ export function Footer({ locale: _locale }: { locale?: Locale }) {
           <p className="text-[14px] text-[#c4bbbd]">
             {tr(
               locale,
-              "© 2026 Tecno X AS  ·  Org.nr. 000 000 000  ·  Alle priser inkl. MVA",
-              "© 2026 Tecno X AS  ·  Org.no. 000 000 000  ·  All prices incl. VAT",
+              `© 2026 Tecno X AS  ·  Org.nr. 000 000 000  ·  ${pricesNote}`,
+              `© 2026 Tecno X AS  ·  Org.no. 000 000 000  ·  ${pricesNote}`,
             )}
           </p>
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">

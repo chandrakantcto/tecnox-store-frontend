@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { KontaktView } from "@/components/site/KontaktView";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { getServerLocale } from "@/lib/locale.server";
@@ -25,7 +25,7 @@ export default async function KontaktPage() {
     <main className=" bg-[var(--color-stone)]">
       <SiteHeader locale={locale} />
       <KontaktView />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

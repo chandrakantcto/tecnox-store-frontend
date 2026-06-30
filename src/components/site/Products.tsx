@@ -9,12 +9,12 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Reveal } from "./Reveal";
 import type { ProductsSectionPayload, CatalogProductCard, SidebarTreeNode } from "@/lib/vendure/catalog-types";
 import { formatShopBannerError } from "@/lib/vendure/shop-banner-error";
-import { formatNOKExclVatCardAmount } from "@/lib/vendure/normalize";
 import { useActiveLocale } from "@/hooks/use-active-locale";
+import { useStorefrontPrice } from "@/hooks/use-storefront-price";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
 import { displayBrandName } from "@/lib/brand";
-import { resolveCollectionDisplayNames } from "@/data/collectionLabels";
+import { storefrontNorwegianCategoryName } from "@/data/collectionLabels";
 import { BsArrowUpRightCircleFill } from "react-icons/bs";
 import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
 import { isMissingStorefrontImage } from "@/lib/storefront-image";
@@ -47,22 +47,18 @@ function productSpecSnippet(product: CatalogProductCard, locale: Locale): string
   return stripHtmlMarkup(raw);
 }
 
-function productPriceDisplay(product: CatalogProductCard, locale: Locale): string {
+function ProductCardPrice({ product }: { product: CatalogProductCard }) {
+  const { formatCardPrice } = useStorefrontPrice();
   const minor = product.priceNumeric > 0 ? product.priceNumeric : null;
-  return formatNOKExclVatCardAmount(locale, minor);
+  return <>{formatCardPrice(minor)}</>;
 }
 
 function subcategoryDisplayName(
   sc: { slug: string; name: string; nameNb?: string; nameEn?: string },
   locale: Locale,
 ): string {
-  const { nb, en } = resolveCollectionDisplayNames(
-    sc.slug,
-    sc.nameNb ?? sc.name,
-    sc.nameEn ?? sc.name,
-    sc.name,
-  );
-  return tr(locale, nb, en);
+  const nb = sc.nameNb?.trim() || storefrontNorwegianCategoryName(sc.slug, new Map(), sc.name);
+  return locale === "en" ? sc.nameEn?.trim() || nb : nb;
 }
 
 function productImage(product: CatalogProductCard, locale: Locale) {
@@ -693,7 +689,7 @@ export function Products({
                               {tr(locale, "Fra", "From")}
                             </p> */}
                             <p className="text-[12px] font-bold text-[var(--color-copper)] tracking-[-0.01em] leading-tight">
-                              {productPriceDisplay(p, locale)}
+                              <ProductCardPrice product={p} />
                             </p>
                           </div>
                           <span className="text-[5px] font-medium text-[var(--color-ink)] inline-flex items-center gap-1 group-hover:text-[var(--color-copper)] transition-colors">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { getServerLocale } from "@/lib/locale.server";
+import { getServerVatIncluded } from "@/lib/vat-display.server";
 import { tr } from "@/lib/locale";
 import "./globals.css";
 
@@ -81,15 +82,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getServerLocale();
+  const initialVatIncluded = await getServerVatIncluded();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className={`${inter.className} min-h-screen antialiased`}>
+    <html
+      lang={locale}
+      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className={`${inter.className} min-h-screen antialiased`} suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd(locale)) }}
         />
-        <Providers locale={locale}>{children}</Providers>
+        <Providers locale={locale} initialVatIncluded={initialVatIncluded}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

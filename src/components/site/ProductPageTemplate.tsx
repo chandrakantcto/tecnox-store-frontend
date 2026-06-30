@@ -10,24 +10,23 @@ import { useEffect, useMemo, useState } from "react";
 import { TopBar } from "@/components/site/TopBar";
 import { MainNav } from "@/components/site/MainNav";
 import { Footer } from "@/components/site/Footer";
+import { megaMenuToFooterRoots } from "@/lib/vendure/catalog-data";
 import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/site/Reveal";
 import { ImageUnavailablePlaceholder } from "@/components/site/ImageUnavailablePlaceholder";
 import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
+import { useStorefrontPrice } from "@/hooks/use-storefront-price";
 import {
   cartSnapshotFromProduct,
   productLocalizedCategory,
   productLocalizedDescriptionHtml,
-  productLocalizedHighlights,
   productLocalizedName,
   productLocalizedPlainDescription,
-  productLocalizedPriceLabel,
   type LocalizedBulletBundle,
   type Product,
   type StorefrontVariantDetail,
 } from "@/lib/catalog/storefront-product";
 import type { MegaMenuLocales, SidebarTreeNode } from "@/lib/vendure/catalog-types";
-import { useActiveLocale } from "@/hooks/use-active-locale";
 import { displayBrandName } from "@/lib/brand";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
@@ -38,7 +37,7 @@ import { Check, ChevronDown, ChevronRight, Home, Minus, Plus, ShoppingBag, Star,
 export type ProductPageTemplateProps = {
   product: Product;
   relatedProducts?: Product[];
-  locale?: Locale;
+  locale: Locale;
   megaMenuByLocale?: MegaMenuLocales;
   sidebarTree?: SidebarTreeNode[];
 };
@@ -46,11 +45,10 @@ export type ProductPageTemplateProps = {
 export function ProductPageTemplate({
   product,
   relatedProducts = [],
-  locale: _locale,
+  locale,
   megaMenuByLocale,
   sidebarTree = [],
 }: ProductPageTemplateProps) {
-  const locale = useActiveLocale();
   const router = useRouter();
   const { addItemFromSnapshot, syncing, lastActionError, clearLastActionError, setSidebarOpen } = useCart();
   const variants = useMemo(() => product.variants ?? [], [product.variants]);
@@ -64,6 +62,11 @@ export function ProductPageTemplate({
   const [cartMessage, setCartMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("description");
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [pdfMounted, setPdfMounted] = useState(false);
+
+  useEffect(() => {
+    setPdfMounted(true);
+  }, []);
 
   const effectiveVariant = useMemo((): StorefrontVariantDetail | null => {
     if (!variants.length) return null;
@@ -175,10 +178,16 @@ export function ProductPageTemplate({
 
   const displayName = productLocalizedName(product, locale);
   const displayCategory = productLocalizedCategory(product, locale);
-  const displayHighlights = productLocalizedHighlights(product, locale);
   const displayDescriptionHtml = productLocalizedDescriptionHtml(product, locale);
   const displayDescriptionPlain = productLocalizedPlainDescription(product, locale);
-  const displayPrice = productLocalizedPriceLabel(product, locale, effectiveVariant);
+
+  const { formatMinorPrice, formatCardPrice } = useStorefrontPrice();
+  const displayPrice = useMemo(() => {
+    const minor =
+      effectiveVariant?.priceNumericExVat ??
+      (product.priceNumeric > 0 ? product.priceNumeric : null);
+    return formatMinorPrice(minor);
+  }, [effectiveVariant?.priceNumericExVat, product.priceNumeric, formatMinorPrice]);
 
   const pdpCustomFields = useMemo(() => {
     const fields: { label: string; value: string }[] = [];
@@ -293,7 +302,7 @@ export function ProductPageTemplate({
           <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
             <Link href="/" className="hover:text-[var(--color-copper)] flex items-center justify-center"><Home className="h-3.5 w-3.5" /></Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link href="/produkter" className="hover:text-[var(--color-copper)]">{tr(locale, "Products", "Produkter")}</Link>
+            <Link href="/produkter" className="hover:text-[var(--color-copper)]">{tr(locale, "Produkter", "Products")}</Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="font-semibold text-[var(--color-ink)] truncate">{displayName}</span>
           </div>
@@ -468,11 +477,11 @@ export function ProductPageTemplate({
                   <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-[var(--color-divider)] pt-6">
                     <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
                       <Truck className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
-                      {tr(locale, "Delivery across Norway", "Levering hele Norge")}
+                      {tr(locale, "Levering hele Norge", "Delivery across Norway")}
                     </div>
                     <div className="flex items-center gap-2 text-[12px] text-[var(--color-muted)]">
                       <Wrench className="h-4 w-4 text-[#3baaf2]" strokeWidth={1.5} />
-                      {tr(locale, "Installation and training", "Montering og opplæring")}
+                      {tr(locale, "Montering og opplæring", "Installation and training")}
                     </div>
                   </div>
                 </div> {/* End of right col content */}
@@ -508,21 +517,14 @@ export function ProductPageTemplate({
                     {displayDescriptionHtml.trim() ? (
                       <div
                         className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90 prose-like [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:mt-4 first:[&_p]:mt-0"
-                       
+                        dangerouslySetInnerHTML={{ __html: displayDescriptionHtml }}
                       />
-                    ) : (
+                    ) : displayDescriptionPlain.trim() ? (
                       <p className="text-[14px] leading-[1.7] text-[var(--color-ink)]/90">{displayDescriptionPlain}</p>
-                    )}
-
-                    {displayHighlights.length > 0 && (
-                      <ul className="mt-6 space-y-3">
-                        {displayHighlights.map((h, i) => (
-                          <li key={i} className="flex items-start gap-3">
-                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--color-ink)] shrink-0" />
-                            <span className="text-[14px] text-[var(--color-ink)] leading-[1.6]">{h}</span>
-                          </li>
-                        ))}
-                      </ul>
+                    ) : (
+                      <p className="text-[14px] text-[var(--color-muted)]">
+                        {tr(locale, "Ingen beskrivelse tilgjengelig.", "No description available.")}
+                      </p>
                     )}
                   </div>
                 )}
@@ -540,7 +542,7 @@ export function ProductPageTemplate({
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[var(--color-muted)]">{tr(locale, "No downloads available for this product.", "Ingen nedlastinger tilgjengelig for dette produktet.")}</p>
+                      <p className="text-[var(--color-muted)]">{tr(locale, "Ingen nedlastinger tilgjengelig for dette produktet.", "No downloads available for this product.")}</p>
                     )}
                   </div>
                 )}
@@ -653,7 +655,7 @@ export function ProductPageTemplate({
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-fr items-stretch gap-4 lg:gap-6">
               {relatedProducts.map((p, i) => {
                 const relatedName = productLocalizedName(p, locale);
-                const relatedPrice = productLocalizedPriceLabel(p, locale);
+                const relatedPrice = formatCardPrice(p.priceNumeric > 0 ? p.priceNumeric : null);
                 return (
                   <Reveal key={p.slug} delay={i * 0.06} className="h-full min-h-0">
                     <Link href={`/produkter/${p.slug}`} className="group card-elevated flex h-full min-h-0 flex-col">
@@ -691,9 +693,13 @@ export function ProductPageTemplate({
         </section>
       )}
 
-      <Footer locale={locale} />
+      <Footer
+        locale={locale}
+        rootCategories={megaMenuToFooterRoots(megaMenuByLocale ?? { nb: [], en: [] })}
+      />
 
-      {/* Hidden PDF Template */}
+      {/* Hidden PDF template — client-only to avoid hydration noise */}
+      {pdfMounted ? (
       <div id="pdf-content" style={{ display: "none", padding: "10px", color: "#000", backgroundColor: "#fff", fontFamily: "sans-serif" }}>
         {/* Header */}
         <div style={{ borderBottom: "2px solid #3baaf2", paddingBottom: "15px", marginBottom: "25px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -750,6 +756,7 @@ export function ProductPageTemplate({
           © TECNO X AS • Alle priser inkl. MVA • Levering til hele Norge • Utstyret skal monteres av autorisert personell
         </div>
       </div>
+      ) : null}
     </main>
   );
 }

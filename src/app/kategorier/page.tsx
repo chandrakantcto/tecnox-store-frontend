@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import catHero from "@/assets/cat-kombi.jpg";
 import { Brands } from "@/components/site/Brands";
 import { Categories } from "@/components/site/Categories";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Newsletter } from "@/components/site/Newsletter";
 import { PageHero } from "@/components/site/PageHero";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -86,7 +86,7 @@ export default async function KategorierPage() {
       />
       <Brands locale={locale} />
       <Newsletter locale={locale} />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

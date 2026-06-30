@@ -12,7 +12,7 @@ export function SingleProductPage({
 }: {
   product: Product;
   relatedProducts?: Product[];
-  locale?: Locale;
+  locale: Locale;
   megaMenuByLocale?: MegaMenuLocales;
   sidebarTree?: SidebarTreeNode[];
 }) {

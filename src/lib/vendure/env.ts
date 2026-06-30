@@ -53,6 +53,11 @@ export function getVendureServerConfig(): VendureServerConfig {
   return c;
 }
 
+/**
+ * Language header for Shop API requests.
+ * UI locale stays `nb`; catalog/search rows in this DB use `nn` (import) not `nb`.
+ */
 export function vendureLanguageCode(locale: string): string {
-  return locale === "en" ? "en" : "nb";
+  if (locale === "en") return "en";
+  return "nn";
 }

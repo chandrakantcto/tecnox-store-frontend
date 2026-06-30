@@ -3,6 +3,7 @@
 import { CartProvider } from "@/contexts/CartContext";
 import { LocaleProvider, useLocale } from "@/contexts/LocaleContext";
 import { ShopAuthProvider } from "@/contexts/ShopAuthContext";
+import { VatDisplayProvider } from "@/contexts/VatDisplayContext";
 import type { Locale } from "@/lib/locale";
 
 function AuthAndCartProviders({ children }: { children: React.ReactNode }) {
@@ -16,14 +17,18 @@ function AuthAndCartProviders({ children }: { children: React.ReactNode }) {
 
 export function Providers({
   locale,
+  initialVatIncluded = true,
   children,
 }: {
   locale: Locale;
+  initialVatIncluded?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <LocaleProvider locale={locale}>
-      <AuthAndCartProviders>{children}</AuthAndCartProviders>
+      <VatDisplayProvider initialVatIncluded={initialVatIncluded}>
+        <AuthAndCartProviders>{children}</AuthAndCartProviders>
+      </VatDisplayProvider>
     </LocaleProvider>
   );
 }

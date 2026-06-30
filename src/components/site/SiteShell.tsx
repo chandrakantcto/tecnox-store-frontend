@@ -2,6 +2,7 @@ import { Footer } from "@/components/site/Footer";
 import { MainNav } from "@/components/site/MainNav";
 import { TopBar } from "@/components/site/TopBar";
 import type { Locale } from "@/lib/locale";
+import { megaMenuToFooterRoots } from "@/lib/vendure/catalog-data";
 import type { MegaMenuLocales } from "@/lib/vendure/catalog-types";
 
 export function SiteShell({
@@ -20,7 +21,10 @@ export function SiteShell({
         <MainNav megaMenuByLocale={megaMenuByLocale} />
       </header>
       {children}
-      <Footer locale={locale} />
+      <Footer
+        locale={locale}
+        rootCategories={megaMenuByLocale ? megaMenuToFooterRoots(megaMenuByLocale) : undefined}
+      />
     </>
   );
 }

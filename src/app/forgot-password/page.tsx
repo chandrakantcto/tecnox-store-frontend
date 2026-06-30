@@ -1,7 +1,7 @@
 "use client";
 
 import { ForgotPasswordForm } from "@/components/account/ForgotPasswordForm";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { MainNav } from "@/components/site/MainNav";
 import { PageHero } from "@/components/site/PageHero";
 import { TopBar } from "@/components/site/TopBar";
@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
         </div>
       </section>
 
-      <Footer locale={lc} />
+      <SiteFooter locale={lc} />
     </main>
   );
 }

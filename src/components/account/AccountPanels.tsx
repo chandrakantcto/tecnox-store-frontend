@@ -18,9 +18,10 @@ import { AuthFieldGroup } from "@/components/account/AuthFieldGroup";
 import { PasswordRequirementsHint } from "@/components/account/PasswordRequirementsHint";
 import { PasswordWithToggle } from "@/components/ui/PasswordWithToggle";
 import { requiredCurrentPasswordMessage } from "@/lib/auth/auth-messages";
-import { isBlankInput } from "@/lib/auth/email-validation";
+import { isBlankInput, sanitizePhoneInput } from "@/lib/auth/email-validation";
+import { parseStoredPhone } from "@/lib/phone/phone-format";
 import { allFieldErrors, firstFieldError } from "@/lib/auth/field-errors";
-import { validatePasswordComplexity } from "@/lib/auth/validate";
+import { validatePasswordBasic } from "@/lib/auth/validate";
 import { PhoneInputWithCountry } from "@/components/ui/PhoneInputWithCountry";
 
 type CustomerAddress = {
@@ -101,61 +102,16 @@ function formatAddressBlock(addr: CustomerAddress): string {
     .join("\n");
 }
 
-export function AccountDashboardPanel() {
-  const { customer, logout } = useShopAuth();
-  const router = useRouter();
-  const lc = useActiveLocale();
-  const displayName =
-    [customer?.firstName, customer?.lastName].filter(Boolean).join(" ").trim() ||
-    customer?.emailAddress ||
-    "";
-
-  return (
-    <div className="rounded-[3px] border border-[var(--color-divider)] bg-white p-6 sm:p-8 lg:p-10">
-      <p className="text-[15px] leading-relaxed text-[var(--color-ink)]">
-        {tr(lc, "Hei ", "Hello ")}
-        <span className="font-semibold text-[var(--color-copper)]">{displayName}</span>{" "}
-        <button
-          type="button"
-          onClick={() => void logout().then(() => router.push("/"))}
-          className="text-[var(--color-copper)] underline-offset-2 hover:underline"
-        >
-          ({tr(lc, "Logg ut", "Log out")})
-        </button>
-      </p>
-      <p className="mt-5 text-[15px] leading-[1.75] text-[var(--color-ink)]">
-        {tr(
-          lc,
-          "Fra kontrollpanelet kan du se ",
-          "From your dashboard you can view ",
-        )}
-        <Link href="/konto/ordrer" className="text-[var(--color-copper)] underline-offset-2 hover:underline">
-          {tr(lc, "nylige bestillinger", "recent orders")}
-        </Link>
-        {tr(lc, ", administrere ", ", manage ")}
-        <Link href="/konto/profil" className="text-[var(--color-copper)] underline-offset-2 hover:underline">
-          {tr(lc, "kontodetaljer", "account details")}
-        </Link>
-        {tr(lc, ", ", ", ")}
-        <Link href="/konto/adresser" className="text-[var(--color-copper)] underline-offset-2 hover:underline">
-          {tr(lc, "adresser", "addresses")}
-        </Link>
-        {tr(lc, " og endre ", " and change your ")}
-        <Link href="/konto/passord" className="text-[var(--color-copper)] underline-offset-2 hover:underline">
-          {tr(lc, "passord", "password")}
-        </Link>
-        .
-      </p>
-    </div>
-  );
-}
-
 export function AccountProfilePanel() {
   const { refresh, customer } = useShopAuth();
   const lc = useActiveLocale();
   const [firstName, setFirstName] = useState(customer?.firstName ?? "");
   const [lastName, setLastName] = useState(customer?.lastName ?? "");
-  const [phone, setPhone] = useState(customer?.phoneNumber ?? "");
+  const [phone, setPhone] = useState(
+    customer?.phoneNumber
+      ? parseStoredPhone(customer.phoneNumber).nationalNumber || customer.phoneNumber
+      : "",
+  );
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -163,7 +119,11 @@ export function AccountProfilePanel() {
     if (customer) {
       setFirstName(customer.firstName);
       setLastName(customer.lastName);
-      setPhone(customer.phoneNumber ?? "");
+      setPhone(
+        customer.phoneNumber
+          ? parseStoredPhone(customer.phoneNumber).nationalNumber || customer.phoneNumber
+          : "",
+      );
     }
   }, [customer]);
 
@@ -177,7 +137,7 @@ export function AccountProfilePanel() {
         input: {
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          phoneNumber: phone.trim() || undefined,
+          phoneNumber: sanitizePhoneInput(phone.trim()) || undefined,
         },
       },
       lc,
@@ -239,10 +199,13 @@ export function AccountProfilePanel() {
           </label>
           <label className={ACCOUNT_FIELD_LABEL}>
             {tr(lc, "Telefonnummer", "Phone number")}
-            <PhoneInputWithCountry
+            <input
+              type="tel"
+              className={ACCOUNT_FIELD_INPUT}
               value={phone}
-              onChange={setPhone}
-              className="mt-1"
+              onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
+              inputMode="numeric"
+              maxLength={40}
             />
           </label>
         </div>
@@ -534,7 +497,7 @@ export function AccountPasswordPanel() {
     e.preventDefault();
     setFieldErrors({});
 
-    const pwdErr = validatePasswordComplexity(next, lc);
+    const pwdErr = validatePasswordBasic(next, lc);
     const errors = allFieldErrors<PasswordFieldKey>([
       { field: "current", message: isBlankInput(current) ? requiredCurrentPasswordMessage(lc) : null },
       { field: "next", message: pwdErr },
@@ -638,7 +601,7 @@ export function AccountPasswordPanel() {
             className="mt-1 w-full rounded-[2px] border border-[var(--color-divider)] px-3 py-2 sm:px-4 pr-10 text-sm sm:text-base"
           />
         </AuthFieldGroup>
-        <PasswordRequirementsHint />
+        <PasswordRequirementsHint basic />
       </div>
 
       <AuthFieldGroup

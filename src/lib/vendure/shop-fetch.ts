@@ -10,6 +10,7 @@ export async function vendureShopQuery<T>(
   query: string,
   variables: Record<string, unknown> | undefined,
   locale: string,
+  options?: { fresh?: boolean },
 ): Promise<{ data: T | null; error: string | null }> {
   const cfg = getVendureServerConfigOrNull();
   if (!cfg) {
@@ -28,6 +29,14 @@ export async function vendureShopQuery<T>(
   }
   try {
     const isMutation = query.trim().startsWith("mutation");
+    const envSeconds = process.env.VENDURE_SHOP_CACHE_SECONDS;
+    const cacheSeconds =
+      envSeconds !== undefined && envSeconds !== ""
+        ? Number(envSeconds)
+        : process.env.NODE_ENV === "development"
+          ? 0
+          : 60;
+    const noStore = isMutation || options?.fresh || cacheSeconds === 0;
 
     const fetchOptions: RequestInit = {
       method: "POST",
@@ -37,7 +46,7 @@ export async function vendureShopQuery<T>(
         "vendure-language-code": vendureLanguageCode(locale),
       },
       body: JSON.stringify({ query, variables }),
-      ...(isMutation ? { cache: "no-store" } : { next: { revalidate: 60 } })
+      ...(noStore ? { cache: "no-store" as const } : { next: { revalidate: cacheSeconds } }),
     };
 
     const res = await shopUpstreamFetch(cfg.shopApiUrl, fetchOptions);

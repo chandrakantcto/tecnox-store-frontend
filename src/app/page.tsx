@@ -1,7 +1,7 @@
 import { Brands } from "@/components/site/Brands";
 import { Categories } from "@/components/site/Categories";
 import { Faq } from "@/components/site/Faq";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Hero } from "@/components/site/Hero";
 import { Newsletter } from "@/components/site/Newsletter";
 import { Products } from "@/components/site/Products";
@@ -38,7 +38,7 @@ export default async function HomePage() {
       <References locale={locale} />
       <Faq locale={locale} />
       <Newsletter locale={locale} />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

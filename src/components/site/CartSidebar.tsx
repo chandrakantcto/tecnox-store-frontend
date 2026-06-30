@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import { StorefrontRemoteImage } from "@/components/site/StorefrontRemoteImage";
 import Link from "next/link";
 import { X, Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
-import { formatNOK, useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
+import { useStorefrontPrice } from "@/hooks/use-storefront-price";
 import { useActiveLocale } from "@/hooks/use-active-locale";
 import type { Locale } from "@/lib/locale";
 import { tr } from "@/lib/locale";
@@ -31,6 +32,8 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
     removeLine,
     clearLastActionError,
   } = useCart();
+  const { formatMajorKr, cartSubtotalLabel, cartTotalLabel, displayMajorKr } = useStorefrontPrice();
+  const displaySubtotal = displayMajorKr(subtotal);
 
   const [mounted, setMounted] = useState(false);
 
@@ -198,7 +201,7 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
                       </div>
 
                       <p className="shrink-0 text-right text-[15px] font-bold tabular-nums tracking-[-0.01em] text-[var(--color-ink)]">
-                        kr {formatNOK(Math.round(line.lineTotalKr))}
+                        kr {formatMajorKr(line.lineTotalKr)}
                       </p>
                     </div>
                   </div>
@@ -211,15 +214,15 @@ export function CartSidebar({ open, onOpenChange, locale: _locale }: CartSidebar
         <footer className="shrink-0 border-t border-[var(--color-divider)] bg-[var(--color-stone)] px-5 py-5">
           <dl className="space-y-2 text-[12px] uppercase tracking-[0.08em] text-[var(--color-muted)]">
             <div className="flex justify-between gap-4">
-              <dt>{tr(locale, "Delsum (inkl. MVA)", "Subtotal (incl. VAT)")}</dt>
+              <dt>{cartSubtotalLabel}</dt>
               <dd className="font-mono text-[14px] font-semibold normal-case tracking-normal text-[var(--color-ink)]">
-                kr {formatNOK(Math.round(subtotal))}
+                kr {formatMajorKr(displaySubtotal)}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt>{tr(locale, "Total (inkl. MVA)", "Total (incl. VAT)")}</dt>
+              <dt>{cartTotalLabel}</dt>
               <dd className="font-mono text-[14px] font-bold normal-case tracking-normal text-[var(--color-ink)]">
-                kr {formatNOK(Math.round(subtotal))}
+                kr {formatMajorKr(displaySubtotal)}
               </dd>
             </div>
           </dl>

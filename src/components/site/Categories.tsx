@@ -43,8 +43,8 @@ export function Categories({
         t.name.length > 0,
     ) ?? [];
 
-  /** Homepage preview: 3 rows × 5 cols (xl). Full grid on /kategorier (`showSeeAllLink={false}`). */
-  const displayCats = showSeeAllLink ? cats.slice(0, 15) : cats;
+  /** Homepage preview: 3 rows × 6 cols (xl). Full grid on /kategorier (`showSeeAllLink={false}`). */
+  const displayCats = showSeeAllLink ? cats.slice(0, 18) : cats;
 
   const apiMsg = catalogError ? formatShopBannerError(catalogError) : null;
 
@@ -105,40 +105,33 @@ export function Categories({
             </p>
           </Reveal>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 lg:gap-3">
             {displayCats.map((cat, i) => (
               <Reveal key={`${cat.slug}-${i}`} delay={Math.min(i * 0.04, 0.32)}>
                 <Link
                   href={cat.href}
-                  className="group block bg-white relative overflow-hidden rounded-[3px] border border-[var(--color-divider)] hover:border-[var(--color-copper)] hover:shadow-[0_16px_32px_-12px_oklch(0.18_0.005_60/0.18)] transition-all duration-300 h-full"
+                  className="group block bg-white relative overflow-hidden rounded-[3px] border border-[var(--color-divider)] hover:border-[var(--color-copper)] hover:shadow-[0_12px_24px_-10px_oklch(0.18_0.005_60/0.16)] transition-all duration-300 h-full"
                 >
-                  <div className="aspect-[3/4] flex flex-col">
-                    <div className="flex-[7] relative overflow-hidden bg-[var(--color-stone)]">
+                  <div className="flex flex-col">
+                    <div className="aspect-square relative overflow-hidden bg-[var(--color-stone)]">
                       <StorefrontRemoteImage
                         src={cat.remoteImageSrc}
                         alt={categoryTileLabel(cat, locale)}
                         locale={locale}
                         className="transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                        width={768}
-                        height={1024}
+                        width={480}
+                        height={480}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.18_0.005_60/0.5)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                      <div className="absolute top-2.5 left-2.5 text-[10px] font-mono text-white/95 tracking-[0.1em] z-10 bg-[oklch(0.18_0.005_60/0.55)] backdrop-blur-sm px-1.5 py-0.5 rounded-[2px]">
-                        /{String(i + 1).padStart(2, "0")}
-                      </div>
                       <ArrowUpRight
-                        className="absolute top-2.5 right-2.5 h-5 w-5 text-white opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all pointer-events-none"
+                        className="absolute top-2 right-2 h-4 w-4 text-white opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all pointer-events-none"
                         strokeWidth={2}
                       />
                     </div>
-                    <div className="flex-[3] flex flex-col justify-center px-3.5 py-3 bg-white border-t border-[var(--color-divider)]">
-                      <h3 className="text-[13px] lg:text-[15px] font-bold text-[var(--color-ink)] leading-tight tracking-[-0.015em] group-hover:text-[var(--color-copper)] transition-colors">
+                    <div className="px-2.5 py-2 bg-white border-t border-[var(--color-divider)]">
+                      <h3 className="text-[12px] lg:text-[13px] font-bold text-[var(--color-ink)] leading-snug tracking-[-0.015em] line-clamp-2 group-hover:text-[var(--color-copper)] transition-colors">
                         {categoryTileLabel(cat, locale)}
                       </h3>
-                      <p className="pt-4 text-[14px] text-[var(--color-muted)] tracking-[0.02em]">
-                        <span className="text-[var(--color-copper)] font-semibold">{cat.count}</span>{" "}
-                        {tr(locale, "produkter", "products")}
-                      </p>
                     </div>
                   </div>
                 </Link>

@@ -33,6 +33,14 @@ export function loginFailedMessage(locale: Locale | string): string {
   );
 }
 
+export function passwordBasicRequirementsMessage(locale: Locale | string): string {
+  return tr(
+    locale as Locale,
+    "Passord må være minst 8 tegn.",
+    "Password must be at least 8 characters.",
+  );
+}
+
 export function passwordRequirementsMessage(locale: Locale | string): string {
   return tr(
     locale as Locale,

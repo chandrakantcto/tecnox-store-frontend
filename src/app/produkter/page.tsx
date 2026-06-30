@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import heroImg from "@/assets/hero-combi.jpg";
 import { Brands } from "@/components/site/Brands";
-import { Footer } from "@/components/site/Footer";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Newsletter } from "@/components/site/Newsletter";
 import { PageHero } from "@/components/site/PageHero";
 import { Products } from "@/components/site/Products";
@@ -111,7 +111,7 @@ export default async function ProdukterPage(props: PageProps) {
       />
       <Brands locale={locale} />
       <Newsletter locale={locale} />
-      <Footer locale={locale} />
+      <SiteFooter locale={locale} />
     </main>
   );
 }

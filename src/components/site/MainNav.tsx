@@ -114,7 +114,7 @@ function UserAccountMenu({ locale, authCustomer }: { locale: Locale; authCustome
 export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: MegaMenuLocales }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { locale, setLocale: setSiteLocale } = useLocale();
+  const { locale } = useLocale();
   const [open, setOpen] = useState(false);
   const { sidebarOpen: cartOpen, setSidebarOpen: setCartOpen } = useCart();
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
@@ -345,32 +345,6 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
         </div>
 
         <div className="flex min-w-0 flex-1 shrink-0 items-center justify-end gap-5">
-          <div className="hidden lg:inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setSiteLocale("nb")}
-              className={`px-2 py-1 text-[11px] font-semibold tracking-[0.08em] transition-colors ${
-                locale === "nb"
-                  ? "bg-[var(--color-copper)] text-white"
-                  : "bg-transparent text-[var(--color-muted)] hover:text-[var(--color-ink)]"
-              }`}
-              aria-label="Bytt til norsk"
-            >
-              NB
-            </button>
-            <button
-              type="button"
-              onClick={() => setSiteLocale("en")}
-              className={`px-2 py-1 text-[11px] font-semibold tracking-[0.08em] transition-colors ${
-                locale === "en"
-                  ? "bg-[var(--color-copper)] text-white"
-                  : "bg-transparent text-[var(--color-muted)] hover:text-[var(--color-ink)]"
-              }`}
-              aria-label="Switch to English"
-            >
-              EN
-            </button>
-          </div>
           <NavSearchDesktop locale={locale} search={storefrontSearch} />
           <UserAccountMenu locale={locale} authCustomer={authCustomer} />
           <button
@@ -641,32 +615,6 @@ export function MainNav({ megaMenuByLocale = EMPTY_MEGA }: { megaMenuByLocale?: 
                 </li>
               </>
             )}
-            <li className="pt-1">
-              <div className="inline-flex items-center rounded-[2px] border border-[var(--color-divider)] overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setSiteLocale("nb")}
-                  className={`px-3 py-1.5 text-[11px] font-semibold tracking-[0.08em] transition-colors ${
-                    locale === "nb"
-                      ? "bg-[var(--color-copper)] text-white"
-                      : "bg-transparent text-[var(--color-muted)]"
-                  }`}
-                >
-                  NB
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSiteLocale("en")}
-                  className={`px-3 py-1.5 text-[11px] font-semibold tracking-[0.08em] transition-colors ${
-                    locale === "en"
-                      ? "bg-[var(--color-copper)] text-white"
-                      : "bg-transparent text-[var(--color-muted)]"
-                  }`}
-                >
-                  EN
-                </button>
-              </div>
-            </li>
             <li>
               <Link
                 href="/handlekurv"
