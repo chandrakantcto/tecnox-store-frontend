@@ -26,10 +26,19 @@ export const GQL_ACTIVE_ORDER = /* GraphQL */ `
           name
           featuredAsset {
             preview
+            source
           }
           product {
             slug
             name
+            featuredAsset {
+              preview
+              source
+            }
+            assets {
+              preview
+              source
+            }
           }
         }
       }

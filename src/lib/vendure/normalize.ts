@@ -16,8 +16,23 @@ export type VCollectionNav = {
 export function absoluteAssetUrl(previewOrSource: string | null | undefined): string | null {
   if (!previewOrSource?.trim()) return null;
   const p = previewOrSource.trim();
-  if (p.startsWith("http://") || p.startsWith("https://")) return p;
   const cfg = resolveVendureShopConfig();
+
+  if (p.startsWith("http://") || p.startsWith("https://")) {
+    if (!cfg) return p;
+    try {
+      const src = new URL(p);
+      const base = new URL(cfg.assetBaseUrl);
+      // Vendure often stores stale absolute previews (e.g. localhost) — serve from configured host.
+      if (src.origin !== base.origin) {
+        return `${cfg.assetBaseUrl}${src.pathname}${src.search}${src.hash}`;
+      }
+    } catch {
+      /* keep original below */
+    }
+    return p;
+  }
+
   if (!cfg) return null;
   const { assetBaseUrl } = cfg;
   if (p.startsWith("/")) return `${assetBaseUrl}${p}`;

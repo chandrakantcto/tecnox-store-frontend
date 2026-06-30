@@ -6,6 +6,9 @@ import { getStorefrontProductDetail } from "@/lib/vendure/product-detail-data";
 import { staticSrc } from "@/lib/static-asset";
 import { getServerLocale } from "@/lib/locale.server";
 
+/** Always resolve PDP from Shop API; catalog tag purge handles admin updates in production. */
+export const dynamic = "force-dynamic";
+
 type Props = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ v?: string }>;

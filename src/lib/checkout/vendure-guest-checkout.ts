@@ -121,7 +121,7 @@ function buildCheckoutAddress(values: CheckoutFormValues, fullName: string): {
     streetLine1: values.addressLine1.trim(),
     ...(values.addressLine2.trim().length ? { streetLine2: values.addressLine2.trim() } : {}),
     city: values.city.trim(),
-    province: values.state.trim(),
+    ...(values.state.trim().length ? { province: values.state.trim() } : {}),
     postalCode: values.postalCode.trim().replace(/\s+/g, ""),
     countryCode,
     ...(values.company.trim().length >= 2 ? { company: values.company.trim() } : {}),

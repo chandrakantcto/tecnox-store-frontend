@@ -19,6 +19,36 @@ function krFromMinor(money: unknown): number {
   return minor !== null ? minor / 100 : 0;
 }
 
+function assetPreviewRel(asset: unknown): string {
+  if (!asset || typeof asset !== "object") return "";
+  const row = asset as Record<string, unknown>;
+  const preview = typeof row.preview === "string" ? row.preview.trim() : "";
+  if (preview) return preview;
+  const source = typeof row.source === "string" ? row.source.trim() : "";
+  return source;
+}
+
+function resolveCartLineImageSrc(
+  pv: Record<string, unknown>,
+  prod: Record<string, unknown> | null,
+): string {
+  const variantRel = assetPreviewRel(pv.featuredAsset);
+  if (variantRel) return absoluteAssetUrl(variantRel) ?? "";
+
+  if (prod) {
+    const productRel = assetPreviewRel(prod.featuredAsset);
+    if (productRel) return absoluteAssetUrl(productRel) ?? "";
+
+    const assets = Array.isArray(prod.assets) ? prod.assets : [];
+    for (const asset of assets) {
+      const rel = assetPreviewRel(asset);
+      if (rel) return absoluteAssetUrl(rel) ?? "";
+    }
+  }
+
+  return "";
+}
+
 export function cartLinesFromActiveOrder(
   raw: unknown,
   inferBrand: (sku: string | undefined | null) => string = inferBrandFromSku,
@@ -55,12 +85,7 @@ export function cartLinesFromActiveOrder(
     const variantName = typeof pv.name === "string" ? pv.name.trim() : "";
     const spec = variantName || (sku ? `SKU ${sku}` : "");
 
-    const preview =
-      pv.featuredAsset && typeof pv.featuredAsset === "object"
-        ? String((pv.featuredAsset as Record<string, unknown>).preview ?? "").trim()
-        : "";
-    const imageSrc =
-      preview ? absoluteAssetUrl(preview) ?? "" : "";
+    const imageSrc = resolveCartLineImageSrc(pv, prod);
 
     const lineTotalKr =
       krFromMinor(
@@ -101,15 +126,43 @@ export function orderSubtotalExTaxKr(order: unknown): number {
   return krFromMinor((order as Record<string, unknown>).subTotal);
 }
 
+function orderLinesRaw(order: unknown): unknown[] {
+  if (!order || typeof order !== "object") return [];
+  const lines = (order as Record<string, unknown>).lines;
+  return Array.isArray(lines) ? lines : [];
+}
+
 export function orderSubtotalWithTaxKr(order: unknown): number {
   if (!order || typeof order !== "object") return 0;
   const withTax = krFromMinor((order as Record<string, unknown>).subTotalWithTax);
   if (withTax > 0) return withTax;
-  return orderSubtotalExTaxKr(order);
+  const exTax = orderSubtotalExTaxKr(order);
+  if (exTax > 0) return exTax;
+
+  let sum = 0;
+  for (const lineRaw of orderLinesRaw(order)) {
+    if (!lineRaw || typeof lineRaw !== "object") continue;
+    const line = lineRaw as Record<string, unknown>;
+    sum += krFromMinor(
+      line.discountedLinePriceWithTax ??
+        line.discountedLinePrice ??
+        line.linePriceWithTax ??
+        line.linePrice,
+    );
+  }
+  return sum;
 }
 
 export function orderTotalQuantity(order: unknown): number {
   if (!order || typeof order !== "object") return 0;
   const n = (order as Record<string, unknown>).totalQuantity;
-  return typeof n === "number" && Number.isFinite(n) ? n : 0;
+  if (typeof n === "number" && Number.isFinite(n) && n > 0) return n;
+
+  let sum = 0;
+  for (const lineRaw of orderLinesRaw(order)) {
+    if (!lineRaw || typeof lineRaw !== "object") continue;
+    const qty = (lineRaw as Record<string, unknown>).quantity;
+    if (typeof qty === "number" && Number.isFinite(qty) && qty > 0) sum += qty;
+  }
+  return sum;
 }

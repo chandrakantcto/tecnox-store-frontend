@@ -92,11 +92,6 @@ export function validateCheckoutForm(values: CheckoutFormValues, options?: Valid
   const city = values.city.trim();
   if (city.length < 2) errs.city = tr(lc, "Poststed må fylles ut.", "City is required.");
 
-  const state = values.state.trim();
-  if (state.length < 2) {
-    errs.state = tr(lc, "Delstat/fylke mangler eller er for kort.", "State / province is missing or too short.");
-  }
-
   const country = values.countryCode.trim().toUpperCase();
   if (!country || country.length !== 2 || !CHECKOUT_ALLOWED_COUNTRY_CODES.has(country)) {
     errs.countryCode = tr(lc, "Velg gyldig land.", "Select a valid country.");

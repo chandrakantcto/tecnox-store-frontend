@@ -531,26 +531,15 @@ export function KasseView({
                       disabled={submitting}
                       maxLength={255}
                     />
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <FieldInput
-                        label={tr(locale, "Poststed", "City")}
-                        required
-                        value={form.city}
-                        onChange={(v) => update({ city: v })}
-                        error={fieldErrors.city}
-                        disabled={submitting}
-                        maxLength={255}
-                      />
-                      <FieldInput
-                        label={tr(locale, "Delstat / fylke", "State / province")}
-                        required
-                        value={form.state}
-                        onChange={(v) => update({ state: v })}
-                        error={fieldErrors.state}
-                        disabled={submitting}
-                        maxLength={255}
-                      />
-                    </div>
+                    <FieldInput
+                      label={tr(locale, "Poststed", "City")}
+                      required
+                      value={form.city}
+                      onChange={(v) => update({ city: v })}
+                      error={fieldErrors.city}
+                      disabled={submitting}
+                      maxLength={255}
+                    />
                     <div className="grid gap-4 sm:grid-cols-2">
                       <FieldInput
                         label={tr(locale, "Postnummer / PIN", "PIN code / ZIP code")}

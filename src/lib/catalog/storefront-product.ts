@@ -141,10 +141,12 @@ export function cartLineKey(snapshot: Pick<CartProductSnapshot, "productSlug" | 
   return snapshot.variantId ? `${snapshot.productSlug}::__v:${snapshot.variantId}` : snapshot.productSlug;
 }
 
-/** Default PDP / cart selection when no query param — lowest ex-VAT price. */
+/** Default PDP / cart selection — cheapest in-stock variant, else cheapest overall. */
 export function selectCheapestVariant(variants: StorefrontVariantDetail[]): StorefrontVariantDetail | null {
   if (!variants.length) return null;
-  const ranked = [...variants].sort((a, b) => a.priceNumericExVat - b.priceNumericExVat);
+  const inStock = variants.filter((v) => v.stockLevel !== "OUT_OF_STOCK");
+  const pool = inStock.length ? inStock : variants;
+  const ranked = [...pool].sort((a, b) => a.priceNumericExVat - b.priceNumericExVat);
   return ranked[0] ?? null;
 }
 

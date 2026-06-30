@@ -54,10 +54,19 @@ export function getVendureServerConfig(): VendureServerConfig {
 }
 
 /**
- * Language header for Shop API requests.
- * UI locale stays `nb`; catalog/search rows in this DB use `nn` (import) not `nb`.
+ * Language header for Shop API entity queries (product, cart, collections).
+ * Matches admin dashboard `contentLanguage` (`nb`) for Norwegian Bokmål storefront.
  */
 export function vendureLanguageCode(locale: string): string {
+  if (locale === "en") return "en";
+  return "nb";
+}
+
+/**
+ * Search index language — legacy import rows are indexed under `nn`, not `nb`.
+ * Use only for `search` queries; PDP uses {@link vendureLanguageCode} + slug fallback.
+ */
+export function vendureSearchLanguageCode(locale: string): string {
   if (locale === "en") return "en";
   return "nn";
 }

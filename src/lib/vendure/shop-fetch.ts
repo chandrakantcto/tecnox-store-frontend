@@ -1,16 +1,26 @@
 import { vendureLikelyWrongApiEndpointHint, vendureShopEnvVarName } from "@/config/vendure";
-import { getVendureServerConfigOrNull, vendureLanguageCode } from "@/lib/vendure/env";
+import {
+  getVendureServerConfigOrNull,
+  vendureLanguageCode,
+  vendureSearchLanguageCode,
+} from "@/lib/vendure/env";
 import { graphqlMessagesFromParsedBody } from "@/lib/vendure/shop-banner-error";
 import { shopNetworkErrorSummary, shopUpstreamFetch } from "@/lib/vendure/shop-upstream-fetch";
 
 type GraphQlResponse<T> = { data?: T; errors?: Array<{ message: string }> };
+
+export type VendureShopQueryOptions = {
+  fresh?: boolean;
+  /** Override `vendure-language-code` (e.g. search index uses `nn` while UI locale is `nb`). */
+  languageCode?: string;
+};
 
 /** POST to Vendure Shop API (SSR / route handlers only). */
 export async function vendureShopQuery<T>(
   query: string,
   variables: Record<string, unknown> | undefined,
   locale: string,
-  options?: { fresh?: boolean },
+  options?: VendureShopQueryOptions,
 ): Promise<{ data: T | null; error: string | null }> {
   const cfg = getVendureServerConfigOrNull();
   if (!cfg) {
@@ -43,7 +53,7 @@ export async function vendureShopQuery<T>(
       headers: {
         "Content-Type": "application/json",
         "vendure-token": cfg.channelToken,
-        "vendure-language-code": vendureLanguageCode(locale),
+        "vendure-language-code": options?.languageCode ?? vendureLanguageCode(locale),
       },
       body: JSON.stringify({ query, variables }),
       ...(noStore ? { cache: "no-store" as const } : { next: { revalidate: cacheSeconds } }),
@@ -84,4 +94,17 @@ export async function vendureShopQuery<T>(
   } catch (e) {
     return { data: null, error: `[vendure] ${shopNetworkErrorSummary(e)}` };
   }
+}
+
+/** Search queries — legacy catalog rows are indexed under `nn`. */
+export async function vendureShopSearchQuery<T>(
+  query: string,
+  variables: Record<string, unknown> | undefined,
+  locale: string,
+  options?: Omit<VendureShopQueryOptions, "languageCode">,
+): Promise<{ data: T | null; error: string | null }> {
+  return vendureShopQuery(query, variables, locale, {
+    ...options,
+    languageCode: vendureSearchLanguageCode(locale),
+  });
 }

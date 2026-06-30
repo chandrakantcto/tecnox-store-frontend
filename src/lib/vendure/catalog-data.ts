@@ -13,7 +13,7 @@ import type {
   SidebarTreeNode,
 } from "@/lib/vendure/catalog-types";
 import { GQL_NAV_COLLECTIONS, GQL_NAV_COLLECTIONS_KATEGORIER, GQL_SEARCH_PRODUCTS, VENDURE_SHOP_LIST_MAX_TAKE } from "@/lib/vendure/queries";
-import { vendureShopQuery } from "@/lib/vendure/shop-fetch";
+import { vendureShopQuery, vendureShopSearchQuery } from "@/lib/vendure/shop-fetch";
 import {
   absoluteAssetUrl,
   formatNOKExclVatFromMinor,
@@ -502,7 +502,7 @@ export const getProductsListingPageCopy = catalogCache(async (locale: Locale): P
 }, ["getProductsListingPageCopy"]);
 
 async function searchGrouped(locale: string, input: Record<string, unknown>) {
-  return vendureShopQuery<unknown>(
+  return vendureShopSearchQuery<unknown>(
     GQL_SEARCH_PRODUCTS,
     { input: { ...input, groupByProduct: true } },
     locale,

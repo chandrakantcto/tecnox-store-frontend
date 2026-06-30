@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveRequestLocale } from "@/lib/email/email-locale";
-import { getVendureServerConfigOrNull } from "@/lib/vendure/env";
+import { getVendureServerConfigOrNull, vendureLanguageCode } from "@/lib/vendure/env";
 import { shopNetworkErrorSummary, shopUpstreamFetch } from "@/lib/vendure/shop-upstream-fetch";
 
 type Body = {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "vendure-token": cfg.channelToken,
-    "vendure-language-code": lc,
+    "vendure-language-code": vendureLanguageCode(lc),
   };
 
   const auth = req.headers.get("authorization")?.trim();

@@ -32,6 +32,7 @@ import {
   type SearchHitRaw,
   type VCollectionNav,
 } from "@/lib/vendure/normalize";
+import { vendureLanguageCode, vendureSearchLanguageCode } from "@/lib/vendure/env";
 import { GQL_SEARCH_PRODUCTS, GQL_STOREFRONT_PRODUCT, GQL_STOREFRONT_PRODUCT_PDP_EXTRA } from "@/lib/vendure/queries";
 import { vendureShopQuery } from "@/lib/vendure/shop-fetch";
 
@@ -390,19 +391,46 @@ const loadStorefrontProductDetail = catalogCache(
   ): Promise<StorefrontProductDetailPayload> => {
     const lc = locale === "en" ? "en" : "nb";
     const altLc = lc === "en" ? "nb" : "en";
+    const slugFallbackLanguage = lc === "en" ? "en" : vendureSearchLanguageCode("nb");
+    const fresh = true;
 
     try {
-      const [navNb, navEn, productRes, productResAlt, pdpExtrasRes] = await Promise.all([
+      const [navNb, navEn, productResNb, productResSlugFallback, productResAlt, pdpExtrasNb, pdpExtrasSlugFallback] =
+        await Promise.all([
         fetchNavRoots("nb"),
         fetchNavRoots("en"),
-        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, lc),
-        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, altLc),
-        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT_PDP_EXTRA, { slug }, lc),
+        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, lc, { fresh }),
+        slugFallbackLanguage !== vendureLanguageCode(lc)
+          ? vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, lc, {
+              fresh,
+              languageCode: slugFallbackLanguage,
+            })
+          : Promise.resolve({ data: null, error: null }),
+        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT, { slug }, altLc, { fresh }),
+        vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT_PDP_EXTRA, { slug }, lc, { fresh }),
+        slugFallbackLanguage !== vendureLanguageCode(lc)
+          ? vendureShopQuery<{ product?: unknown }>(GQL_STOREFRONT_PRODUCT_PDP_EXTRA, { slug }, lc, {
+              fresh,
+              languageCode: slugFallbackLanguage,
+            })
+          : Promise.resolve({ data: null, error: null }),
       ]);
       const roots = lc === "en" ? navEn.roots : navNb.roots;
 
-      const err = productRes.error;
-      const rawRoot = productRes.data?.product;
+      const rawRoot =
+        (productResNb.data?.product && typeof productResNb.data.product === "object"
+          ? productResNb.data.product
+          : null) ??
+        (productResSlugFallback.data?.product && typeof productResSlugFallback.data.product === "object"
+          ? productResSlugFallback.data.product
+          : null);
+
+      const err =
+        rawRoot != null
+          ? null
+          : productResNb.error ??
+            productResSlugFallback.error ??
+            `[vendure] No product returned for slug "${slug}"`;
 
       const idToRoot = new Map<string, string>();
       const attachNav = (node: VCollectionNav, rootSlug: string) => {
@@ -427,14 +455,18 @@ const loadStorefrontProductDetail = catalogCache(
       }
 
       const p = rawRoot as Record<string, unknown>;
+      const pNb =
+        productResNb.data?.product && typeof productResNb.data.product === "object"
+          ? (productResNb.data.product as Record<string, unknown>)
+          : null;
       const pAlt =
         productResAlt.data?.product && typeof productResAlt.data.product === "object"
           ? (productResAlt.data.product as Record<string, unknown>)
           : null;
 
-      const productSlug = typeof p.slug === "string" ? p.slug : slug;
-      const fieldsNb = productFieldsForStorefrontLocale(p, "nb");
-      const fieldsEn = productFieldsForStorefrontLocale(p, "en");
+      const productSlug = typeof (pNb?.slug ?? p.slug) === "string" ? String(pNb?.slug ?? p.slug) : slug;
+      const fieldsNb = productFieldsForStorefrontLocale(pNb ?? p, "nb");
+      const fieldsEn = productFieldsForStorefrontLocale(pAlt ?? p, "en");
       const namePrimary = fieldsNb.name;
       const nameAlternate = fieldsEn.name;
       const descriptionPrimary = fieldsNb.description;
@@ -476,11 +508,20 @@ const loadStorefrontProductDetail = catalogCache(
         (rootSlug && slugToCategoryNameEn.get(rootSlug)) ?? slugToCategoryNameEn.values().next().value ?? categoryNb;
       const categoryLabel = locale === "en" ? categoryEn : categoryNb;
 
+      const pdpExtrasRaw =
+        (!pdpExtrasNb.error &&
+          pdpExtrasNb.data?.product &&
+          typeof pdpExtrasNb.data.product === "object" &&
+          pdpExtrasNb.data.product) ||
+        (!pdpExtrasSlugFallback.error &&
+          pdpExtrasSlugFallback.data?.product &&
+          typeof pdpExtrasSlugFallback.data.product === "object" &&
+          pdpExtrasSlugFallback.data.product) ||
+        null;
+
       const pdpCf =
-        !pdpExtrasRes.error &&
-        pdpExtrasRes.data?.product &&
-        typeof pdpExtrasRes.data.product === "object"
-          ? readProductCustomFields(pdpExtrasRes.data.product as Record<string, unknown>)
+        pdpExtrasRaw && typeof pdpExtrasRaw === "object"
+          ? readProductCustomFields(pdpExtrasRaw as Record<string, unknown>)
           : {};
 
       const reviews = parseReviewsJson(
@@ -751,13 +792,13 @@ const loadStorefrontProductDetail = catalogCache(
         slugToCategoryNameEn,
       );
 
-      return { product: productRecord, relatedProducts, error: productRes.error ?? null };
+      return { product: productRecord, relatedProducts, error: null };
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       return { product: null, relatedProducts: [], error: msg };
     }
   },
-  ["getStorefrontProductDetail"],
+  ["getStorefrontProductDetail", "v3"],
 );
 
 /** Dedupe metadata + page loader within the same request. */
