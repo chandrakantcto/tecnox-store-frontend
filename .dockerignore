@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log*
+Dockerfile
+.dockerignore
+# Never bake local dev env (e.g. localhost URLs) into a production image.
+.env
+.env.local
+.env.*.local
